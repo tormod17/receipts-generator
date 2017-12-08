@@ -17,7 +17,7 @@ function receiptsSuccess(payload) {
   const receipts = [].concat(...dataArr);
   return {
     type: RECEIPTS_SUCCESS,
-    receipts: receipts,
+    receipts,
   };
 }
 

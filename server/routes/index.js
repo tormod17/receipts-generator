@@ -163,16 +163,19 @@ router.post('/api/upload', function(req, res, next) {
             const sheet_name_list = workbook.SheetNames;
             const jsonResults = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-            const new_receipt = {
-                data: jsonResults,
-                userId,
-                filename,
-                time: DATETIMESTAMP,
-            }
-            ReceiptDB.create(new_receipt, function(err) {
-                if (err) return console.log(err)
-                console.log('saved');
+            jsonResults.forEach(receipt => {
+                const new_receipt = {
+                    data: receipt,
+                    filename,
+                    userId,
+                    time: DATETIMESTAMP,
+                }
+                ReceiptDB.create(new_receipt, function(err) {
+                    if (err) return console.log(err)
+                    console.log('saved');
+                })
             })
+
 
             try {
                 fs.unlinkSync(req.file.path);
@@ -195,8 +198,8 @@ router.get('/api/receipts', function(req, res, next) {
     query.sort({ time: -1 });
     query.select('data');
     query.exec((err, receipts) => {
+        console.log(receipts, 'database return');
         if (err) return console.error(err);
-        console.log(receipts.length)
         res.json(receipts);
     })
 })

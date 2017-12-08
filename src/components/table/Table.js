@@ -5,38 +5,37 @@ import PropTypes from "prop-types";
 class TableData extends Component { 
     constructor(props){
       super(props)
-      this.state ={
-
-      }
+      this.state = {};
     }
 
     handleClick(receipt){
       console.log('link to detail view', receipt)
     }
 
+    createHeaders(){
+      const { data } = this.props;
+      const headers =  Object.keys(data[0] || {});
+      return headers.map(header => <th> {header}</th>)
+    }
+
+    createRows = receipt =>
+        <tr
+          onClick={() => this.handleClick(receipt)}
+        >
+          { Object.keys(receipt).map(field => <td>{receipt[field]}</td> )}
+        </tr>
+
     render() {
-      const { receipts } = this.props;
+      const { data } = this.props;
       return  (
         <Table>
           <thead>
             <tr>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
+              { data && this.createHeaders() }
             </tr>
           </thead>
           <tbody>
-            { receipts.map( receipt =>
-                <tr
-                 onClick={() => this.handleClick(receipt)}
-                >
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-            )}
+            { data.map( receipt => this.createRows(receipt))}
           </tbody>
         </Table>
       )

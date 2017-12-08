@@ -15,6 +15,7 @@ function uploadRequest(user) {
 function uploadSuccess(payload) {
   return {
     type: UPLOAD_SUCCESS,
+    payload,
   };
 }
 

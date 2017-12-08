@@ -20,21 +20,32 @@ class Home extends Component {
     this.state ={
       value: new Date().toISOString(),
       selectedDay: undefined,
+      receipts: {
+        ...props.receipts
+      }
     }
     this.handleDayChange = this.handleDayChange.bind(this)
     this.uploadFile = this.uploadFile.bind(this)
+  }
+
+
+  componentWillReceiveProps(nextProps){
+    const { upload, auth, dispatch } = this.props;
+    if (upload !== nextProps.upload && nextProps.upload.uploaded) {
+      dispatch(getReceipts(auth.id))
+    }
   }
 
   componentWillMount() {
       const { id } = this.props.auth;
       if (!id) {
         this.props.history.replace("/login");
-      }
-      this.props.dispatch(getReceipts(id))
+      } 
   }
 
   componentDidMount(){
-
+    const { id } = this.props.auth;
+    this.props.dispatch(getReceipts(id))
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -52,8 +63,8 @@ class Home extends Component {
   }
 
   render() {
-    const { auth } =this.props;
-    const { selectedDay, receipts } = this.state;
+    const { auth, receipts } =this.props;
+    const { selectedDay } = this.state;
     return (
       <Container>
         {  auth &&
@@ -104,7 +115,7 @@ class Home extends Component {
         <Row>
           {receipts && 
               <TableData
-                data={receipts}
+                data={Object.values(receipts)}
               />
           }
         </Row>
@@ -143,12 +154,6 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  const { auth, receipts } = state;
-  return {
-    auth,
-    receipts,
-  };
-};
+const mapStateToProps = state => ({ ...state })
 
 export default connect(mapStateToProps)(Home);
