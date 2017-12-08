@@ -204,7 +204,23 @@ router.get('/api/receipts', function(req, res, next) {
     })
 })
 
-router.post('/api/receipts', function(req, res, next) {
+router.post('/api/addreceipt', function(req, res, next) {
+    console.log(req.query);
+    if (!req.query.userId) return console.error('no userId');
+    const { userId } = req.query;
+    const new_receipt = {
+        data: req.body,
+        filename: 'manual entry',
+        userId,
+        time: DATETIMESTAMP,
+    }
+
+    ReceiptDB.create(new_receipt, function(err) {
+        if (err) return console.log(err)
+        console.log('saved');
+        res.send('Your receipt has been added');
+    })
+   
     /// add or edit a receipt 
 })
 

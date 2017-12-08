@@ -13,7 +13,6 @@ class Header extends Component {
   };
 
   render() {
-    const { user } = this.props;
     const pathname = this.props.history.location.pathname;
     const isLoginPage = pathname.indexOf("login") > -1;
     const isAboutPage = pathname.indexOf("about") > -1;
@@ -66,7 +65,6 @@ class Header extends Component {
 }
 
 Header.propTypes = {
-  user: PropTypes.string,
   handleLogout: PropTypes.func.isRequired
 };
 

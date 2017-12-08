@@ -37,14 +37,14 @@ class App extends Component {
       <Router>
         <div>
           <div className="container">
-            <Header user={auth} handleLogout={() => this.handleLogout()} />
+            <Header handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
                 <Route exact path="/" component={Home} />
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
-                <Route path="/receipt" component={Receipt} />
+                <Route user={auth} path="/receipt" component={Receipt} />
                 <Route component={NotFound} />
               </Switch>
             </div>

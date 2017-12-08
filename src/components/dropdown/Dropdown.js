@@ -33,7 +33,7 @@ export default class Example extends React.Component {
         </DropdownToggle>
         <DropdownMenu>
           { items.map(item => 
-            <DropdownItem>{item}</DropdownItem>
+            <DropdownItem onClick={item.func}>{item.name}</DropdownItem>
           )}
         </DropdownMenu>
       </ButtonDropdown>

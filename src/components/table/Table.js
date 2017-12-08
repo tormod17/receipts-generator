@@ -22,7 +22,7 @@ class TableData extends Component {
         <tr
           onClick={() => this.handleClick(receipt)}
         >
-          { Object.keys(receipt).map(field => <td>{receipt[field]}</td> )}
+          { Object.keys(receipt || {}).map(field => <td>{receipt[field]}</td> )}
         </tr>
 
     render() {

@@ -1,19 +1,33 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-//import {  } from "../../actions/auth";
+import { addReceipt } from "../../actions/receipts";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 import Dropdown from '../../components/dropdown/Dropdown';
+import EditableField from '../../components/EditableField/EditableField';
 
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-day-picker/lib/style.css';
 import "./receipt.css";
 
 class Receipt extends Component {
+
+  static propTypes ={
+    receipt: PropTypes.shape({})
+  }
+
+  static defaultProps ={
+    receipt:{},
+  }
+
+
   constructor(props) {
     super(props)
-    this.state ={}
+    this.state ={
+    }
+    this.updateFieldValue = this.updateFieldValue.bind(this);
+    this.handleSubmission = this.handleSubmission.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -21,12 +35,20 @@ class Receipt extends Component {
   }
 
   handleSubmission(){
+    const { dispatch, auth } = this.props;
+    const data  = {
+      ...this.state,
+    };
+    dispatch(addReceipt(auth.id, data))
+  }
 
+  updateFieldValue(field, value){
+    this.setState((prevState)=> ({ [field]: value }))
   }
 
  
   render() {
-    const {} = this.props;
+    const {receipt } = this.props;
     return (
     <Form clasName="receipt">
         <FormGroup row>
@@ -34,7 +56,13 @@ class Receipt extends Component {
             <br/>
             <Dropdown
               name="Auszahlung"
-              items={['invoices', 'receipts']}
+              items={[{ 
+                  name:'invoices',
+                  func: () => {},
+                },{
+                  name:'receipts',
+                  func: ()=> {},                  
+                }]}
             />
           </Col>
           <Col sm={{ size:1, offset: 6}}>
@@ -42,29 +70,28 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col>
-            <Label for="name">Name</Label>
-            <Input name="name" type="text" placeholder="Name des Kunden"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Name des Kunden" value={receipt.name} />
           </Col>
           <Col>
-            <Label for="fortlaufende">Fortlaufende</Label>
-            <Input name="fortlaufende" type="text"  placeholder="Fortlaufende Rechnungsnummer"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Fortlaufende Rechnungsnummer"/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="adresse">Adresse</Label>
-            <Input name="fortlaufende" type="text" placeholder="Adresse des Kunden"/>
+            <EditableField updateFieldValue={this.updateFieldValue} placeholder="Adresse des Kunden"/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col>            
-            <Label for="Kundennummer" >Kundennummer</Label>
-            <Input name="Kundennummer" type="text" placeholder="Kundennummer"/>
+            <EditableField updateFieldValue={this.updateFieldValue} placeholder="Kundennummer"/>
           </Col>
           <Col>
           <Label for="Rechnungsdatum">Rechnungsdatum</Label>
             <InputGroupAddon>
-              <DayPickerInput name="Rechnungsdatum"/>
+              <DayPickerInput 
+                name="Rechnungsdatum"
+                onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
+              />
             </InputGroupAddon>
           </Col>
         </FormGroup>
@@ -73,37 +100,39 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col  sm={{ size: 6, order: 1 }}>
-            <Label for="nameDesGastes" >Name des Gastes</Label>
-            <Input name="nameDesGastes" type="text" placeholder="Name des Gastes"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Name des Gastes"/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col>
-            <Label for="Anreisedatum" >Anreisedatum</Label>
-            <Input name="Anreisedatum" type="text" placeholder="Anreisedatum"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Anreisedatum"/>
           </Col>
           <Col>
             <Label for="HansTest">Hans Test</Label>
             <InputGroupAddon>
-              <DayPickerInput name="HansTestOne"/>
+              <DayPickerInput 
+                name="HansTestOne"
+                onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
+              />
             </InputGroupAddon>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col>
-            <Label for="Abreisedatum" >Abreisedatum</Label>
-            <Input name="Abreisedatum" type="text" placeholder="Abreisedatum"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Abreisedatum"/>
           </Col>
           <Col>
            <InputGroupAddon>
-             <DayPickerInput name="HansTestTwo"/>
+            <DayPickerInput 
+              name="HansTestTwo"
+              onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
+            />
            </InputGroupAddon>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="Auszahlung" >Auszahlung</Label>
-            <Input name="Auszahlung" type="text" placeholder="Auszahlung"/>
+            <EditableField updateFieldValue={this.updateFieldValue}  placeholder="Auszahlung"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
               <hr/>
@@ -113,7 +142,7 @@ class Receipt extends Component {
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
             <Label for="davonReinigung" >Davon Reinigung</Label>
-            <Input name="davon Reinigung" type="text" placeholder="Davon Reinigung"/>
+            <Input name="davonReinigung" type="text" placeholder="Davon Reinigung"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
             <hr/>
@@ -122,8 +151,7 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="davonAirgreetsServiceGebühr" >Davon Airgreets Service Gebühr</Label>
-            <Input name="davonAirgreetsServiceGebühr" type="text" placeholder="davon Airgreets Service Gebühr"/>
+            <EditableField updateFieldValue={this.updateFieldValue} placeholder="davon Airgreets Service Gebühr"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
             <hr/>
@@ -137,18 +165,23 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col className="col-4">
-            <Label for="Rechnungskorrektur">Rechnungskorrektur</Label>
-            <InputGroupAddon>
-              <DayPickerInput name="Rechnungskorrektur"/>
-            </InputGroupAddon>
+            <hr/>
+            <Dropdown
+              name="Rechnungskorrektur"
+              items={[{ 
+                  name:'Rechnungskorrektur',
+                  func: () => {},
+                },{
+                  name:'Auszahlungskorrektur',
+                  func: ()=> {},                  
+                }]}
+            />
           </Col>
           <Col className="col-4">
-            <Label for="anpassungsgrund" >Anpassungsgrund</Label>
-            <Input name="anpassungsgrund" type="text" placeholder="Anpassungsgrund"/>
+              <EditableField updateFieldValue={this.updateFieldValue} placeholder="Anpassungsgrund"/>
           </Col>
           <Col className="col-3">
-            <Label for="betrag" >Betrag</Label>
-            <Input name="betrag" type="text" placeholder="Betrag"/>
+             <EditableField updateFieldValue={this.updateFieldValue} placeholder="Betrag"/>
           </Col>
           <Col className="col-1">
             <br/>
@@ -172,8 +205,7 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="gesamtauszahlungsbetrag" >Gesamtauszahlungsbetrag</Label>
-            <Input name="gesamtauszahlungsbetrag" type="text" placeholder="Gesamtauszahlungsbetrag"/>
+             <EditableField updateFieldValue={this.updateFieldValue} placeholder="Gesamtauszahlungsbetrag"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
             <hr/>
@@ -182,8 +214,7 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="gesamtRechnungsbetrag" >Gesamt Rechnungsbetrag</Label>
-            <Input name="gesamtRechnungsbetrag" type="text" placeholder="Gesamt Rechnungsbetrag"/>
+           <EditableField updateFieldValue={this.updateFieldValue} placeholder="Gesamt Rechnungsbetrag"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
             <hr/>
@@ -192,8 +223,7 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-            <Label for="darinEnthalteneUmsatzsteuer" >Darin enthaltene Umsatzsteuer</Label>
-            <Input name="darinEnthalteneUmsatzsteuer" type="text" placeholder="Darin enthaltene Umsatzsteuer"/>
+           <EditableField updateFieldValue={this.updateFieldValue} placeholder="Darin enthaltene Umsatzsteuer"/>
           </Col>
           <Col sm={{ size: 2, order: 2 }}>
             <hr/>
@@ -202,7 +232,7 @@ class Receipt extends Component {
         </FormGroup>
         <Row className="">
           <Col sm={{ size: 2, order: 2, offset: 10 }}>
-            <Button color="primary">
+            <Button onClick={this.handleSubmission} type="button" color="primary">
             Speichern
             </Button>
           </Col>
@@ -212,14 +242,8 @@ class Receipt extends Component {
   }
 }
 
-Receipt.contextTypes = {
-};
+const mapStateToProps = state => ({ ...state })
 
-Receipt.propTypes = {
-};
-
-function mapStateToProps(state) {
-}
 
 export default connect(mapStateToProps)(Receipt);
 
