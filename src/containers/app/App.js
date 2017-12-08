@@ -16,6 +16,7 @@ import PrivateRoute from "../misc/PrivateRoute";
 import Home from "../home/Home";
 import UsersPage from "../user/UsersPage";
 import Signup from "../signup/Signup";
+import Receipt from "../receipt/Receipt";
 import About from "../about/About";
 import NotFound from "../misc/NotFound";
 
@@ -43,6 +44,7 @@ class App extends Component {
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
+                <Route path="/receipt" component={Receipt} />
                 <Route component={NotFound} />
               </Switch>
             </div>

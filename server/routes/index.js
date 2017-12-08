@@ -106,7 +106,7 @@ router.post("/api/login", function(req, res) {
             email: user.email,
             id: user._id
         }
-        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 5 * 60 });
+        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 1 * 60 * 60 * 24 * 150 });
         return res.status(200).json({
             id_token: jwtToken
         });

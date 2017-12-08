@@ -24,8 +24,9 @@ class Home extends Component {
         ...props.receipts
       }
     }
-    this.handleDayChange = this.handleDayChange.bind(this)
-    this.uploadFile = this.uploadFile.bind(this)
+    this.handleDayChange = this.handleDayChange.bind(this);
+    this.uploadFile = this.uploadFile.bind(this);
+    this.handleAddEntry = this.handleAddEntry.bind(this);
   }
 
 
@@ -52,6 +53,11 @@ class Home extends Component {
     this.setState({
       selectedDay,
     });
+  }
+
+  handleAddEntry() {
+    console.log('show entry form');
+    this.props.history.replace("/receipt");
   }
 
   uploadFile(){
@@ -122,7 +128,11 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <Button >+</Button>
+              <Button
+                onClick={this.handleAddEntry}
+              >
+                +
+              </Button>
             </InputGroup>
           </Col>
           <Col sm={4}>
