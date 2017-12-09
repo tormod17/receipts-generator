@@ -41,6 +41,25 @@ UserSchema.statics.authenticate = (email, password, callback) => {
     });
 }
 
+UserSchema.statics.addUser = (data, callback) => {
+  const { email } = data;
+
+  User.findOne({ email })
+    .exec((err, user) => {
+      if (err) return callback(err)
+      if(!user) {
+        return User.create(data, (err,user) => {
+          callback(err, user)
+        })
+      } else {
+        callback()
+      }
+
+    })
+}
+
+
+
 //hashing a password before saving it to the database
 UserSchema.pre('save', function (next) {
   const user = this;

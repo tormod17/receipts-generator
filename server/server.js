@@ -66,12 +66,6 @@ app.use(function (err, req, res, next) {
   res.send(err.message);
 });
 
-app.use(session({
-  secret: 'work hard',
-  resave: true,
-  saveUninitialized: false
-}));
-
 // Test server is working (GET http://localhost:3001/api)
 app.get("/api/", function(req, res) {
   res.json({ message: "Hi, welcome to the server api!" });

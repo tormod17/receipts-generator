@@ -12,13 +12,7 @@ const multer = require('multer');
 
 const mongoose = require('mongoose');
 
-// GET route for reading data
-router.get('/', function(req, res, next) {
-    const jwtToken = extractToken(req);
-    const { username } = jwt.verify(jwtToken, JWT_SECRET);
-    console.log(username, '>>>>>>>>')
-    //return res.sendFile(path.join(__dirname + '/public/index.html'));
-});
+const expTime = 1 * 60 * 60 * 24 * 150
 
 
 //POST route for updating data
@@ -31,20 +25,27 @@ router.post('/api/signup', function(req, res, next) {
         res.send("passwords dont match");
         return next(err);
     }
-
     const userData = {
-        email: req.body.email,
-        username: req.body.username,
-        password: req.body.password,
+        email,
+        username,
+        password,
     }
-
-    User.create(userData, function(err, user) {
+    User.addUser(userData, function(err, newUser) {
         if (err) {
             return next(err)
         }
-        return res.redirect('/api/profile?userId=' + user._id);
-    });
-})
+        if (!newUser) {
+            const err = new Error('You have an account');
+            err.status = 400;
+            return next(err);
+        }
+        userData.id = newUser._id
+        const jwtToken = jwt.sign(userData, JWT_SECRET, { expiresIn: expTime  });
+        return res.status(200).json({
+            id_token: jwtToken
+        });
+    })
+});
 
 // GET route after registering
 router.get('/api/profile', function(req, res, next) {
@@ -63,7 +64,7 @@ router.get('/api/profile', function(req, res, next) {
                         email: user.email,
                         id: user._id
                     }
-                    const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 5 * 60 });
+                    const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: expTime });
                     return res.status(200).json({
                         id_token: jwtToken
                     });
@@ -77,11 +78,8 @@ router.get('/api/profile', function(req, res, next) {
  * Util function to extract jwt token from the authorization header
  */
 function extractToken(req) {
-    if (
-        req.headers.authorization &&
-        req.headers.authorization.split(" ")[0] === "Bearer"
-    ) {
-        return req.headers.authorization.split(" ")[1];
+    if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
+      return req.headers.authorization.split(" ")[1];
     }
     return null;
 }
@@ -99,14 +97,14 @@ router.post("/api/login", function(req, res) {
 
     User.authenticate(email, password, function(err, user) {
         if (err || !user) {
-            return res.status(401).send(err || { message: "User Not Found" })
+            return res.status(401).send({ message: "User Not Found" })
         }
         const profile = {
             username: user.username,
             email: user.email,
             id: user._id
         }
-        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 1 * 60 * 60 * 24 * 150 });
+        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: expTime  });
         return res.status(200).json({
             id_token: jwtToken
         });
@@ -117,14 +115,14 @@ router.post("/api/login", function(req, res) {
 // GET for logout logout
 router.post('/api/logout', function(req, res, next) {
     const jwtToken = extractToken(req);
-    try {
+    if (!jwtToken) {
+        return res.status(200).json({ message: `logged out` });
+    } else {
         const { username } = jwt.verify(jwtToken, JWT_SECRET);
         return res.status(200).json({ message: `User ${username} logged out` });
-
-    } catch (err) {
-        console.log("jwt verify error", err);
-        return res.status(500).json({ message: "Invalid jwt token" });
     }
+    console.log("jwt verify error", err);
+    return res.status(500).json({ message: "Invalid jwt token" });
 });
 
 
@@ -155,8 +153,8 @@ router.post('/api/upload', function(req, res, next) {
             return;
         }
         const { originalname, filename } = file;
-        const ext = originalname.split('.')[originalname.split('.').length - 1] 
-        if ( ext === 'xlsx' || ext === 'xlsm') {
+        const ext = originalname.split('.')[originalname.split('.').length - 1]
+        if (ext === 'xlsx' || ext === 'xlsm') {
             const workbook = XLSX.readFile('./uploads/' + filename);
             const sheet_name_list = workbook.SheetNames;
             const jsonResults = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
@@ -196,14 +194,12 @@ router.get('/api/receipts', function(req, res, next) {
     query.sort({ time: -1 });
     query.select('Name Kundenummer Kunde Belegart Rechnungsnummer Rechnungsdatum Rechnungsbetrag Kunden-nummer BALANCE-DUE TOTAL-PAID ');
     query.exec((err, receipts) => {
-        console.log(receipts, 'database return');
         if (err) return console.error(err);
         res.json(receipts);
     })
 })
 
 router.post('/api/addreceipt', function(req, res, next) {
-    console.log(req.query);
     if (!req.query.userId) return console.error('no userId');
     const { userId } = req.query;
     const new_receipt = {
@@ -214,11 +210,10 @@ router.post('/api/addreceipt', function(req, res, next) {
     }
 
     ReceiptDB.create(new_receipt, function(err) {
-        if (err) return console.log(err)
-        console.log('saved');
+        if (err) return console.err(err)
         res.send('Your receipt has been added');
     })
-   
+
     /// add or edit a receipt 
 })
 
