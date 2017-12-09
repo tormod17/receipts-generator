@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Client = require('./client.js');
 
 const ReceiptsSchema = new mongoose.Schema({
     userId: {
@@ -8,7 +9,10 @@ const ReceiptsSchema = new mongoose.Schema({
     email: {
         type: String,
     },
-    feeds: [mongoose.Schema.Types.Mixed]
+    feeds: [mongoose.Schema.Types.Mixed],
+    client: {
+        type: Client.schema,
+    },
 }, { strict: false });
 
 ReceiptsSchema.statics.checkExisting = function (email, password, callback) {
@@ -19,7 +23,5 @@ ReceiptsSchema.statics.checkExisting = function (email, password, callback) {
 };
 
 var Receipts = mongoose.model('Receipts', ReceiptsSchema);
-
-
 
 module.exports = Receipts;
