@@ -159,11 +159,12 @@ router.post('/api/upload', function(req, res, next) {
             const sheet_name_list = workbook.SheetNames;
             const jsonResults = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
-            jsonResults.forEach(receipt => {
+            jsonResults.forEach((receipt, i) => {
                 const new_receipt = {
                     ...receipt,
                     filename,
                     userId,
+                    Rechnungsnummer: userId + i,
                     time: DATETIMESTAMP,
                 }
                 ReceiptDB.create(new_receipt, function(err) {
@@ -187,16 +188,25 @@ router.post('/api/upload', function(req, res, next) {
 
 router.get('/api/receipts', function(req, res, next) {
     /// get the list of the reciepts
+
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
-    query = ReceiptDB.find({ 'userId': userId });
-    query.limit(10);
-    query.sort({ time: -1 });
-    query.select('Name Kundenummer Kunde Belegart Rechnungsnummer Rechnungsdatum Rechnungsbetrag Kunden-nummer BALANCE-DUE TOTAL-PAID ');
-    query.exec((err, receipts) => {
-        if (err) return console.error(err);
-        res.json(receipts);
-    })
+    ReceiptDB.find({ userId })
+        .limit(10)
+        .sort({ time: -1 })
+        .select({ 
+            'Kunde': 1 , 
+            'Kunden-nummer':1, 
+            'Belegart': 1,
+            'Rechnungsnummer':1, 
+            'Rechnungs-datum':1, 
+            'Rechnungsbetrag': 1,
+            'Auszahlung an Kunde':1,
+        })
+        .exec((err, receipts) => {
+            if (err) return console.error(err);
+            res.json(receipts);
+        })
 })
 
 router.post('/api/addreceipt', function(req, res, next) {

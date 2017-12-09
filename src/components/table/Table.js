@@ -15,14 +15,15 @@ class TableData extends Component {
     createHeaders(){
       const { data } = this.props;
       const headers =  Object.keys(data[0] || {});
-      return headers.map(header => <th> {header}</th>)
+      return headers.map(header => <th key={header}> {header}</th>)
     }
 
     createRows = receipt =>
         <tr
+          key={receipt._id}
           onClick={() => this.handleClick(receipt)}
         >
-          { Object.keys(receipt || {}).map(field => <td>{receipt[field]}</td> )}
+          { Object.keys(receipt || {}).map(field => <td key={field}>{receipt[field]}</td> )}
         </tr>
 
     render() {
