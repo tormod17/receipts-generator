@@ -114,8 +114,6 @@ router.post("/api/login", function(req, res) {
 
 });
 
-
-
 // GET for logout logout
 router.post('/api/logout', function(req, res, next) {
     const jwtToken = extractToken(req);
@@ -139,7 +137,6 @@ var storage = multer.diskStorage({
         cb(null, file.originalname.split('.')[0] + '-' + DATETIMESTAMP + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1])
     }
 });
-
 
 var upload = multer({ storage: storage }).single('file')
 

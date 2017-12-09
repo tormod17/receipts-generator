@@ -18,10 +18,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  receipts: {
-    type: String,
-    required: true,
-  }
 });
 
 //authenticate input against database
