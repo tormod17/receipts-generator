@@ -17,11 +17,9 @@ function receiptsRequest() {
 }
 
 function receiptsSuccess(payload) {
-  const dataArr = payload.map(obj => obj.data)
-  const receipts = [].concat(...dataArr);
   return {
     type: RECEIPTS_SUCCESS,
-    receipts,
+    receipts: payload,
   };
 }
 
