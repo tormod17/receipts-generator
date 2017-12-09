@@ -106,15 +106,13 @@ router.post("/api/login", function(req, res) {
             email: user.email,
             id: user._id
         }
-        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 5 * 60 });
+        const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: 1 * 60 * 60 * 24 * 150 });
         return res.status(200).json({
             id_token: jwtToken
         });
     })
 
 });
-
-
 
 // GET for logout logout
 router.post('/api/logout', function(req, res, next) {
@@ -140,7 +138,6 @@ var storage = multer.diskStorage({
     }
 });
 
-
 var upload = multer({ storage: storage }).single('file')
 
 router.post('/api/upload', function(req, res, next) {
@@ -158,14 +155,15 @@ router.post('/api/upload', function(req, res, next) {
             return;
         }
         const { originalname, filename } = file;
-        if (originalname.split('.')[originalname.split('.').length - 1] === 'xlsx') {
+        const ext = originalname.split('.')[originalname.split('.').length - 1] 
+        if ( ext === 'xlsx' || ext === 'xlsm') {
             const workbook = XLSX.readFile('./uploads/' + filename);
             const sheet_name_list = workbook.SheetNames;
             const jsonResults = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
             jsonResults.forEach(receipt => {
                 const new_receipt = {
-                    data: receipt,
+                    ...receipt,
                     filename,
                     userId,
                     time: DATETIMESTAMP,
@@ -196,7 +194,7 @@ router.get('/api/receipts', function(req, res, next) {
     query = ReceiptDB.find({ 'userId': userId });
     query.limit(10);
     query.sort({ time: -1 });
-    query.select('data');
+    query.select('Name Kundenummer Kunde Belegart Rechnungsnummer Rechnungsdatum Rechnungsbetrag Kunden-nummer BALANCE-DUE TOTAL-PAID ');
     query.exec((err, receipts) => {
         console.log(receipts, 'database return');
         if (err) return console.error(err);
@@ -204,7 +202,23 @@ router.get('/api/receipts', function(req, res, next) {
     })
 })
 
-router.post('/api/receipts', function(req, res, next) {
+router.post('/api/addreceipt', function(req, res, next) {
+    console.log(req.query);
+    if (!req.query.userId) return console.error('no userId');
+    const { userId } = req.query;
+    const new_receipt = {
+        ...req.body,
+        filename: 'manual entry',
+        userId,
+        time: DATETIMESTAMP,
+    }
+
+    ReceiptDB.create(new_receipt, function(err) {
+        if (err) return console.log(err)
+        console.log('saved');
+        res.send('Your receipt has been added');
+    })
+   
     /// add or edit a receipt 
 })
 
