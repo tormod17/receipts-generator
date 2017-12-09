@@ -1,11 +1,11 @@
 {
-  "name": "react-redux-starter-kit",
-  "homepage": "https://cloudmu.github.com/react-redux-starter-kit",
+  "name": "airgreets-tool",
+  "homepage": "https://github.com/ryce/airgreets-tool",
   "version": "1.0.0",
-  "description": "React/Redux Starter Kit with Zero Build Configuration",
+  "description": "A Tool to upload tables and export pdfs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cloudmu/react-redux-starter-kit.git"
+    "url": "https://github.com/ryce/airgreets-tool.git"
   },
   "keywords": [
     "react",
@@ -25,10 +25,10 @@
     "PWA",
     "Progressive Web Apps"
   ],
-  "author": "twitter.com/_cloudmu (http://github.com/cloudmu)",
+  "author": "Tormod Smith",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/cloudmu/react-redux-starter-kit/issues"
+    "url": "https://github.com/ryce/airgreets-tool/issues"
   },
   "proxy": "http://localhost:3001",
   "devDependencies": {

@@ -8,6 +8,7 @@
 - Redux 
 
 # Run Project, 
+
 - Add this to your bash profile and double check the path to the project matches and you have `npm install -g ttab` and have installed mongodb.
 
     `alias receipts_generator='cd ~/Desktop/Projects/airgreets-tool'`
