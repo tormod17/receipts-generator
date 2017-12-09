@@ -56,7 +56,6 @@ class Home extends Component {
   }
 
   handleAddEntry() {
-    console.log('show entry form');
     this.props.history.replace("/receipt");
   }
 

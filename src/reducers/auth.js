@@ -32,12 +32,16 @@ function initializeState() {
 export default function auth(state = initializeState(), action = {}) {
   switch (action.type) {
     case SIGNUP_REQUEST:
-      return Object.assign({}, state, { loggingIn: true });
+      return {
+        ...state,
+        loggingIn: true 
+      };
     case SIGNUP_SUCCESS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         ...action.user,
-        role: action.role
-      });
+        role: action.role,
+      };
     case SIGNUP_FAILURE:
       return {
         ...state,
@@ -47,14 +51,18 @@ export default function auth(state = initializeState(), action = {}) {
         loginError: action.error
       }
     case LOGIN_REQUEST:
-      return Object.assign({}, state, { loggingIn: true });
+      return {
+        ...state,
+        loggingIn: true 
+      };
     case LOGIN_SUCCESS:
-      return Object.assign({}, state, {
+      return { 
+        ...state, 
         loggingIn: false,
         ...action.user,
         role: action.role,
         message: null,
-      });
+      };
     case LOGIN_FAILURE:
       return {
         ...state,

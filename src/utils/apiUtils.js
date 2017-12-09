@@ -65,7 +65,6 @@ export function callApi(
 export const ID_TOKEN = "id_token"; // this will be hidden and somewhere in production. 
 
 export function setIdToken(idToken) {
-  console.log('setting id token');
   localStorage.setItem(ID_TOKEN, idToken);
 }
 

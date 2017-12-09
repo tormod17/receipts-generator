@@ -11,16 +11,9 @@ class Signup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user) {
-      // logged in, let's show redirect if any, or show home
-      try {
-        const { from } = this.props.location.state || {
-          from: { pathname: "/" }
-        };
-        nextProps.history.replace(from);
-      } catch (err) {
-        nextProps.history.replace("/");
-      }
+    console.log(nextProps);
+    if (nextProps.auth) {
+      nextProps.history.push('/');
     }
   }
 
@@ -59,7 +52,7 @@ class Signup extends Component {
                     type="text"
                     ref="username"
                     className="form-control"
-                    placeholder="Username (hint: admin)"
+                    placeholder="Username"
                     required
                     autoFocus
                   />
@@ -72,7 +65,7 @@ class Signup extends Component {
                     type="text"
                     ref="email"
                     className="form-control"
-                    placeholder="Email (hint: email)"
+                    placeholder="Email"
                     required
                     autoFocus
                   />
@@ -86,7 +79,7 @@ class Signup extends Component {
                     type="password"
                     ref="password"
                     className="form-control"
-                    placeholder="Password (hint: password)"
+                    placeholder="Password"
                     required
                   />
                 </div>
@@ -98,7 +91,7 @@ class Signup extends Component {
                       type="password"
                       ref="confirmPassword"
                       className="form-control"
-                      placeholder="confirmPassword (hint: confirmPassword)"
+                      placeholder="confirmPassword"
                       required
                     />
                   </div>              
@@ -112,7 +105,7 @@ class Signup extends Component {
                 {!user &&
                   loginError &&
                   <div className="alert alert-danger">
-                    {loginError.message}. Hint: use admin/password to log in.
+                    {loginError.message}
                   </div>
                 }
 
@@ -136,7 +129,7 @@ Signup.contextTypes = {
 };
 
 Signup.propTypes = {
-  user: PropTypes.string,
+  user: PropTypes.shape({}),
   loginError: PropTypes.object,
   dispatch: PropTypes.func.isRequired
 };
@@ -144,7 +137,7 @@ Signup.propTypes = {
 function mapStateToProps(state) {
   const { auth } = state;
   if (auth) {
-    return { user: auth.user, loginError: auth.loginError };
+    return { auth, loginError: auth.loginError };
   }
 
   return { user: null };

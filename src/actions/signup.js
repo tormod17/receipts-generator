@@ -20,7 +20,6 @@ function signupRequest(user) {
 
 function signupSuccess(payload) {
   const idToken = payload[ID_TOKEN];
-
   setIdToken(idToken);
   const user = decodeUserProfile(idToken);
   return {
@@ -30,7 +29,7 @@ function signupSuccess(payload) {
 }
 
 function signupFailure(error) {
-  removeIdToken();
+
   return {
     type: SIGNUP_FAILURE,
     error

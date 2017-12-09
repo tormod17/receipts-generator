@@ -54,7 +54,7 @@ class Login extends Component {
                     type="text"
                     ref="email"
                     className="form-control"
-                    placeholder="email (hint: admin)"
+                    placeholder="email"
                     required
                     autoFocus
                   />
@@ -68,7 +68,7 @@ class Login extends Component {
                     type="password"
                     ref="password"
                     className="form-control"
-                    placeholder="Password (hint: password)"
+                    placeholder="Password"
                     required
                   />
                 </div>
@@ -82,7 +82,7 @@ class Login extends Component {
                 {!user &&
                   loginError &&
                   <div className="alert alert-danger">
-                    {loginError.message}. Hint: use admin/password to log in.
+                    {loginError.message}
                   </div>}
 
                 <button

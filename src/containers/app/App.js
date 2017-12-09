@@ -37,7 +37,7 @@ class App extends Component {
       <Router>
         <div>
           <div className="container">
-            <Header handleLogout={() => this.handleLogout()} />
+            <Header user={auth}  handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
                 <Route exact path="/" component={Home} />
