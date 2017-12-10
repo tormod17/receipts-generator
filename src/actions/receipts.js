@@ -9,6 +9,7 @@ export const RECEIPTS_FAILURE = "RECEIPTS_FAILURE";
 export const ADD_RECEIPT_REQUEST = "ADD_RECEIPT_REQUEST";
 export const ADD_RECEIPT_SUCCESS = "ADD_RECEIPT_SUCCESS";
 export const ADD_RECEIPT_FAILURE = "ADD_RECEIPT_FAILURE";
+export const SELECTED_RECEIPT = 'SELECTED_RECEIPT';
 
 function receiptsRequest() {
   return {
@@ -17,9 +18,13 @@ function receiptsRequest() {
 }
 
 function receiptsSuccess(payload) {
+  const object = Object.values(payload).reduce((p,c) => {
+    p[c._id] = {...c}
+    return  p
+  }, {})
   return {
     type: RECEIPTS_SUCCESS,
-    receipts: payload,
+    receipts: object,
   };
 }
 
@@ -40,6 +45,13 @@ export function getReceipts(userId) {
     receiptsSuccess,
     receiptsFailure
   );
+}
+
+export function getSingleReceipt(receiptId) {
+  return {
+    type: SELECTED_RECEIPT,
+    selected: receiptId,
+  }
 }
 
 function addReceiptsRequest() {

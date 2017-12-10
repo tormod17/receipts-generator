@@ -12,11 +12,14 @@ class EditableField extends Component {
     placeholder: PropTypes.string,
     type: PropTypes.string,
     value: PropTypes.string, 
+    label: PropTypes.string, 
+    value: PropTypes.string, 
   }
 
   static defaultProps ={
     placeholder: 'please type here',
     type: 'text',
+    label: undefined,
     updateFieldValue: () =>{},
     value: null,
   }
@@ -41,15 +44,15 @@ class EditableField extends Component {
   }
 
   render() {
-    const { placeholder, updateFieldValue, type, value } =this.props;
-    const name = this.camelCaseName(placeholder);
+    const { placeholder, updateFieldValue, type, value, name, label, nolabel } =this.props;
+    //const name = this.camelCaseName(placeholder);
 
     return (
       <div>
         <Label 
           for={name}
         >
-          {placeholder}
+          {label  || (!nolabel && placeholder)}
         </Label>
         <Input 
           name={name}

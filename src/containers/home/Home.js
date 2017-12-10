@@ -10,7 +10,7 @@ import createReactClass from 'create-react-class';
 
 import TableData from '../../components/table/Table';
 import { upload } from "../../actions/upload";
-import { getReceipts } from "../../actions/receipts"
+import { getReceipts, getSingleReceipt } from "../../actions/receipts"
 
 import "./home.css";
 
@@ -27,6 +27,7 @@ class Home extends Component {
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.handleAddEntry = this.handleAddEntry.bind(this);
+    this.selectReceipt = this.selectReceipt.bind(this);
   }
 
 
@@ -57,6 +58,12 @@ class Home extends Component {
 
   handleAddEntry() {
     this.props.history.replace("/receipt");
+  }
+
+  selectReceipt(receipt) {
+    const { history, dispatch } = this.props;
+    console.log(receipt);
+    history.push("/receipt", dispatch(getSingleReceipt(receipt._id)));
   }
 
   uploadFile(){
@@ -121,6 +128,7 @@ class Home extends Component {
           {receipts && 
               <TableData
                 data={Object.values(receipts)}
+                getReceipt={this.selectReceipt}
               />
           }
         </Row>

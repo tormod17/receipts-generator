@@ -9,6 +9,7 @@ const querystring = require('querystring');
 const csv = require('fast-csv');
 const XLSX = require('xlsx');
 const multer = require('multer');
+const uuidv1 = require('uuid/v1');
 
 const mongoose = require('mongoose');
 
@@ -164,8 +165,8 @@ router.post('/api/upload', function(req, res, next) {
                     ...receipt,
                     filename,
                     userId,
-                    Rechnungsnummer: userId + i,
-                    time: DATETIMESTAMP,
+                    Rechnungsnummer: uuidv1(),
+                    time: DATETIMESTAMP + i,
                 }
                 ReceiptDB.create(new_receipt, function(err) {
                     if (err) return console.log(err)
@@ -194,15 +195,6 @@ router.get('/api/receipts', function(req, res, next) {
     ReceiptDB.find({ userId })
         .limit(10)
         .sort({ time: -1 })
-        .select({ 
-            'Kunde': 1 , 
-            'Kunden-nummer':1, 
-            'Belegart': 1,
-            'Rechnungsnummer':1, 
-            'Rechnungs-datum':1, 
-            'Rechnungsbetrag': 1,
-            'Auszahlung an Kunde':1,
-        })
         .exec((err, receipts) => {
             if (err) return console.error(err);
             res.json(receipts);
@@ -212,9 +204,11 @@ router.get('/api/receipts', function(req, res, next) {
 router.post('/api/addreceipt', function(req, res, next) {
     if (!req.query.userId) return console.error('no userId');
     const { userId } = req.query;
+    console.log(req.body);
     const new_receipt = {
         ...req.body,
         filename: 'manual entry',
+        Rechnungsnummer: uuidv1(),
         userId,
         time: DATETIMESTAMP,
     }
