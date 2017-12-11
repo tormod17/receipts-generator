@@ -49,7 +49,6 @@ class App extends Component {
   render() {
     const { auth } = this.props;
     const isAuthenticated = true && auth;
-    console.log(this.props, 'APP');
     
     return (
       <Router>

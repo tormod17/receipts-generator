@@ -196,7 +196,7 @@ router.get('/api/receipts', function(req, res, next) {
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
     ReceiptDB.find({ userId })
-        .limit(10)
+        //.limit(10)
         .sort({ time: -1 })
         .exec((err, receipts) => {
             if (err) return console.error(err);

@@ -22,12 +22,16 @@ class Receipt extends Component {
 
   static defaultProps ={
     receipt:{},
+    customer: {},
+    transactions: [],
   }
 
   constructor(props) {
     super(props)
     this.state ={
       receipt: {},
+      customer: {},
+      transactions: [],
     }
     this.updateFieldValue = this.updateFieldValue.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
@@ -35,13 +39,18 @@ class Receipt extends Component {
 
   componentDidMount(){
     const { data } = this.props.receipts;
-    console.log(data);
     const id = this.props.match.params.id;
     if (id && data) {
+      const customerNumber = data[id]['Kunden-nummer'];
+      const allTransactions = Object.values(data || {}).filter( trans => customerNumber === trans['Kunden-nummer'])
+      console.log(allTransactions);
       this.setState({
-          receipt: {
+          customer: {
             ...data[id],
-          }
+          },
+          transactions: [
+            ...allTransactions
+          ]
       })
     }
   }
@@ -59,9 +68,9 @@ class Receipt extends Component {
   }
 
   render() {
-    const { receipt } = this.state;
+    const { customer, transactions, receipt } = this.state;
     return (
-    <Form clasName="receipt">
+    <Form clasName="customer">
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>
@@ -81,26 +90,26 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue}  name="Kunde" placeholder="Name des Kunden" value={receipt.Kunde} />
+            <EditableField updateFieldValue={this.updateFieldValue}  name="Kunde" placeholder="Name des Kunden" value={customer.Kunde} />
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue}  name="Rechnungsnummer" placeholder="Fortlaufende Rechnungsnummer" value={receipt.Rechnungsnummer}/>
+            <EditableField updateFieldValue={this.updateFieldValue}  name="Rechnungsnummer" placeholder="Fortlaufende Rechnungsnummer" value={customer.Rechnungsnummer}/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col >
-            <EditableField updateFieldValue={this.updateFieldValue} name="Straße" placeholder="Stadt" label="Adresse des Kunden" value={receipt.Straße}/>
+            <EditableField updateFieldValue={this.updateFieldValue} name="Straße" placeholder="Stadt" label="Adresse des Kunden" value={customer.Straße}/>
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue} name="Stadt" placeholder="Stadt" nolabel value={receipt.Stadt}/>
+            <EditableField updateFieldValue={this.updateFieldValue} name="Stadt" placeholder="Stadt" nolabel value={customer.Stadt}/>
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue} name="PLZ" placeholder="PLZ" nolabel value={receipt.PLZ}/>
+            <EditableField updateFieldValue={this.updateFieldValue} name="PLZ" placeholder="PLZ" nolabel value={customer.PLZ}/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col>            
-            <EditableField updateFieldValue={this.updateFieldValue} name="Kunden-nummer" placeholder="Kunden-nummer" value={receipt['Kunden-nummer']}/>
+            <EditableField updateFieldValue={this.updateFieldValue} name="Kunden-nummer" placeholder="Kunden-nummer" value={customer['Kunden-nummer']}/>
           </Col>
           <Col>
           <Label for="Rechnungs-datum">Rechnungs-datum</Label>
@@ -108,7 +117,7 @@ class Receipt extends Component {
               <DayPickerInput 
                 name="Rechnungs-datum"
                 onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
-                value={receipt['Rechnungs-datum'] ||  Date.now()}
+                value={customer['Rechnungs-datum'] ||  Date.now()}
               />
             </InputGroupAddon>
           </Col>
@@ -116,57 +125,64 @@ class Receipt extends Component {
         <FormGroup>
           <h2>Geschäftsvorfall 1:</h2>
         </FormGroup>
-        <FormGroup row>
-          <Col  sm={{ size: 6, order: 1 }}>
-            <EditableField updateFieldValue={this.updateFieldValue} name="Name des Gastes" placeholder="Name des Gastes" value={receipt["Name des Gastes"]}/>
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-            <Label for="Anreisedatum">Anreise-datum</Label>
-            <InputGroupAddon>
-              <DayPickerInput 
-                name="Anreisedatum"
-                onDayChange={(val) => this.updateFieldValue('Anreisedatum', val )}
-                value={receipt.Anreisedatum}
-              />
-            </InputGroupAddon>
-          </Col>
-      
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-            <Label for="Abreisedatum">Abreise-datum</Label>
-            <InputGroupAddon>
-              <DayPickerInput 
-                name="Abreisedatum"
-                onDayChange={val => this.updateFieldValue('Abreisedatum', val )}
-                value={receipt.Abreisedatum}
-              />
-            </InputGroupAddon>
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-            <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde"  placeholder="Auszahlung" value={receipt["Auszahlung an Kunde"]}/>
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-            <Label for="Reinigungs-gebühr" >Reinigungs-gebühr</Label>
-            <Input name="Reinigungs-gebühr" type="text" placeholder="Reinigungs-gebühr"/>
-          </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-            <EditableField 
-              updateFieldValue={this.updateFieldValue}  
-              name="Airgreets Service Fee (€)"
-              placeholder="Airgreets Service Fee (€)"
-              value={receipt['Auszahlungskorrektur in €']}
-            />
-          </Col>
-        </FormGroup>
+        { transactions && transactions.map(trans => {
+          return (
+            <div>
+            <FormGroup row>
+              <Col  sm={{ size: 6, order: 1 }}>
+                <EditableField updateFieldValue={this.updateFieldValue} name="Name des Gastes" placeholder="Name des Gastes" value={trans["Name des Gastes"]}/>
+              </Col>
+              <Col sm={{ size: 6, order: 1 }}>
+                <EditableField 
+                  updateFieldValue={this.updateFieldValue}  
+                  name="Airgreets Service Fee (€)"
+                  placeholder="Airgreets Service Fee (€)"
+                  value={trans['Airgreets Service Fee (€)']}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup row>
+              <Col sm={{ size: 6, order: 1 }}>
+                <Label for="Anreisedatum">Anreise-datum</Label>
+                <InputGroupAddon>
+                  <DayPickerInput 
+                    name="Anreisedatum"
+                    onDayChange={(val) => this.updateFieldValue('Anreisedatum', val )}
+                    value={trans.Anreisedatum}
+                  />
+                </InputGroupAddon>
+              </Col>
+              <Col sm={{ size: 6, order: 1 }}>
+                <EditableField name="CLEANING FARE" updateFieldValue={this.updateFieldValue} placeholder="Reinigungs-gebühr" value={trans["CLEANING FARE"]} />
+              </Col>
+            </FormGroup>
+            <FormGroup row>
+              <Col sm={{ size: 6, order: 1 }}>
+                <Label for="Abreisedatum">Abreise-datum</Label>
+                <InputGroupAddon>
+                  <DayPickerInput 
+                    name="Abreisedatum"
+                    onDayChange={val => this.updateFieldValue('Abreisedatum', val )}
+                    value={trans.Abreisedatum}
+                  />
+                </InputGroupAddon>
+              </Col>
+              <Col sm={{ size: 6, order: 1 }}>
+                <EditableField updateFieldValue={this.updateFieldValue} name="TOTAL PAID"  placeholder="Auszahlung" value={trans["TOTAL PAID"]}/>
+              </Col>
+            </FormGroup>
+            <FormGroup row>
+         
+            </FormGroup>
+            <FormGroup row>
+            
+            </FormGroup>
+            <FormGroup row>
+          
+            </FormGroup>
+            <hr/>
+            </div>
+        )})}
         <FormGroup row>
           <Col>
             <h2>Geschäftsvorfall 2:</h2>
@@ -214,17 +230,17 @@ class Receipt extends Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-             <EditableField updateFieldValue={this.updateFieldValue} name="Gesamtumsatz Airgreets" placeholder="Gesamtauszahlungsbetrag"/>
+             <EditableField updateFieldValue={this.updateFieldValue} name="Gesamtumsatz Airgreets" placeholder="Gesamt Auszahlungs Betrag"/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-           <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde" placeholder="Gesamt Rechnungsbetrag"/>
+           <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde" placeholder="Gesamt Rechnungs Betrag"/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
-           <EditableField updateFieldValue={this.updateFieldValue} name="Darin enthaltene Umsatzsteuer" placeholder="Darin enthaltene Umsatzsteuer"/>
+           <EditableField updateFieldValue={this.updateFieldValue} name="Darin enthaltene Umsatzsteuer" placeholder="Darin Enthaltene Umsatzsteuer"/>
           </Col>
         </FormGroup>
         <Row className="">
