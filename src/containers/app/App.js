@@ -23,8 +23,24 @@ import NotFound from "../misc/NotFound";
 import { logout } from "../../actions/auth";
 
 import "./app.css";
+import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+
+
 
 class App extends Component {
+
+  componentDidMount(){
+    const { id } = this.props.auth;
+    this.props.dispatch(getReceipts(id))
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { receipts, auth } = this.props;
+    if (receipts.message !== nextProps.receipts.message ){
+      this.props.dispatch(getReceipts(auth.id))
+    }
+  }
+
   handleLogout() {
     const { user } = this.props;
     this.props.dispatch(logout(user));
@@ -33,6 +49,8 @@ class App extends Component {
   render() {
     const { auth } = this.props;
     const isAuthenticated = true && auth;
+    console.log(this.props, 'APP');
+    
     return (
       <Router>
         <div>
@@ -40,11 +58,12 @@ class App extends Component {
             <Header user={auth}  handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
-                <Route exact path="/" component={Home} />
+                <Route exact path="/" render={() => <Home {...this.props}/>} />
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
-                <Route user={auth} path="/receipt" component={Receipt} />
+                <Route path="/receipt/:id" component={() => <Receipt {...this.props} />} />
+                <Route path="/receipt" component={() => <Receipt {...this.props} />} />
                 <Route component={NotFound} />
               </Switch>
             </div>
@@ -66,9 +85,10 @@ App.contextTypes = {
 };
 
 const mapStateToProps = state => {
-  const { auth } = state;
+  const { auth, receipts } = state;
   return {
     auth,
+    receipts,
   };
 };
 

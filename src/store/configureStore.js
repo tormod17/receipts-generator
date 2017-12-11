@@ -2,15 +2,12 @@ import { createStore, applyMiddleware, combineReducers, compose } from "redux";
 import thunkMiddleware from "redux-thunk";
 import { createLogger } from "redux-logger";
 import auth from "../reducers/auth";
-import upload from "../reducers/upload";
-import { receipts, selectedReceipt }from "../reducers/receipts";
+import { receipts }from "../reducers/receipts";
 
 const logger = createLogger();
 const rootReducer = combineReducers({
   auth,
-  upload,
   receipts,
-  selectedReceipt,
 });
 
 const initialState = {};

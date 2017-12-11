@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import {withRouter} from "react-router-dom";
 import { addReceipt } from "../../actions/receipts";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 import Dropdown from '../../components/dropdown/Dropdown';
 import EditableField from '../../components/EditableField/EditableField';
+
+import { getReceipts } from "../../actions/receipts";
 
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-day-picker/lib/style.css';
@@ -21,17 +24,26 @@ class Receipt extends Component {
     receipt:{},
   }
 
-
   constructor(props) {
     super(props)
     this.state ={
+      receipt: {},
     }
     this.updateFieldValue = this.updateFieldValue.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-
+  componentDidMount(){
+    const { data } = this.props.receipts;
+    console.log(data);
+    const id = this.props.match.params.id;
+    if (id && data) {
+      this.setState({
+          receipt: {
+            ...data[id],
+          }
+      })
+    }
   }
 
   handleSubmission(){
@@ -43,13 +55,11 @@ class Receipt extends Component {
   }
 
   updateFieldValue(field, value){
-    this.setState((prevState)=> ({ [field]: value }))
+    this.setState( prevState => ({ [field]: value }))
   }
 
   render() {
-    const {receipts, selectedReceipt } = this.props;
-    const receipt = { ...receipts[selectedReceipt.id] } ;
-
+    const { receipt } = this.state;
     return (
     <Form clasName="receipt">
         <FormGroup row>
@@ -98,7 +108,7 @@ class Receipt extends Component {
               <DayPickerInput 
                 name="Rechnungs-datum"
                 onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
-                value={receipt['Rechnungs-datum']}
+                value={receipt['Rechnungs-datum'] ||  Date.now()}
               />
             </InputGroupAddon>
           </Col>
@@ -112,7 +122,7 @@ class Receipt extends Component {
           </Col>
         </FormGroup>
         <FormGroup row>
-          <Col>
+          <Col sm={{ size: 6, order: 1 }}>
             <Label for="Anreisedatum">Anreise-datum</Label>
             <InputGroupAddon>
               <DayPickerInput 
@@ -122,19 +132,10 @@ class Receipt extends Component {
               />
             </InputGroupAddon>
           </Col>
-          <Col>
-            <Label for="HansTest">Hans Test</Label>
-            <InputGroupAddon>
-              <DayPickerInput 
-                name="HansTestOne"
-                onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
-                value={receipt["HansTestOne"]}
-              />
-            </InputGroupAddon>
-          </Col>
+      
         </FormGroup>
         <FormGroup row>
-          <Col>
+          <Col sm={{ size: 6, order: 1 }}>
             <Label for="Abreisedatum">Abreise-datum</Label>
             <InputGroupAddon>
               <DayPickerInput 
@@ -144,33 +145,16 @@ class Receipt extends Component {
               />
             </InputGroupAddon>
           </Col>
-          <Col>
-           <InputGroupAddon>
-            <DayPickerInput 
-              name="HansTestTwo"
-              onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
-              value={receipt.HansTestTwo}
-            />
-           </InputGroupAddon>
-          </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
             <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde"  placeholder="Auszahlung" value={receipt["Auszahlung an Kunde"]}/>
-          </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-              <hr/>
-              <Input name="" type="text" placeholder=""/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
             <Label for="Reinigungs-gebühr" >Reinigungs-gebühr</Label>
             <Input name="Reinigungs-gebühr" type="text" placeholder="Reinigungs-gebühr"/>
-          </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-            <hr/>
-            <Input name="" type="text" />
           </Col>
         </FormGroup>
         <FormGroup row>
@@ -181,10 +165,6 @@ class Receipt extends Component {
               placeholder="Airgreets Service Fee (€)"
               value={receipt['Auszahlungskorrektur in €']}
             />
-          </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-            <hr/>
-            <Input name="" type="text" />
           </Col>
         </FormGroup>
         <FormGroup row>
@@ -236,27 +216,15 @@ class Receipt extends Component {
           <Col sm={{ size: 6, order: 1 }}>
              <EditableField updateFieldValue={this.updateFieldValue} name="Gesamtumsatz Airgreets" placeholder="Gesamtauszahlungsbetrag"/>
           </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-            <hr/>
-            <Input name="" type="text" />
-          </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
            <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde" placeholder="Gesamt Rechnungsbetrag"/>
           </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-            <hr/>
-            <Input name="" type="text" />
-          </Col>
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 6, order: 1 }}>
            <EditableField updateFieldValue={this.updateFieldValue} name="Darin enthaltene Umsatzsteuer" placeholder="Darin enthaltene Umsatzsteuer"/>
-          </Col>
-          <Col sm={{ size: 2, order: 2 }}>
-            <hr/>
-            <Input name="" type="text" />
           </Col>
         </FormGroup>
         <Row className="">
@@ -274,5 +242,5 @@ class Receipt extends Component {
 const mapStateToProps = state => ({ ...state })
 
 
-export default connect(mapStateToProps)(Receipt);
+export default withRouter(connect(mapStateToProps)(Receipt));
 

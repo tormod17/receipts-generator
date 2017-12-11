@@ -13,6 +13,9 @@ const uuidv1 = require('uuid/v1');
 
 const mongoose = require('mongoose');
 
+const DATETIMESTAMP = Date.now();
+
+
 const expTime = 1 * 60 * 60 * 24 * 150
 
 
@@ -127,7 +130,6 @@ router.post('/api/logout', function(req, res, next) {
 });
 
 
-const DATETIMESTAMP = Date.now();
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, './uploads/')
@@ -137,7 +139,7 @@ var storage = multer.diskStorage({
     }
 });
 
-var upload = multer({ storage: storage }).single('file')
+var upload = multer({ storage }).single('file')
 
 router.post('/api/upload', function(req, res, next) {
     const { files, body } = req
@@ -166,6 +168,7 @@ router.post('/api/upload', function(req, res, next) {
                     filename,
                     userId,
                     Rechnungsnummer: uuidv1(),
+                    'Rechnungs-datum': DATETIMESTAMP,
                     time: DATETIMESTAMP + i,
                 }
                 ReceiptDB.create(new_receipt, function(err) {
@@ -204,7 +207,6 @@ router.get('/api/receipts', function(req, res, next) {
 router.post('/api/addreceipt', function(req, res, next) {
     if (!req.query.userId) return console.error('no userId');
     const { userId } = req.query;
-    console.log(req.body);
     const new_receipt = {
         ...req.body,
         filename: 'manual entry',
@@ -218,6 +220,20 @@ router.post('/api/addreceipt', function(req, res, next) {
         res.send('Your receipt has been added');
     })
 
+    /// add or edit a receipt 
+})
+
+
+router.post('/api/deletereceipts', function(req, res, next) {
+    if (!req.body) return console.error('no body to request');
+    const ids = [...req.body];
+    ids.forEach(id => {
+        ReceiptDB.deleteOne({ _id: id }, function(err) {
+            if (err) return console.error(err)
+            console.log('receipt has been removed')
+        })
+    });
+    res.json({ message: 'Your receipts has been removed'});
     /// add or edit a receipt 
 })
 
