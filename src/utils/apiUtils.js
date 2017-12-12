@@ -14,6 +14,25 @@ export function parseJSON(response) {
   return response.json();
 }
 
+
+export function formatDate(today) {
+  if (!today) return false;
+  console.log(today);
+  let newDate =  new Date(today);
+  let dd = newDate.getDate();
+  let mm = newDate.getMonth()+1; //January is 0!
+
+  const yyyy = newDate.getFullYear();
+  if(dd <10){
+      dd ='0'+dd;
+  } 
+  if(mm <10){
+      mm ='0'+mm;
+  } 
+  newDate = dd+'/'+mm+'/'+yyyy;
+  return newDate;
+}
+
 /**
  * A utility to call a restful service.
  *
