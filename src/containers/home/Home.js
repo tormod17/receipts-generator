@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import {withRouter} from "react-router-dom";
 import { Grid, Row, Col, ControlLabel, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -10,7 +11,8 @@ import createReactClass from 'create-react-class';
 
 import TableData from '../../components/table/Table';
 import { upload } from "../../actions/upload";
-import { getReceipts } from "../../actions/receipts"
+import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+import 'font-awesome/css/font-awesome.min.css';
 
 import "./home.css";
 
@@ -20,33 +22,30 @@ class Home extends Component {
     this.state ={
       value: new Date().toISOString(),
       selectedDay: undefined,
-      receipts: {
-        ...props.receipts
-      }
+      receipts: { ...props.receipts.data },
+      selectedArray: [],
     }
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.handleAddEntry = this.handleAddEntry.bind(this);
-  }
-
-
-  componentWillReceiveProps(nextProps){
-    const { upload, auth, dispatch } = this.props;
-    if (upload !== nextProps.upload && nextProps.upload.uploaded) {
-      dispatch(getReceipts(auth.id))
-    }
+    this.selectReceipt = this.selectReceipt.bind(this);
+    this.handleSelect = this.handleSelect.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
   }
 
   componentWillMount() {
-      const { id } = this.props.auth;
-      if (!id) {
-        this.props.history.replace("/login");
-      } 
+    const { id } = this.props.auth;
+    if (!id) {
+      this.props.history.replace("/login");
+    } 
   }
 
-  componentDidMount(){
-    const { id } = this.props.auth;
-    this.props.dispatch(getReceipts(id))
+  componentWillReceiveProps(nextProps) {
+    if( this.props.receipts !== nextProps.receipts && nextProps.receipts.data) {
+      this.setState({
+        receipts: { ...nextProps.receipts.data }
+      })
+    }
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -56,7 +55,63 @@ class Home extends Component {
   }
 
   handleAddEntry() {
-    this.props.history.replace("/receipt");
+    this.props.history.push("/receipt");
+  }
+
+  handleDelete() {
+    const { selectedArray } = this.state;
+    if (selectedArray.length) {
+      this.props.dispatch(deleteReceipts(selectedArray));
+    }
+  }
+
+  handleSelectAll(){
+    const { selectedArray } = this.state;
+    let newArr;
+    const selectAll = document.querySelector('#selectAll');
+    const checkBoxes = document.querySelectorAll('.selectCheckBox');    
+    if (selectAll.getAttribute('checked')){
+      for (let i=0; i < checkBoxes.length; i++) {
+        checkBoxes[i].setAttribute('checked', true);
+        selectedArray.push(checkBoxes[i].getAttribute('id'))
+        newArr = [...selectedArray];
+      }
+    } else {
+      for (let i=0; i < checkBoxes.length; i++) {
+        console.log('CALLL ME NOW ', selectAll.getAttribute('checked'));
+        checkBoxes[i].setAttribute('checked', false);
+        newArr = [];
+      }
+    }
+
+    this.setState({
+      selectedArray: newArr,
+    })
+  }
+
+  handleSelect(e) {  // could just add a selected field to each receipt object. 
+    const { selectedArray } = this.state;
+    if(e.target) {
+      const id = e.target.getAttribute('id');
+      if (id ==='selectAll'){
+        this.handleSelectAll()
+      }
+      let newArr ;
+      if (!selectedArray.includes(id)) {
+        selectedArray.push(id);  
+        newArr = [...selectedArray]    
+      } else {
+        newArr = selectedArray.filter(item => item !== id);
+      }
+      this.setState({
+        selectedArray: [...newArr]
+      })
+    }
+  }
+
+  selectReceipt(receipt) {
+    const { history, dispatch } = this.props;
+    history.push("/receipt/"+receipt._id);
   }
 
   uploadFile(){
@@ -68,8 +123,9 @@ class Home extends Component {
   }
 
   render() {
-    const { auth, receipts } =this.props;
-    const { selectedDay } = this.state;
+    const { auth } =this.props;
+    const { selectedDay, receipts } = this.state;
+
     return (
       <Container>
         {  auth &&
@@ -121,17 +177,15 @@ class Home extends Component {
           {receipts && 
               <TableData
                 data={Object.values(receipts)}
+                getReceipt={this.selectReceipt}
+                handleSelect={this.handleSelect}
               />
           }
         </Row>
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <Button
-                onClick={this.handleAddEntry}
-              >
-                +
-              </Button>
+              <i onClick={this.handleAddEntry} className="fa fa-plus fa-3x" aria-hidden="true"></i>
             </InputGroup>
           </Col>
           <Col sm={4}>
@@ -144,7 +198,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <Button >Clear</Button>
+              <i onClick={this.handleDelete} className="fa fa-trash fa-3x" aria-hidden="true"></i>
             </InputGroup>
           </Col>
             <Col sm={4}>
@@ -165,4 +219,5 @@ class Home extends Component {
 
 const mapStateToProps = state => ({ ...state })
 
-export default connect(mapStateToProps)(Home);
+
+export default withRouter(connect(mapStateToProps)(Home));

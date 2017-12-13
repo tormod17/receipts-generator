@@ -1,42 +1,77 @@
 import React, { Component } from "react";
-import { Table } from 'reactstrap';
+import { Table, Input, Label } from 'reactstrap';
 import PropTypes from "prop-types";
+
+
 
 class TableData extends Component { 
     constructor(props){
       super(props)
-      this.state = {};
+      this.state = {
+        selectedArray: [],
+      };
+
+      this.handleClick = this.handleClick.bind(this);
+
+      this.requiredFields = ['Kunden-nummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select']
+      this.header = ['Kundenummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll') ];
     }
 
+    makeCheckBox = id => 
+      <Label check>
+        <Input 
+          className="selectCheckBox"
+          type="checkbox"
+          id={id} 
+          onChange={this.props.handleSelect}
+        />   
+      </Label>
+
     handleClick(receipt){
-      console.log('link to detail view', receipt)
+      this.props.getReceipt(receipt)
     }
 
     createHeaders(){
-      const { data } = this.props;
-      const headers =  Object.keys(data[0] || {});
-      return headers.map(header => <th key={header}> {header}</th>)
+      return this.header.map(header => <th key={header}> {header}</th>)
     }
 
     createRows = receipt =>
         <tr
           key={receipt._id}
-          onClick={() => this.handleClick(receipt)}
         >
-          { Object.keys(receipt || {}).map(field => <td key={field}>{receipt[field]}</td> )}
+          { this.requiredFields.map(field => {
+              let output;
+              switch(true){
+                case field === 'Belgart':
+                  output = receipt.Rechnung === 'x' ? 'Rechnung' : 'Auszahlung';
+                  break;
+                case field === 'Rechnungs-datum':
+                 output = new Date(receipt['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
+                 output = output[0] + ' ' +output[1] + ' ' + output[2] + ' ' + output[3];
+                 break;
+                case field === 'select':
+                  output = this.makeCheckBox(receipt._id)
+                  return <td key={field}>{ output || ' '}</td>
+                default:
+                  output = receipt[field];
+                  break;
+              }
+              return <td key={field} onClick={() => this.handleClick(receipt)}>{ output || ' '}</td>
+          })}
         </tr>
 
     render() {
       const { data } = this.props;
       return  (
-        <Table>
+        <Table striped>
           <thead>
             <tr>
               { data && this.createHeaders() }
             </tr>
           </thead>
           <tbody>
-            { data.map( receipt => this.createRows(receipt))}
+            { data &&  (data.map( receipt => this.createRows(receipt))) }
+            { !data && <h2>Need to add some receipts</h2> }
           </tbody>
         </Table>
       )

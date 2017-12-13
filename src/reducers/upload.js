@@ -10,7 +10,7 @@ const initialState = {
   uploaded: null
 };
 
-export default function upload(state = initialState, action = {}) {
+export default function uploadReceipts(state = initialState, action = {}) {
   switch (action.type) {
     case UPLOAD_REQUEST:
       return { 

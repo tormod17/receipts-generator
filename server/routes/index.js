@@ -9,8 +9,12 @@ const querystring = require('querystring');
 const csv = require('fast-csv');
 const XLSX = require('xlsx');
 const multer = require('multer');
+const uuidv1 = require('uuid/v1');
 
 const mongoose = require('mongoose');
+
+const DATETIMESTAMP = Date.now();
+
 
 const expTime = 1 * 60 * 60 * 24 * 150
 
@@ -126,7 +130,6 @@ router.post('/api/logout', function(req, res, next) {
 });
 
 
-const DATETIMESTAMP = Date.now();
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, './uploads/')
@@ -136,7 +139,7 @@ var storage = multer.diskStorage({
     }
 });
 
-var upload = multer({ storage: storage }).single('file')
+var upload = multer({ storage }).single('file')
 
 router.post('/api/upload', function(req, res, next) {
     const { files, body } = req
@@ -164,8 +167,9 @@ router.post('/api/upload', function(req, res, next) {
                     ...receipt,
                     filename,
                     userId,
-                    Rechnungsnummer: userId + i,
-                    time: DATETIMESTAMP,
+                    Rechnungsnummer: uuidv1(),
+                    'Rechnungs-datum': DATETIMESTAMP,
+                    time: DATETIMESTAMP + i,
                 }
                 ReceiptDB.create(new_receipt, function(err) {
                     if (err) return console.log(err)
@@ -192,17 +196,8 @@ router.get('/api/receipts', function(req, res, next) {
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
     ReceiptDB.find({ userId })
-        .limit(10)
+        //.limit(10)
         .sort({ time: -1 })
-        .select({ 
-            'Kunde': 1 , 
-            'Kunden-nummer':1, 
-            'Belegart': 1,
-            'Rechnungsnummer':1, 
-            'Rechnungs-datum':1, 
-            'Rechnungsbetrag': 1,
-            'Auszahlung an Kunde':1,
-        })
         .exec((err, receipts) => {
             if (err) return console.error(err);
             res.json(receipts);
@@ -215,6 +210,7 @@ router.post('/api/addreceipt', function(req, res, next) {
     const new_receipt = {
         ...req.body,
         filename: 'manual entry',
+        Rechnungsnummer: uuidv1(),
         userId,
         time: DATETIMESTAMP,
     }
@@ -224,6 +220,20 @@ router.post('/api/addreceipt', function(req, res, next) {
         res.send('Your receipt has been added');
     })
 
+    /// add or edit a receipt 
+})
+
+
+router.post('/api/deletereceipts', function(req, res, next) {
+    if (!req.body) return console.error('no body to request');
+    const ids = [...req.body];
+    ids.forEach(id => {
+        ReceiptDB.deleteOne({ _id: id }, function(err) {
+            if (err) return console.error(err)
+            console.log('receipt has been removed')
+        })
+    });
+    res.json({ message: 'Your receipts has been removed'});
     /// add or edit a receipt 
 })
 

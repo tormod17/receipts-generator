@@ -42,6 +42,7 @@ export function callApi(
         dispatch(onRequestSuccess(json));
       })
       .catch(error => {
+        console.log(error);
         const response = error.response;
         if (response === undefined) {
           dispatch(onRequestFailure(error));

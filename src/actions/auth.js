@@ -86,7 +86,6 @@ function logoutFailure(error) {
 }
 
 export function logout(user) {
-  console.log('LOGOUT CALLED');
   const idToken = loadIdToken();
   const config = {
     method: "post",
