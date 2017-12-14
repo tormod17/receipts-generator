@@ -21,7 +21,7 @@ import "./receipt.css";
 
 class Receipt extends Component {
 
-  static propTypes ={
+  static propTypes = {
     data: PropTypes.shape({})
   }
 

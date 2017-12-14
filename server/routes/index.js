@@ -85,10 +85,10 @@ function extractToken(req) {
     return null;
 }
 // This should be well-guarded secret on the server (in a file or database).
-const JWT_SECRET = "JWT Rocks!";
+const JWT_SECRET = 'JWT Rocks!';
 
 // JWT based login service.
-router.post("/api/login", function(req, res) {
+router.post('/api/login', function(req, res) {
 
     const credentials = req.body;
     const { email, password } = credentials;
@@ -98,18 +98,18 @@ router.post("/api/login", function(req, res) {
 
     User.authenticate(email, password, function(err, user) {
         if (err || !user) {
-            return res.status(401).send({ message: "User Not Found" })
+            return res.status(401).send({ message: 'User Not Found' });
         }
         const profile = {
             username: user.username,
             email: user.email,
             id: user._id
-        }
+        };
         const jwtToken = jwt.sign(profile, JWT_SECRET, { expiresIn: expTime  });
         return res.status(200).json({
             id_token: jwtToken
         });
-    })
+    });
 
 });
 
@@ -189,7 +189,7 @@ router.get('/api/receipts', function(req, res) {
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
     ReceiptDB.find({ userId })
-        .limit(30)
+        //.limit(50)
         .sort({ time: -1 })
         .exec((err, receipts) => {
             if (err) return console.error(err);

@@ -13,6 +13,9 @@ import { formatDate } from "../../utils/apiUtils";
 import TableData from '../../components/table/Table';
 import { upload } from "../../actions/upload";
 import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import 'font-awesome/css/font-awesome.min.css';
 
 import "./home.css";
@@ -32,6 +35,8 @@ class Home extends Component {
     this.selectReceipt = this.selectReceipt.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handlePDF = this.handlePDF.bind(this);
+
   }
 
   componentWillMount() {
@@ -51,7 +56,7 @@ class Home extends Component {
 
   componentDidMount(){
     const { auth, dispatch } = this.props;
-    dispatch(getReceipts(auth.id))
+    dispatch(getReceipts(auth.id));
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -61,7 +66,7 @@ class Home extends Component {
   }
 
   handleAddEntry() {
-    this.props.history.push("/receipt");
+    this.props.history.push('/receipt');
   }
 
   handleDelete() {
@@ -79,7 +84,7 @@ class Home extends Component {
     if (selectAll.getAttribute('checked')){
       for (let i=0; i < checkBoxes.length; i++) {
         checkBoxes[i].setAttribute('checked', true);
-        selectedArray.push(checkBoxes[i].getAttribute('id'))
+        selectedArray.push(checkBoxes[i].getAttribute('id'));
         newArr = [...selectedArray];
       }
     } else {
@@ -92,7 +97,7 @@ class Home extends Component {
 
     this.setState({
       selectedArray: newArr,
-    })
+    });
   }
 
   handleSelect(e) {  // could just add a selected field to each receipt object. 
@@ -100,24 +105,97 @@ class Home extends Component {
     if(e.target) {
       const id = e.target.getAttribute('id');
       if (id ==='selectAll'){
-        this.handleSelectAll()
+        this.handleSelectAll();
       }
       let newArr ;
       if (!selectedArray.includes(id)) {
         selectedArray.push(id);  
-        newArr = [...selectedArray]    
+        newArr = [...selectedArray];   
       } else {
         newArr = selectedArray.filter(item => item !== id);
       }
       this.setState({
         selectedArray: [...newArr]
-      })
+      });
     }
   }
 
+  handlePDF(){
+    const { receipts } = this.props;
+    const { selectedArray } = this.state;
+
+    const selectedId = selectedArray[0];
+    const receipt = { ...receipts.data[selectedId] };
+
+    const customerNumber = receipt['Kunden-nummer'];
+    const allguests = Object.values(receipts.data || {}).filter( trans => 
+      customerNumber === trans['Kunden-nummer']
+    );
+    
+    const titleHeaders = [
+      'Name des Gastes', 
+      'Anreisedatum',
+      'Abreisedatum',
+      'Reinigungs-gebühr',
+      'Airgreets Service Fee (€)',
+      'CLEANING FARE',
+      'TOTAL PAID'
+    ];
+
+    const columns = titleHeaders.map(key => {
+      return {
+        title: key,
+        dataKey: key
+      };
+    });
+    const rows = allguests.map(guest => {
+      return titleHeaders.reduce((p,c) => {
+          p[c] = guest[c];
+          return p;
+      },{});
+    });
+
+    const doc = new jsPDF();
+    doc.setFontSize(10);
+    doc.setTextColor(20);
+    doc.setFontStyle('normal');
+    doc.text(receipt['Kunde'], 10, 20);
+    doc.text(receipt['Stadt'], 10, 26);
+    doc.text(receipt['Straße'], 10, 32);
+    doc.text(receipt['PLZ'], 10, 38);
+    doc.text(receipt['Kunden-nummer'], 50, 38);
+
+    doc.text('Rechnungsübersicht', 10, 70);
+
+    doc.text('Rechnungsnummer '+ receipt['Rechnungsnummer'], 10, 75);
+    doc.text('Bitte bei Zahlung und Schriftverkehr angeben', 10, 80);
+  
+    doc.autoTable(columns, rows, {
+      startY: doc.autoTableEndPosY() + 85,
+      margin: { horizontal: 10 },
+      styles: { overflow: 'linebreak' },
+      bodyStyles: { valign: 'top' },
+      columnStyles: { email: { columnWidth: 'wrap' } },
+      theme: 'striped'
+    });
+
+    doc.setFontSize(8);
+    doc.text('Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto', 10, 200);
+    doc.text('Beste Grube', 10, 208);
+    doc.text('Florian', 10, 216);
+
+    doc.setFontSize(7);
+    doc.text('IBAN: DE49700700240017773300, SWIFT-BIC: DEUTDEDBMUC',10, 260);
+    doc.text('Geschäftsführung: Julian Ritter, Sebastian Drescher', 10, 265);
+    doc.text('Florian Bogenschütz Handelsregister: Amtsgericht München, HRB-Nr. 227243', 10, 270);
+    doc.text('Sitz der Gesellschaft: München Steuernr: 143/112/10719', 10, 275);
+    doc.save('repro.pdf');
+
+  }
+
   selectReceipt(receipt) {
-    const { history, dispatch } = this.props;
-    history.push("/receipt/"+receipt._id);
+    const { history } = this.props;
+    history.push('/receipt/'+receipt._id);
   }
 
   uploadFile(){
@@ -146,7 +224,7 @@ class Home extends Component {
                 type="file"
                 name="file"
                 onChange={this.uploadFile}
-                ref={(input) => { this.newFile = input}}
+                ref={(input) => { this.newFile = input;}}
                />        
             </InputGroupAddon>
           </Col>
@@ -211,7 +289,7 @@ class Home extends Component {
           </Col>
             <Col sm={4}>
             <InputGroup>
-              <Button >PDF</Button>
+              <Button onClick={this.handlePDF} >PDF</Button>
             </InputGroup>
           </Col>
             <Col sm={4}>
