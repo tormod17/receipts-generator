@@ -13,7 +13,7 @@
 
     `alias receipts_generator='cd ~/Desktop/Projects/airgreets-tool'`
     `alias receipts_generator_mongo='cd ~/Desktop/Projects/airgreets-tool && mongod'`
-    `alias receipts_generator_server='cd ~/Desktop/Projects/airgreets-tool/server && npm run dev'`
+    `alias receipts_generator_server='cd ~/Desktop/Projects/airgreets-tool/lib && npm run dev'`
     `alias receipts_generator_client='cd ~/Desktop/Projects/airgreets-tool && npm start'`
     `alias receipts_generator_start='ttab receipts_generator_mongo && ttab receipts_generator_server && ttab receipts_generator_client'`
 
