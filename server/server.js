@@ -16,7 +16,6 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const fileUpload = require('express-fileupload');
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/airgreets');
 const db = mongoose.connection;
