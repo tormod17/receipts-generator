@@ -9,13 +9,14 @@
  * The server will also broadcast the login/logout events to connected clients via socket.io.
  * 
  */
-const express = require("express");
+const express = require('express');
 const app = express();
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
+const path =require('path');
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/airgreets');
 const db = mongoose.connection;
@@ -37,10 +38,11 @@ app.use(session({
   })
 }));
 
-//app.use(fileUpload());
+const staticFilePath = process.env.NODE_ENV ==='production' ? 'build' : 'public';
+app.use(express.static(path.resolve(__dirname, '..', staticFilePath )));
 
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 // Configure app to use bodyParser to parse json data
 //const server = require("http").createServer(app);
@@ -66,11 +68,11 @@ app.use(function (err, req, res, next) {
 });
 
 // Test server is working (GET http://localhost:3001/api)
-app.get("/api/", function(req, res) {
-  res.json({ message: "Hi, welcome to the server api!" });
+app.get('/api/', function(req, res) {
+  res.json({ message: 'Hi, welcome to the server api!' });
 });
 
 // Start the server
 app.listen(port,  function(){
-  console.log("Server is listening on port " + port);  
+  console.log('Server is listening on port ' + port);  
 });

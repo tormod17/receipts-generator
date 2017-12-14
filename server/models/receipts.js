@@ -2,6 +2,9 @@ const mongoose = require('mongoose');
 const Client = require('./client.js');
 
 const ReceiptsSchema = new mongoose.Schema({
+    _id: {
+      type: Object,
+    },
     userId: {
         type: String,
         isRequired: true,
@@ -15,12 +18,6 @@ const ReceiptsSchema = new mongoose.Schema({
     },
 }, { strict: false });
 
-ReceiptsSchema.statics.checkExisting = function (email, password, callback) {
-  Receipts.findOne({  })
-  .exec((err, Receipts) => {
-
-  })
-};
 
 var Receipts = mongoose.model('Receipts', ReceiptsSchema);
 
