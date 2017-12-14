@@ -134,7 +134,7 @@ export function updateReceipt(id, data) {
     config,
     updateReceiptRequest(data),
     updateReceiptSuccess,
-    updateReceiptFailure,
+    updateReceiptFailure
   );
 }
 
@@ -158,6 +158,7 @@ function addReceiptsFailure(error) {
 }
 
 export function addReceipt(id, data) {
+  console.log('data', data);
   const config = {
     method: "post",
     headers: {

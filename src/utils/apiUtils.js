@@ -1,5 +1,5 @@
-import "isomorphic-fetch";
-import jwt_decode from "jwt-decode";
+import 'isomorphic-fetch';
+import jwt_decode from 'jwt-decode';
 
 export function checkStatus(response) {
   if (!response.ok) {

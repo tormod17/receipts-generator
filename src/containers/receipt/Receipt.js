@@ -80,15 +80,16 @@ class Receipt extends Component {
         return Number(total)
       }
     }, 0);
-    console.log(sum);
     return sum 
   }
 
   handleSubmission(){
-    const { dispatch, auth } = this.props;
+    const { dispatch, auth, receipts } = this.props;
     const receiptId = this.props.match.params.id;
+    const prevState = receipts.data[receiptId]
     const data  = {
-      ...this.state,
+      ...prevState,
+      ...this.state.customer,
     };
     if (receiptId) {
       dispatch(updateReceipt(receiptId, data), this.props.history.push('/'))
@@ -151,6 +152,7 @@ class Receipt extends Component {
 
   render() {
     const { customer, guests, corrections } = this.state;
+    console.log(guests);
     return (
     <Form clasName="bill">
         <FormGroup row>
