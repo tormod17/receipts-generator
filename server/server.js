@@ -18,7 +18,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const fileUpload = require('express-fileupload');
 
-mongoose.connect('mongodb://localhost/testForAuth');
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/airgreets');
 const db = mongoose.connection;
 
 //handle mongo error
