@@ -14,10 +14,12 @@ class Header extends Component {
 
   render() {
     const pathname = this.props.history.location.pathname;
+    const isAuthenticated = true && this.props.auth.id;
+    console.log(isAuthenticated);
+
     const isLoginPage = pathname.indexOf("login") > -1;
-    const isAboutPage = pathname.indexOf("about") > -1;
     const isUsersPage = pathname.indexOf("users") > -1;
-    const isReposPage = pathname.indexOf("repos") > -1;
+    const isSignupPage = pathname.indexOf("signup") > -1;
 
     return (
       <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
@@ -39,23 +41,23 @@ class Header extends Component {
           <ul className="navbar-nav mr-auto">
             <li
               title="Login"
-              className={isAboutPage ? "nav-item active" : "nav-item"}
+              className={!isLoginPage ? "nav-item active" : "nav-item"}
             >
-              <Link className="nav-link" to="/login">Login</Link>
+             { (!isAuthenticated && isSignupPage ) && <Link className="nav-link" to="/login">Login</Link> }
             </li>
             <li
               title="Signup"
-              className={isAboutPage ? "nav-item active" : "nav-item"}
+              className={ !isSignupPage? "nav-item active" : "nav-item"}
             >
-              <Link className="nav-link" to="/signup">Signup</Link>
+            { (!isAuthenticated && isLoginPage) && <Link className="nav-link" to="/signup">Signup</Link> }
             </li>
 
              <li
               title="Logout"
-              className={isAboutPage ? "nav-item active" : "nav-item"}
+              className={isAuthenticated ? "nav-item active" : "nav-item"}
               onClick={this.onLogoutClick}
             >
-              <Link className="nav-link" to="/logout">Logout</Link>
+             { isAuthenticated && <Link className="nav-link" to="/logout">Logout</Link> }
             </li>
           </ul>
         </div>

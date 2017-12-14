@@ -15,10 +15,9 @@ export function parseJSON(response) {
 }
 
 
-export function formatDate(today) {
-  if (!today) return false;
-  console.log(today);
-  let newDate =  new Date(today);
+export function formatDate(timeStamp) {
+  if (!timeStamp) return false;
+  let newDate =  new Date(timeStamp);
   let dd = newDate.getDate();
   let mm = newDate.getMonth()+1; //January is 0!
 
@@ -53,7 +52,6 @@ export function callApi(
 ) {
   return dispatch => {
     dispatch(request);
-
     return fetch(url, config)
       .then(checkStatus)
       .then(parseJSON)

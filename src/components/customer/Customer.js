@@ -20,61 +20,79 @@ export default class Customer extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-    };
+    this.state = {};
+    this.handleValueChange = this.handleValueChange.bind(this);
+  }
+
+  handleValueChange(field, val) {
+    this.props.updateFieldValue(field, val, 'customer')
+
   }
 
   render() {
-    const { customer } = this.props;
+    const { customer, updateFieldValue } = this.props;
+
     return (
       <div>
-        <FormGroup row>
-          <Col sm={{ size:5 }}>
-            <br/>
-            <Dropdown
-              name="Auszahlung/Rechnung"
-              items={[{ 
-                  name:'Rechnung',
-                  func: () => {},
-                },{
-                  name:'Auszahlung',
-                  func: ()=> {},                  
-                }]}
-            />
-          </Col>
-          <Col sm={{ size:1, offset: 6}}>
-          </Col>
+        <FormGroup>
+          <h2>Kunde</h2>
         </FormGroup>
         <FormGroup row>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue}  name="Kunde" placeholder="Name des Kunden" value={customer.Kunde} />
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+               name="Kunde" 
+               placeholder="Name des Kunden" 
+               value={customer.Kunde} />
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue}  name="Rechnungsnummer" placeholder="Fortlaufende Rechnungsnummer" value={customer.Rechnungsnummer}/>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+               name="Rechnungsnummer" 
+               placeholder="Fortlaufende Rechnungsnummer" 
+               value={customer.Rechnungsnummer}/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col >
-            <EditableField updateFieldValue={this.updateFieldValue} name="Straße" placeholder="Stadt" label="Adresse des Kunden" value={customer.Straße}/>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+              name="Straße" 
+              placeholder="Straße" 
+              label="Adresse des Kunden" 
+              value={customer.Straße}/>
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue} name="Stadt" placeholder="Stadt" nolabel value={customer.Stadt}/>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+              name="Stadt" 
+              placeholder="Stadt" 
+              nolabel 
+              value={customer.Stadt}/>
           </Col>
           <Col>
-            <EditableField updateFieldValue={this.updateFieldValue} name="PLZ" placeholder="PLZ" nolabel value={customer.PLZ}/>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+              name="PLZ" 
+              placeholder="PLZ" 
+              nolabel 
+              value={customer.PLZ}/>
           </Col>
         </FormGroup>
         <FormGroup row>
           <Col>            
-            <EditableField updateFieldValue={this.updateFieldValue} name="Kunden-nummer" placeholder="Kunden-nummer" value={customer['Kunden-nummer']}/>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
+              name="Kunden-nummer" 
+              placeholder="Kunden-nummer" value={customer['Kunden-nummer']}/>
           </Col>
           <Col>
           <Label for="Rechnungs-datum">Rechnungs-datum</Label>
             <InputGroupAddon>
               <DayPickerInput 
                 name="Rechnungs-datum"
-                onDayChange={(val) => this.updateFieldValue('rechnungsdatum', val )}
-                value={formatDate(customer['Rechnungs-datum'])}
+                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', val, 'customer' )}
+                value={formatDate(customer['Rechnungs-datum'] || Date.now())}
               />
             </InputGroupAddon>
           </Col>

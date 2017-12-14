@@ -5,7 +5,7 @@ import "./footer.css";
 const Footer = () => (
   <footer className="footer">
     <div className="container">
-      Some random Stuff down here.
+      @TSmith
     </div>
   </footer>
 );

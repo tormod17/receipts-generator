@@ -74,9 +74,6 @@ class Login extends Component {
                 </div>
 
                 <div className="checkbox">
-                  <label>
-                    <input type="checkbox" value="remember-me" /> Remember me
-                  </label>
                 </div>
 
                 {!user &&

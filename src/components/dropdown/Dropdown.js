@@ -7,15 +7,19 @@ export default class Example extends React.Component {
   static defaultProps = {
     name: PropTypes.string.isRequired,
     items: PropTypes.shape([]).isRequired,
+    data: PropTypes.shape({}).isRequired,
+    //updateFieldValue: PropTypes.func.isRequired,
   }
 
   constructor(props) {
     super(props);
-
-    this.toggle = this.toggle.bind(this);
+    const { data } = props;
     this.state = {
-      dropdownOpen: false
+      dropdownOpen: false,
+      selected: data['Rechnung'] === 'X' ? 'Rechnung' : 'Auszahlung',
     };
+    this.toggle = this.toggle.bind(this);
+    this.handleSelectItem = this.handleSelectItem.bind(this);
   }
 
   toggle() {
@@ -24,16 +28,28 @@ export default class Example extends React.Component {
     });
   }
 
+  handleSelectItem(item) {
+    const { name, updateFieldValue } = this.props;
+    this.setState({
+      selected: item,
+    }, updateFieldValue(name, item))
+  }
+
   render() {
-    const { name, items } = this.props;
+    const { items } = this.props;
+    const { selected } =this.state
+
     return (
-      <ButtonDropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
+      <ButtonDropdown 
+        isOpen={this.state.dropdownOpen} 
+        toggle={this.toggle}
+      >
         <DropdownToggle caret>
-          {name}
+          {selected}
         </DropdownToggle>
         <DropdownMenu>
           { items.map(item => 
-            <DropdownItem onClick={item.func}>{item.name}</DropdownItem>
+            <DropdownItem onClick={() => this.handleSelectItem(item.name)}>{item.name}</DropdownItem>
           )}
         </DropdownMenu>
       </ButtonDropdown>

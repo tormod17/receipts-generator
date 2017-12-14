@@ -8,16 +8,13 @@ const jwt = require("jsonwebtoken");
 const querystring = require('querystring');
 const csv = require('fast-csv');
 const XLSX = require('xlsx');
-const multer = require('multer');
+const multer = require('multer'); // used for writing file before saving.
 const uuidv1 = require('uuid/v1');
 
 const mongoose = require('mongoose');
 
 const DATETIMESTAMP = Date.now();
-
-
 const expTime = 1 * 60 * 60 * 24 * 150
-
 
 //POST route for updating data
 router.post('/api/signup', function(req, res, next) {
@@ -169,15 +166,13 @@ router.post('/api/upload', function(req, res, next) {
                     userId,
                     Rechnungsnummer: uuidv1(),
                     'Rechnungs-datum': DATETIMESTAMP,
-                    time: DATETIMESTAMP + i,
+                    time: DATETIMESTAMP,
                 }
                 ReceiptDB.create(new_receipt, function(err) {
                     if (err) return console.log(err)
                     console.log('saved');
                 })
             })
-
-
             try {
                 fs.unlinkSync(req.file.path);
             } catch (e) {
@@ -185,9 +180,7 @@ router.post('/api/upload', function(req, res, next) {
             }
             res.json(jsonResults);
         }
-
     });
-
 });
 
 router.get('/api/receipts', function(req, res, next) {
@@ -196,7 +189,7 @@ router.get('/api/receipts', function(req, res, next) {
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
     ReceiptDB.find({ userId })
-        //.limit(10)
+        .limit(30)
         .sort({ time: -1 })
         .exec((err, receipts) => {
             if (err) return console.error(err);
@@ -204,23 +197,93 @@ router.get('/api/receipts', function(req, res, next) {
         })
 })
 
-router.post('/api/addreceipt', function(req, res, next) {
+router.put('/api/receipt', function(req, res, next) {
+
+    const { customer, type, guests, corrections } = req.body
+    const { receiptId } = req.query;
+    if (!receiptId) return console.error('no receiptId');
+
+    const billType =  type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'}
+    if (guests) {
+        Object.keys(guests).forEach((key) => {
+            const changes = {
+                ...guests[key],
+                ...customer['Kunde'],
+                ...customer['Kunde-nummer'],
+                ...customer['Stadt'],
+                ...customer['Straße'],
+                ...customer['Rechnungs-datum'],
+            }
+            console.log(changes ,'>>>>>>>>>', guests[key], customer,);
+            ReceiptDB.findByIdAndUpdate( key, changes, (model) => {
+                res.json({ message: 'receipt updated'})
+            })
+        })
+    }
+    if (corrections) {
+        Object.keys(corrections).forEach((key) => {
+            const changes = {
+                ...corrections[key],
+                ...customer['Kunde'],
+                ...customer['Kunde-nummer'],
+                ...customer['Stadt'],
+                ...customer['Straße'],
+                ...customer['Rechnungs-datum'],
+            }
+            console.log(changes);
+            ReceiptDB.findByIdAndUpdate( key, changes, (model) => {
+                res.json({ message: 'receipt updated'})
+            })
+        })
+    }
+});
+
+router.post('/api/receipt', function(req, res, next) {
     if (!req.query.userId) return console.error('no userId');
     const { userId } = req.query;
-    const new_receipt = {
-        ...req.body,
-        filename: 'manual entry',
-        Rechnungsnummer: uuidv1(),
-        userId,
-        time: DATETIMESTAMP,
+
+    const { guests, corrections, customer, type }= req.body    
+    const billType =  type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'}
+    
+    if (guests){
+        Object.keys(guests).forEach(key => {
+            const new_receipt = {
+                ...customer,
+                ...guests[key],
+                ...billType,
+                filename: 'manual entry',
+                Rechnungsnummer: !guests[key]['Rechnungsnummer'] && uuidv1(),
+                'Rechnungs-datum':  customer['Rechnungs-datum']|| DATETIMESTAMP,
+                userId,
+                time: DATETIMESTAMP,
+            }
+            console.log(new_receipt);
+            ReceiptDB.create(new_receipt, function(err) {
+                if (err) return console.error(err)
+                res.json({ message:'Your receipt has been added'});
+            })
+        })
+
     }
 
-    ReceiptDB.create(new_receipt, function(err) {
-        if (err) return console.err(err)
-        res.send('Your receipt has been added');
-    })
-
-    /// add or edit a receipt 
+    if (corrections) {
+        Object.keys(corrections).forEach(key => {
+            const new_receipt = {
+                ...customer,
+                ...corrections[key],
+                ...billType,
+                filename: 'manual entry',
+                Rechnungsnummer: !corrections[key]['Rechnungsnummer'] && uuidv1(),
+                userId,
+                time: DATETIMESTAMP,
+            }
+            console.log(new_receipt);
+            ReceiptDB.create(new_receipt, function(err) {
+                if (err) return console.error(err)
+                res.json({message:'Your receipt has been added'});
+            })
+        })
+    }
 })
 
 

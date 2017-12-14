@@ -47,14 +47,12 @@ class App extends Component {
   }
 
   render() {
-    const { auth } = this.props;
-    const isAuthenticated = true && auth;
-    
+    const { auth } = this.props;    
     return (
       <Router>
         <div>
           <div className="container">
-            <Header user={auth}  handleLogout={() => this.handleLogout()} />
+            <Header auth={auth}  handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
                 <Route exact path="/" render={() => <Home {...this.props}/>} />

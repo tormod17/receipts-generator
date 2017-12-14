@@ -10,11 +10,16 @@ export const ADD_RECEIPT_REQUEST = "ADD_RECEIPT_REQUEST";
 export const ADD_RECEIPT_SUCCESS = "ADD_RECEIPT_SUCCESS";
 export const ADD_RECEIPT_FAILURE = "ADD_RECEIPT_FAILURE";
 
+export const UPDATE_RECEIPT_REQUEST = "UPDATE_RECEIPT_REQUEST";
+export const UPDATE_RECEIPT_SUCCESS = "UPDATE_RECEIPT_SUCCESS";
+export const UPDATE_RECEIPT_FAILURE = "UPDATE_RECEIPT_FAILURE";
+
 export const DEL_RECEIPT_REQUEST = "DEL_RECEIPT_REQUEST";
 export const DEL_RECEIPT_SUCCESS = "DEL_RECEIPT_SUCCESS";
 export const DEL_RECEIPT_FAILURE = "DEL_RECEIPT_FAILURE";
 
 export const SELECTED_RECEIPT = 'SELECTED_RECEIPT';
+
 export const UPLOAD_REQUEST = "UPLOAD_REQUEST";
 export const UPLOAD_SUCCESS = "UPLOAD_SUCCESS";
 export const UPLOAD_FAILURE = "UPLOAD_FAILURE";
@@ -96,22 +101,59 @@ export function getSingleReceipt(receiptId) {
   }
 }
 
+function updateReceiptRequest() {
+  return {
+    type: UPDATE_RECEIPT_REQUEST,
+  };
+}
+
+function updateReceiptSuccess(payload) {
+  return {
+    type: UPDATE_RECEIPT_SUCCESS,
+    payload,
+  };
+}
+
+function updateReceiptFailure(error) {
+  return {
+    type: UPDATE_RECEIPT_FAILURE,
+  };
+}
+
+export function updateReceipt(id, data) {
+  const config = {
+    method: "put",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data),
+  };
+  return callApi(
+    "/api/receipt?receiptId=" + id,
+    config,
+    updateReceiptRequest(data),
+    updateReceiptSuccess,
+    updateReceiptFailure,
+  );
+}
+
 function addReceiptsRequest() {
   return {
-    type: DEL_RECEIPT_REQUEST,
+    type: ADD_RECEIPT_REQUEST,
   };
 }
 
 function addReceiptsSuccess(payload) {
   return {
-    type: DEL_RECEIPT_SUCCESS,
+    type: ADD_RECEIPT_SUCCESS,
     payload,
   };
 }
 
 function addReceiptsFailure(error) {
   return {
-    type: DEL_RECEIPT_FAILURE,
+    type: ADD_RECEIPT_FAILURE,
   };
 }
 
@@ -125,7 +167,7 @@ export function addReceipt(id, data) {
     body: JSON.stringify(data),
   };
   return callApi(
-    "/api/addreceipt?userId="+id,
+    "/api/receipt?userId="+id,
     config,
     addReceiptsRequest(data),
     addReceiptsSuccess,
@@ -153,7 +195,6 @@ function delReceiptsFailure(error) {
     type: DEL_RECEIPT_FAILURE,
   };
 }
-
 
 export function deleteReceipts(data) {
   const config = {

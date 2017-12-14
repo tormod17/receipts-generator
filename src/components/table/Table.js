@@ -13,8 +13,8 @@ class TableData extends Component {
 
       this.handleClick = this.handleClick.bind(this);
 
-      this.requiredFields = ['Kunden-nummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select']
-      this.header = ['Kundenummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll') ];
+      this.requiredFields = ['Kunden-nummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select']
+      this.header = ['Kundenummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', ''];  //this.makeCheckBox('selectAll') 
     }
 
     makeCheckBox = id => 
@@ -42,10 +42,11 @@ class TableData extends Component {
           { this.requiredFields.map(field => {
               let output;
               switch(true){
-                case field === 'Belgart':
+                case field === 'Belegart':
                   output = receipt.Rechnung === 'x' ? 'Rechnung' : 'Auszahlung';
                   break;
                 case field === 'Rechnungs-datum':
+                console.log(receipt['Rechnungs-datum']);               
                  output = new Date(receipt['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
                  output = output[0] + ' ' +output[1] + ' ' + output[2] + ' ' + output[3];
                  break;

@@ -6,12 +6,14 @@ import { addReceipt } from "../../actions/receipts";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 import Dropdown from '../../components/dropdown/Dropdown';
-import EditableField from '../../components/editableField/EditableField';
+import EditableField from '../../components/editableField/EditableField'; 
 import Corrections from '../../components/corrections/Corrections';
 import Customer from '../../components/customer/Customer';
-import Transactions from '../../components/transactions/Transactions';
+import Guests from '../../components/guests/Guests';
+import uuidv4 from 'uuid/v4';
 
-import { getReceipts } from "../../actions/receipts";
+
+import { getReceipts, updateReceipt } from "../../actions/receipts";
 
 import 'font-awesome/css/font-awesome.min.css';
 import 'react-day-picker/lib/style.css';
@@ -20,24 +22,26 @@ import "./receipt.css";
 class Receipt extends Component {
 
   static propTypes ={
-    receipt: PropTypes.shape({})
+    data: PropTypes.shape({})
   }
 
   static defaultProps ={
-    receipt:{},
+    data:{},
     customer: {},
-    transactions: [],
   }
 
   constructor(props) {
     super(props)
     this.state ={
-      receipt: {},
-      customer: {},
-      transactions: [],
+      customer: undefined,
+      guests: {},
+      corrections: {},
     }
-    this.updateFieldValue = this.updateFieldValue.bind(this);
+    this.updateFieldValue = this.updateFieldValue.bind(this);    
+    this.handleAdd = this.handleAdd.bind(this);
+    this.handleDel = this.handleDel.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
+    this.calculateTotals = this.calculateTotals.bind(this);
   }
 
   componentDidMount(){
@@ -45,65 +49,179 @@ class Receipt extends Component {
     const id = this.props.match.params.id;
     if (id && data) {
       const customerNumber = data[id]['Kunden-nummer'];
-      const allTransactions = Object.values(data || {}).filter( trans => customerNumber === trans['Kunden-nummer'])
-      const corrections = allTransactions.filter(trans => trans['Auszhalungskorrektur'] || trans['Rechnungskorrektur'])
+      const allguests = Object.values(data || {}).filter( trans => customerNumber === trans['Kunden-nummer'])
+      const correctionsList = allguests.filter(trans => trans['Auszhalungskorrektur'] || trans['Rechnungskorrektur'])
+      console.log(allguests);
+      const guests = allguests.reduce((p,c) => {
+        p[c._id] = { ...c }
+        return p;
+      }, {})
+
+      const corrections = correctionsList.reduce((p,c) => {
+        p[c._id] = { ...c }
+        return p;
+      }, {})
       this.setState({
           customer: {
-            ...data[id],
+            ...allguests[0]
           },
-          receipt: {
-            ...data[id],
-          },
-          transactions: [
-            ...allTransactions
-          ],
-          corrections: [
-            ...corrections
-          ]
+          guests: {...guests },
+          corrections: {...corrections },
       })
     }
   }
 
+  calculateTotals(type) {
+    const { guests } = this.state;
+    const sum =Object.values(guests).reduce((a, b) => {
+      let total;
+      if(b[type] === 'X') {
+        total = b['TOTAL PAID']
+        return Number(total)
+      }
+    }, 0);
+    console.log(sum);
+    return sum 
+  }
+
   handleSubmission(){
     const { dispatch, auth } = this.props;
+    const receiptId = this.props.match.params.id;
     const data  = {
       ...this.state,
     };
-    dispatch(addReceipt(auth.id, data), this.props.history.push('/'))
+    if (receiptId) {
+      dispatch(updateReceipt(receiptId, data), this.props.history.push('/'))
+    } else {
+      dispatch(addReceipt(auth.id, data), this.props.history.push('/'))
+    }
   }
 
-  updateFieldValue(field, value){
-    this.setState( prevState => ({ [field]: value }))
+  handleAdd(type , obj){  
+    const entries = this.state[type];
+    const newId = uuidv4();
+    this.setState({
+      [type]: {
+        ...entries,
+        [newId]: {
+          ...obj
+        }
+      }
+    })
+  }
+
+  handleDel(key, type){
+    const entries = { ...this.state[type] };
+    const newEntries = Object.keys(entries).reduce((p,c) => {
+       if (c !== key ){
+        p[c] = { ...entries[c]}
+       } 
+       return p;
+    }, {})
+    
+    this.setState({
+      [type]: {
+        ...newEntries,
+      }
+    })
+  }
+
+  updateFieldValue(field, value, type, id){
+    if (id) {
+      this.setState( prevSate => ({ 
+        [type]: {
+           ...prevSate[type],
+          [id]: {
+            ...prevSate[type][id],
+            [field]: value,
+          }
+        } 
+      }));
+    } else if (type) {
+        this.setState( prevState => ({
+          [type]: {
+            ...prevState[type],
+            [field]: value,
+          }
+        }));
+    } else  {
+      this.setState( prevState => ({ [field]: value }));
+    }
   }
 
   render() {
-    const { customer, transactions, receipt, corrections } = this.state;
+    const { customer, guests, corrections } = this.state;
     return (
     <Form clasName="bill">
-        <Customer customer={customer} updateFieldValue={this.updateFieldValue} />
-        <FormGroup>
-          <h2>Geschäftsvorfall 1:</h2>
+        <FormGroup row>
+          <Col sm={{ size:5 }}>
+            <br/>
+            <Dropdown
+              data={customer}
+              name="billType"
+              items={[{ 
+                  name:'Rechnung',
+                },{
+                  name:'Auszahlung',
+                }]}
+              updateFieldValue={this.updateFieldValue} 
+
+            />
+          </Col>
+          <Col sm={{ size:1, offset: 6}}>
+            <i 
+              style={{
+                margin: '10px',
+              }}
+              class="fa fa-chevron-left fa-3x"
+              aria-hidden="true"
+              onClick={() => this.props.history.push('/')}
+            />
+          </Col>
         </FormGroup>
-        { transactions && transactions.map(trans => {
-          return (
-           <Transactions updateFieldValue={this.updateFieldValue} trans={trans}/>
-        )})}
+        <Customer 
+          customer={customer}
+          updateFieldValue={this.updateFieldValue} 
+        />
+        <Guests 
+          updateFieldValue={this.updateFieldValue}
+          guests={guests}
+          handleDelGuest={this.handleDel}
+          handleAddGuest={this.handleAdd}
+
+        />
         <div>
-          <Corrections updateFieldValue={this.updateFieldValue} corrections={corrections}/>
+          <Corrections 
+            updateFieldValue={this.updateFieldValue} 
+            corrections={corrections}
+            handleDelCorrection ={this.handleDel}
+            handleAddCorrection ={this.handleAdd}
+          />
         </div>
         <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-             <EditableField updateFieldValue={this.updateFieldValue} name="Gesamtumsatz Airgreets" placeholder="Gesamt Auszahlungs Betrag"/>
+          <Col sm={{ size: 4, order: 1 }}>
+            <EditableField 
+              //updateFieldValue={this.updateFieldValue}
+              name="Gesamtumsatz Airgreets" 
+              placeholder="Gesamt Auszahlungs Betrag"
+              value={this.calculateTotals('Auszahlung')}
+            />
           </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-           <EditableField updateFieldValue={this.updateFieldValue} name="Auszahlung an Kunde" placeholder="Gesamt Rechnungs Betrag"/>
+          <Col sm={{ size: 4, order: 1 }}>
+            <EditableField 
+              //updateFieldValue={this.updateFieldValue}
+              name="Auszahlung an Kunde"
+              placeholder="Gesamt Rechnungs Betrag"
+              value={this.calculateTotals('Rechnungs')}
+            />
           </Col>
-        </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size: 6, order: 1 }}>
-           <EditableField updateFieldValue={this.updateFieldValue} name="Darin enthaltene Umsatzsteuer" placeholder="Darin Enthaltene Umsatzsteuer"/>
+          <Col sm={{ size: 4, order: 1 }}>
+            <EditableField 
+              //updateFieldValue={this.updateFieldValue}
+              name="Darin enthaltene Umsatzsteuer"
+              placeholder="Darin Enthaltene Umsatzsteuer"
+              //value={this.calculateTotals()}
+            />
           </Col>
         </FormGroup>
         <Row className="">

@@ -2,12 +2,13 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import { Grid, Row, Col, ControlLabel, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import { Grid, Row, Col, Control, Label, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 
 import createReactClass from 'create-react-class';
+import { formatDate } from "../../utils/apiUtils";
 
 import TableData from '../../components/table/Table';
 import { upload } from "../../actions/upload";
@@ -21,7 +22,7 @@ class Home extends Component {
     super(props);
     this.state ={
       value: new Date().toISOString(),
-      selectedDay: undefined,
+      selectedDay: formatDate(Date.now()),
       receipts: { ...props.receipts.data },
       selectedArray: [],
     }
@@ -46,6 +47,11 @@ class Home extends Component {
         receipts: { ...nextProps.receipts.data }
       })
     }
+  }
+
+  componentDidMount(){
+    const { auth, dispatch } = this.props;
+    dispatch(getReceipts(auth.id))
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -129,50 +135,52 @@ class Home extends Component {
     return (
       <Container>
         {  auth &&
-          <Row>
-            <h1>Home</h1>
-            <div>{auth.username}</div>
-            <div>{auth.email}</div>
-          </Row>
+          <FormGroup row>
+            <h3>Willkommen {auth.username} {auth.email}</h3>
+          </FormGroup>
         }
+        <FormGroup row>
+          <Col sm={{ size:3 }}>
+            <InputGroupAddon>
+              <input 
+                type="file"
+                name="file"
+                onChange={this.uploadFile}
+                ref={(input) => { this.newFile = input}}
+               />        
+            </InputGroupAddon>
+          </Col>
+          <Col sm={{ size:3 , offset: 6}}>
+            <InputGroupAddon>
+              <DayPickerInput
+                value={selectedDay}
+                onDayChange={this.handleDayChange}
+                dayPickerProps={{
+                  selectedDays: selectedDay,
+                  disabledDays: {
+                    daysOfWeek: [0, 6],
+                  },
+                }} 
+              />
+            </InputGroupAddon>
+                <InputGroupAddon>
+                  <DayPickerInput
+                    value={selectedDay}
+                    onDayChange={this.handleDayChange}
+                    dayPickerProps={{
+                      selectedDays: selectedDay,
+                      disabledDays: {
+                        daysOfWeek: [0, 6],
+                      },
+                    }} 
+                  />
+                </InputGroupAddon>
+            </Col>
+          </FormGroup>
           <Row>
-            <Col sm={{ size: 4, order: 9, offset: 8 }}>
-                <DayPickerInput
-                  value={selectedDay}
-                  onDayChange={this.handleDayChange}
-                  dayPickerProps={{
-                    selectedDays: selectedDay,
-                    disabledDays: {
-                      daysOfWeek: [0, 6],
-                    },
-                  }} 
-                />
-            </Col>
-          </Row>
-          <Row>
-            <Col sm={4}>
-              <InputGroup>
-                <input 
-                  type="file"
-                  name="file"
-                  onChange={this.uploadFile}
-                  ref={(input) => { this.newFile = input}}
-                 />
-              </InputGroup>
-            </Col>
-            <Col sm={{ size: 4, order: 9, offset: 8 }}>
-                <DayPickerInput
-                  value={selectedDay}
-                  onDayChange={this.handleDayChange}
-                  dayPickerProps={{
-                    selectedDays: selectedDay,
-                    disabledDays: {
-                      daysOfWeek: [0, 6],
-                    },
-                  }} 
-                />
-            </Col>
+        
         </Row>
+        <br/>
         <Row>
           {receipts && 
               <TableData

@@ -3,8 +3,19 @@ import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroup
 import PropTypes from "prop-types";
 import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
+import uuidv4 from 'uuid/v4';
+
 import 'font-awesome/css/font-awesome.min.css';
 
+
+const corr = {
+  'billType': null,
+  'Sonstige Leistungsbeschreibung': null,
+  'Auszahlungskorrektur in €': null,
+  'Rechnungskorrektur in €': null,
+  'Ust-Korrektur': null,
+  'correctionId': uuidv4(),
+};
 
 export default class Corrections extends React.Component {
   
@@ -19,47 +30,18 @@ export default class Corrections extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      corrections: [ ...props.corrections],
-    };
-    this.handleAddCorrection = this.handleAddCorrection.bind(this);
-    this.handleDelCorrection = this.handleDelCorrection.bind(this);
+    this.state = {};
+    this.handleValueChange = this.handleValueChange.bind(this)
   }
 
-  handleAddCorrection(){  
-    const  { corrections } = this.state;
-    const corr = {
-      type: null,
-      'Sonstige Leistungsbeschreibung': null,
-      'Auszahlungskorrektur in €': null,
-      'Rechnungskorrektur in €': null,
-      'Ust-Korrektur': null,
-      'correctionId': 55 + corrections.length,
-      'customerNumber': '12343',
-    };
-    const newArr = [];
-    newArr.push(corr)
-    this.setState({
-      corrections: [
-        ...corrections,
-        ...newArr,
-      ]
-    })
+  handleValueChange(name, value, id) {
+    this.props.updateFieldValue(name, value, 'corrections', id)
   }
-
-  handleDelCorrection(e){
-    const id = e.target.getAttribute('id');
-    const { corrections } = this.state;
-    const newCorr = corrections.filter(c => c['correctionId'] !== Number(id));
-    this.setState({
-      corrections: [...newCorr],
-    })
-  }
-
 
   render() {
-    const { corrections } = this.state;
-    const noCorrections = corrections.length === 0
+    const {  } = this.state;
+    const { updateFieldValue, corrections } = this.props;
+ 
     return (
       <div>
         <FormGroup row>
@@ -67,35 +49,38 @@ export default class Corrections extends React.Component {
             <h2>Geschäftsvorfall 2: korrektur</h2>
           </Col>
         </FormGroup>
-        { corrections && corrections.map(correction =>
-          <div>
+        { corrections && Object.keys(corrections).map(key =>
+          <div
+            key={corrections[key].correctionId}
+          >
             <FormGroup row>
               <Col className="col-4">
                 <hr/>
                 <Dropdown
-                  name="Rechnungskorrektur/Auszahlungskorrektur"
+                  name="correctionType"
+                  data={corrections[key]}
+                  updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   items={[{ 
-                      name:'Rechnungskorrektur',
-                      func: () => {},
+                      name:'Rechnungskorrektur in €',
                     },{
-                      name:'Auszahlungskorrektur',
-                      func: ()=> {},                  
+                      name:'Auszahlungskorrektur in €',
                     }]}
                 />
               </Col>
               <Col className="col-4">
                   <EditableField 
-                    updateFieldValue={this.updateFieldValue}
+                    updateFieldValue={(name, val) => this.handleValueChange(name, val, key)}                     
                     name="Anpassungs-grund"
                     placeholder="Anpassungs grund"
-                    value={correction['Sonstige Leistungsbeschreibung']} 
+                    value={corrections[key]['Sonstige Leistungsbeschreibung']} 
                   />
               </Col>
               <Col className="col-3">
                  <EditableField
-                  updateFieldValue={this.updateFieldValue}
+                  name="Auszahlungskorrektur in €"
+                  updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   placeholder="Betrag"
-                  value={correction['Rechnungskorrektur in €'] || correction['Auszahlungskorrektur in €']}
+                  value={corrections[key]['Rechnungskorrektur in €'] || corrections[key]['Auszahlungskorrektur in €']}
                 />
               </Col>
               <Col className="col-1">
@@ -103,8 +88,8 @@ export default class Corrections extends React.Component {
                 <i 
                   class="fa fa-trash fa-3x"
                   aria-hidden="true"
-                  onClick={this.handleDelCorrection}
-                  id={correction['correctionId']}
+                  onClick={() => this.props.handleDelCorrection(key, 'corrections')}
+                  id={corrections[key]['correctionId']}
                 >
                 </i>
               </Col>
@@ -121,12 +106,16 @@ export default class Corrections extends React.Component {
             </FormGroup>
           </div>
        )}
-       { noCorrections &&
+        { Object.keys(corrections).length === 0 &&
           <p> No korrektur </p>
-       }
+        }
         <FormGroup row>
           <Col>
-            <i class="fa fa-plus fa-3x" aria-hidden="true" onClick={this.handleAddCorrection}></i>
+            <i 
+              class="fa fa-plus fa-3x"
+              aria-hidden="true"
+              onClick={() => this.props.handleAddCorrection('corrections',corr)}
+            ></i>
           </Col>
         </FormGroup>
       </div>
