@@ -86,9 +86,9 @@ class Receipt extends Component {
     const { dispatch, auth, receipts } = this.props;
     const receiptId = this.props.match.params.id;
     const prevState = receipts.data[receiptId]
+    
     const data  = {
-      ...prevState,
-      ...this.state.customer,
+      ...this.state,
     };
     if (receiptId) {
       dispatch(updateReceipt(receiptId, data), this.props.history.push('/'))

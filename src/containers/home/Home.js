@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import { Grid, Row, Col, Control, Label, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import {  Row, Col, Control, Label, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
