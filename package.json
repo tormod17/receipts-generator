@@ -7,24 +7,6 @@
     "type": "git",
     "url": "https://github.com/ryce/airgreets-tool.git"
   },
-  "keywords": [
-    "react",
-    "reactjs",
-    "redux",
-    "react-router",
-    "bootstrap",
-    "webpack",
-    "jwt",
-    "auth0",
-    "dashboard",
-    "template",
-    "boilerplate",
-    "create-react-app",
-    "websockets",
-    "socket.io",
-    "PWA",
-    "Progressive Web Apps"
-  ],
   "author": "Tormod Smith",
   "license": "MIT",
   "bugs": {
