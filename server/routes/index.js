@@ -129,7 +129,7 @@ router.post('/api/logout', function(req, res, next) {
 
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './uploads/')
+        cb(null, './uploads/');
     },
     filename: function(req, file, cb) {
         cb(null, file.originalname.split('.')[0] + '-' + DATETIMESTAMP + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1])
@@ -263,7 +263,8 @@ router.put('/api/receipt', function(req, res) {
 router.post('/api/receipt', function(req, res) {
     if (!req.query.userId) return console.error('no userId');
     const { userId } = req.query;
-
+    
+    console.log('ADDING A USER MANUALLY NOT BY UPLOAD');
     const { guests, corrections, customer, type }= req.body;   
     const billType =  type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'};
     

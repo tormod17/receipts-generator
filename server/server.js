@@ -53,7 +53,7 @@ const routes = require('./routes/');
 app.use('/', routes);
 
 const staticFilePath = process.env.NODE_ENV ==='production' ? 'build' : 'public';
-app.use(express.static(path.resolve(__dirname, '..', staticFilePath )));
+app.use(express.static(path.resolve(__dirname, staticFilePath )));
 
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
