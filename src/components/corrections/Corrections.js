@@ -5,8 +5,6 @@ import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
 import uuidv4 from 'uuid/v4';
 
-import 'font-awesome/css/font-awesome.min.css';
-
 
 const corr = {
   'billType': null,

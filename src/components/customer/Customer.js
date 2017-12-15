@@ -8,7 +8,6 @@ import DayPickerInput from 'react-day-picker/DayPickerInput';
 
 import { formatDate } from "../../utils/apiUtils";
 
-import 'font-awesome/css/font-awesome.min.css';
 
 export default class Customer extends React.Component {
   

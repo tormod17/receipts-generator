@@ -23,7 +23,7 @@ import NotFound from "../misc/NotFound";
 import { logout } from "../../actions/auth";
 
 import "./app.css";
-import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+import { getReceipts } from "../../actions/receipts";
 
 
 

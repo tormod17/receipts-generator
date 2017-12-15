@@ -8,8 +8,6 @@ import { formatDate } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
 
-import 'font-awesome/css/font-awesome.min.css';
-
 const guest = {
   Abreisedatum: null,
   Anreisedatum: null,

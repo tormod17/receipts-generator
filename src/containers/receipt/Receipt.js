@@ -15,7 +15,6 @@ import uuidv4 from 'uuid/v4';
 
 import { getReceipts, updateReceipt } from "../../actions/receipts";
 
-import 'font-awesome/css/font-awesome.min.css';
 import 'react-day-picker/lib/style.css';
 import "./receipt.css";
 

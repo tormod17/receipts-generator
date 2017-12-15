@@ -16,7 +16,6 @@ import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/rec
 
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import 'font-awesome/css/font-awesome.min.css';
 
 import "./home.css";
 
