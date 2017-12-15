@@ -29,7 +29,7 @@ router.post('/api/signup', function(req, res, next) {
     const userData = {
         email,
         username,
-        password,
+        password
     };
     User.addUser(userData, function(err, newUser) {
         if (err) {
@@ -189,7 +189,7 @@ router.get('/api/receipts', function(req, res) {
     if (!req.query) return console.error('no userId');
     const { userId } = req.query;
     ReceiptDB.find({ userId })
-        //.limit(50)
+        .limit(50)
         .sort({ time: -1 })
         .exec((err, receipts) => {
             if (err) return console.error(err);
@@ -198,67 +198,23 @@ router.get('/api/receipts', function(req, res) {
 });
 
 router.put('/api/receipt', function(req, res) {
-    //type, guests, corrections 
-    const { customer, } = req.body;
+    const { type, guests, customer, corrections } = req.body;
     const { receiptId } = req.query;
     if (!receiptId) return console.error('no receiptId');
+    console.log(customer, '>>>>>>>');
 
     //const billType = type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'};
+ 
 
-    const changes ={
-        ...req.body
-    };
 
-    ReceiptDB.findByIdAndUpdate(receiptId, changes, (err, model) => {
+    ReceiptDB.findByIdAndUpdate(receiptId, customer, (err, model) => {
         if(err) {
             console.error(err);
             return res.json({ message: err });
         }
         res.json({ message: 'customer has been updated', model : {...model, ...customer} });
     });
-    console.log('req body', req.body, receiptId);
 });
-
-   
-    // if (guests) {
-    //     Object.keys(guests).forEach((key) => {
-    //         const changes = {
-    //             ...guests[key],
-    //             ...customer['Kunde'],
-    //             ...customer['Kunde-nummer'],
-    //             ...customer['Stadt'],
-    //             ...customer['Straße'],
-    //             ...customer['Rechnungs-datum'],
-    //         };
-    //         ReceiptDB.findByIdAndUpdate( key, changes, () => {
-    //             res.json({ message: 'receipt updated for guests'});
-    //         });
-    //     });
-    // }
-    // if (corrections) {
-    //     Object.keys(corrections).forEach((key) => {
-    //         const changes = {
-    //             ...corrections[key],
-    //             ...customer['Kunde'],
-    //             ...customer['Kunde-nummer'],
-    //             ...customer['Stadt'],
-    //             ...customer['Straße'],
-    //             ...customer['Rechnungs-datum'],
-    //         };
-    //         console.log(changes);
-    //         ReceiptDB.findByIdAndUpdate( key, changes, () => {
-    //             res.json({ message: 'receipt updated, for correcitons'});
-    //         });
-    //     });
-    // }
-
-    // if (!guests || !corrections) {
-    //     const changes ={
-    //         ...customer,
-    //     };
-    //     console.log(changes);
-    //}
-
 
 router.post('/api/receipt', function(req, res) {
     if (!req.query.userId) return console.error('no userId');
@@ -267,8 +223,9 @@ router.post('/api/receipt', function(req, res) {
     console.log('ADDING A USER MANUALLY NOT BY UPLOAD');
     const { guests, corrections, customer, type }= req.body;   
     const billType =  type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'};
-    
-    if (Object.keys(guests).length >0){
+        
+    console.log(guests, corrections, customer);    
+    if (Object.keys(guests|| {}).length >0){
         Object.keys(guests).forEach(key => {
             const Rechnungsnummer = uuidv1();
             const new_receipt = {
@@ -280,7 +237,7 @@ router.post('/api/receipt', function(req, res) {
                 'Rechnungs-datum':  customer['Rechnungs-datum']|| DATETIMESTAMP,
                 userId,
                 time: DATETIMESTAMP,
-                _id: Rechnungsnummer,
+                _id: Rechnungsnummer
             };
             console.log(new_receipt);
             ReceiptDB.create(new_receipt, function(err) {
@@ -291,7 +248,7 @@ router.post('/api/receipt', function(req, res) {
 
     }
 
-    if (Object.keys(corrections).length > 0) {
+    if (Object.keys(corrections || {}).length > 0) {
         Object.keys(corrections).forEach(key => {
             const Rechnungsnummer = uuidv1();
             const new_receipt = {
@@ -302,7 +259,7 @@ router.post('/api/receipt', function(req, res) {
                 Rechnungsnummer: !corrections[key]['Rechnungsnummer'] || Rechnungsnummer ,
                 userId,
                 time: DATETIMESTAMP,
-                _id: Rechnungsnummer,
+                _id: Rechnungsnummer
             };
             console.log(new_receipt);
             ReceiptDB.create(new_receipt, function(err) {
