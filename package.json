@@ -94,6 +94,7 @@
     "popper.js": "^1.13.0",
     "prop-types": "^15.6.0",
     "react": "^16.0.0",
+    "react-scripts": "1.0.17",
     "react-bootstrap": "^0.31.5",
     "react-day-picker": "^7.0.5",
     "react-dom": "^16.0.0",
@@ -113,8 +114,9 @@
     "dev": "nodemon server.js",
     "test": "jest ./tests/*",
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js",
-    "build": "babel src/*.js -d dist",
-    "start": "webpack-dev-server",
+    "build": "react-scripts build",
+    "start": "react-scripts start",
+    "eject": "react-scripts eject",
     "webpack": "webpack --watch",
     "lint": "eslint src"
   }

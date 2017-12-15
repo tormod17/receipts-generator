@@ -37,13 +37,13 @@ module.exports = {
       loader: ['style-loader', 'css-loader']
     },{
       test: /\.scss$/,
-      loaders: ["style-loader", "css-loader", "sass-loader"],
+      loaders: ['style-loader', 'css-loader', 'sass-loader']
     },{ 
       test: /\.(png|woff|woff2|eot|ttf|svg|jpg|jpeg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-      loader: "url-loader?limit=10000&mimetype=application/font-woff"
+      loader: 'url-loader?limit=10000&mimetype=application/font-woff'
     },{
       test: /\.less$/,
-      loader: "style!css!less"
+      loader: 'style!css!less'
     },{ 
       test: /\.jsx?$/, 
       loader: 'babel-loader',
