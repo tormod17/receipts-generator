@@ -31,13 +31,13 @@ class App extends Component {
 
   componentDidMount(){
     const { id } = this.props.auth;
-    this.props.dispatch(getReceipts(id))
+    this.props.dispatch(getReceipts(id));
   }
 
   componentWillReceiveProps(nextProps) {
     const { receipts, auth } = this.props;
     if (receipts.message !== nextProps.receipts.message ){
-      this.props.dispatch(getReceipts(auth.id))
+      this.props.dispatch(getReceipts(auth.id));
     }
   }
 
@@ -85,7 +85,7 @@ const mapStateToProps = state => {
   const { auth, receipts } = state;
   return {
     auth,
-    receipts,
+    receipts
   };
 };
 
