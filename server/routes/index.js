@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const XLSX = require('xlsx');
 const multer = require('multer'); // used for writing file before saving.
 const uuidv1 = require('uuid/v1');
+const path =require('path');
 
 //const mongoose = require('mongoose');
 
@@ -125,18 +126,19 @@ router.post('/api/logout', function(req, res, next) {
     console.log("jwt verify error", err);
     return res.status(500).json({ message: "Invalid jwt token" });
 });
-
-
+const  rootDir  = path.resolve(__dirname, '..', '..');
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, './uploads/');
+        console.log('Learning about paths' , rootDir );
+        cb(null, rootDir + '/tmp');
     },
     filename: function(req, file, cb) {
-        cb(null, file.originalname.split('.')[0] + '-' + DATETIMESTAMP + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1])
+        cb(null, file.originalname.split('.')[0] + '-' + DATETIMESTAMP + '.' + file.originalname.split('.')[file.originalname.split('.').length - 1]);
     }
 });
 
 var upload = multer({ storage }).single('file');
+
 
 router.post('/api/upload', function(req, res) {
     const { userId } = req.query;
@@ -154,7 +156,7 @@ router.post('/api/upload', function(req, res) {
         const { originalname, filename } = file;
         const ext = originalname.split('.')[originalname.split('.').length - 1];
         if (ext === 'xlsx' || ext === 'xlsm') {
-            const workbook = XLSX.readFile('./uploads/' + filename);
+            const workbook = XLSX.readFile(rootDir + '/tmp/' + filename);
             const sheet_name_list = workbook.SheetNames;
             const jsonResults = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
             jsonResults.forEach((receipt) => {
@@ -166,7 +168,7 @@ router.post('/api/upload', function(req, res) {
                     Rechnungsnummer,
                     'Rechnungs-datum': DATETIMESTAMP,
                     time: DATETIMESTAMP,
-                    _id: Rechnungsnummer,
+                    _id: Rechnungsnummer
                 };
                 ReceiptDB.create(new_receipt, function(err) {
                     if (err) return console.log(err);
