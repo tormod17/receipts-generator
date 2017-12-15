@@ -1,6 +1,5 @@
 {
   "name": "airgreets-tool",
-  "homepage": "https://github.com/ryce/airgreets-tool",
   "version": "1.0.0",
   "description": "A Tool to upload tables and export pdfs",
   "repository": {
