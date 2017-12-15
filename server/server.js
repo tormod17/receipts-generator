@@ -38,8 +38,7 @@ app.use(session({
   })
 }));
 
-const staticFilePath = process.env.NODE_ENV ==='production' ? 'build' : 'public';
-app.use(express.static(path.resolve(__dirname, '..', staticFilePath )));
+
 
 
 const port = process.env.PORT || 3001;
@@ -52,6 +51,13 @@ app.use(bodyParser.json());
 // include routes
 const routes = require('./routes/');
 app.use('/', routes);
+
+const staticFilePath = process.env.NODE_ENV ==='production' ? 'build' : 'public';
+app.use(express.static(path.resolve(__dirname, '..', staticFilePath )));
+
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
