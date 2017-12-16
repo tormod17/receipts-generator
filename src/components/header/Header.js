@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
+import { Nav, NavItem, NavLink } from 'reactstrap'
+
 import "./header.css";
 
 class Header extends Component {
@@ -14,54 +16,57 @@ class Header extends Component {
 
   render() {
     const pathname = this.props.history.location.pathname;
-    const isAuthenticated = true && this.props.auth.id;
-    console.log(isAuthenticated);
+    const isAuthenticated = this.props.auth.id && true
+    console.log(isAuthenticated, 'isAuthenticated');
 
     const isLoginPage = pathname.indexOf("login") > -1;
     const isUsersPage = pathname.indexOf("users") > -1;
     const isSignupPage = pathname.indexOf("signup") > -1;
 
     return (
-      <nav className="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-      <Link to="/" className="navbar-brand">
-        <div title="Home" className="brand" />
-        Home
-      </Link>
-      
-        <button
-          type="button"
-          className="navbar-toggler"
-          data-toggle="collapse"
-          data-target="#navbarCollapse"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-        
-        <div id="navbarCollapse" className="collapse navbar-collapse">
-          <ul className="navbar-nav mr-auto">
-            <li
-              title="Login"
-              className={!isLoginPage ? "nav-item active" : "nav-item"}
+      <div>
+       <Nav pills>
+         <NavItem>
+         { isAuthenticated && 
+           <NavLink 
+              href="/home"
+              active={isAuthenticated}
             >
-             { (!isAuthenticated && isSignupPage ) && <Link className="nav-link" to="/login">Login</Link> }
-            </li>
-            <li
-              title="Signup"
-              className={ !isSignupPage? "nav-item active" : "nav-item"}
+              Home
+            </NavLink>
+          }
+         </NavItem>
+         { !isAuthenticated &&
+         <NavItem>
+           <NavLink 
+            href="#signup"
+            active={isSignupPage}
             >
-            { (!isAuthenticated && isLoginPage) && <Link className="nav-link" to="/signup">Signup</Link> }
-            </li>
-
-             <li
-              title="Logout"
-              className={isAuthenticated ? "nav-item active" : "nav-item"}
-              onClick={this.onLogoutClick}
-            >
-             { isAuthenticated && <Link className="nav-link" to="/logout">Logout</Link> }
-            </li>
-          </ul>
-        </div>
-      </nav>
+            Sign up
+            </NavLink>
+         </NavItem>
+        }
+         <NavItem>
+          {!isAuthenticated && 
+            <NavLink 
+            href="#login"
+            active={isLoginPage}
+          >
+            Login
+          </NavLink>
+         }
+         </NavItem>
+         <NavItem>
+           { isAuthenticated && 
+              <NavLink 
+                onClick={this.onLogoutClick} 
+                href="/logout">
+                Logout
+              </NavLink>
+            }
+         </NavItem>
+       </Nav>
+     </div>
     );
   }
 }

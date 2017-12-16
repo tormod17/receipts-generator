@@ -211,13 +211,27 @@ class Home extends Component {
 
     return (
       <Container>
-        {  auth &&
           <FormGroup row>
-            <h3>Willkommen {auth.username} {auth.email}</h3>
+            <Col sm={{ size:8 }}>
+              <h3>Willkommen {auth.username} {auth.email}</h3>
+            </Col>
+            <Col sm={{ size:4 }}>
+              <InputGroupAddon>
+                <DayPickerInput
+                  value={selectedDay}
+                  onDayChange={this.handleDayChange}
+                  dayPickerProps={{
+                    selectedDays: selectedDay,
+                    disabledDays: {
+                      daysOfWeek: [0, 6]
+                    }
+                  }} 
+                />
+              </InputGroupAddon>
+            </Col>
           </FormGroup>
-        }
         <FormGroup row>
-          <Col sm={{ size:3 }}>
+          <Col sm={{ size:4 }}>
             <InputGroupAddon>
               <input 
                 type="file"
@@ -228,7 +242,7 @@ class Home extends Component {
                />        
             </InputGroupAddon>
           </Col>
-          <Col sm={{ size:3 , offset: 6}}>
+          <Col sm={{ size:4 , offset: 4 }}>
             <InputGroupAddon>
               <DayPickerInput
                 value={selectedDay}
@@ -241,18 +255,6 @@ class Home extends Component {
                 }} 
               />
             </InputGroupAddon>
-                <InputGroupAddon>
-                  <DayPickerInput
-                    value={selectedDay}
-                    onDayChange={this.handleDayChange}
-                    dayPickerProps={{
-                      selectedDays: selectedDay,
-                      disabledDays: {
-                        daysOfWeek: [0, 6]
-                      }
-                    }} 
-                  />
-                </InputGroupAddon>
             </Col>
           </FormGroup>
           <Row>
