@@ -200,8 +200,8 @@ class Home extends Component {
   uploadFile(){
     const file = this.newFile.files[0];
     const { id } = this.props.auth;    
-    let data= new FormData();
-    data.append('file', file);
+    let data = new FormData();
+    data.append('csvdata', file);
     this.props.dispatch(upload(data, id));
   }
 
@@ -221,7 +221,8 @@ class Home extends Component {
             <InputGroupAddon>
               <input 
                 type="file"
-                name="file"
+                name="csvdata"
+                accept="text/cvs"
                 onChange={this.uploadFile}
                 ref={(input) => { this.newFile = input;}}
                />        
@@ -235,8 +236,8 @@ class Home extends Component {
                 dayPickerProps={{
                   selectedDays: selectedDay,
                   disabledDays: {
-                    daysOfWeek: [0, 6],
-                  },
+                    daysOfWeek: [0, 6]
+                  }
                 }} 
               />
             </InputGroupAddon>
@@ -247,8 +248,8 @@ class Home extends Component {
                     dayPickerProps={{
                       selectedDays: selectedDay,
                       disabledDays: {
-                        daysOfWeek: [0, 6],
-                      },
+                        daysOfWeek: [0, 6]
+                      }
                     }} 
                   />
                 </InputGroupAddon>

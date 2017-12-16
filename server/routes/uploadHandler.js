@@ -17,7 +17,7 @@ exports.uploadHandler = (req, res) => {
         const workbook = xlsx.read(file.buffer);
         const sheet_name_list = workbook.SheetNames;
         const jsonResults = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        console.log(jsonResults);
+        console.log(jsonResults, '>>>>>>>>>>>>>>>>>>>>>', workbook);
         jsonResults.forEach((receipt) => {
             const Rechnungsnummer = uuidv1();
             const new_receipt = {
