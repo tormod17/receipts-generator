@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer'); // used for writing file before saving.
+
 
 const { 
     getReceiptsHandler,
@@ -15,7 +17,7 @@ const {
     profileHandler
 } = require ('./authHandler');
 
-const uploadHandler = require('./uploadHandler');
+const { uploadHandler } = require('./uploadHandler');
 
 
 //auth
@@ -27,11 +29,8 @@ router.post('/api/login', (req, res) => loginHandler(req, res));
 // GET for logout logout
 router.post('/api/logout', (req, res, next) => logoutHandler(req,res, next));
 
-
-// upload
-router.post('/api/upload', (req,res) =>  uploadHandler(req,res));
-
-
+var upload = multer();
+router.post('/api/upload', upload.single('csvdata'), (req,res) => uploadHandler(req, res));
 // receipts 
 router.get('/api/receipts', (req, res) => getReceiptsHandler(req,res));
 
