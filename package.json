@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/ryce/airgreets-tool/issues"
   },
-  "proxy": "http://localhost:3001Y",
+  "proxy": "http://localhost:3001",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.26.0",
@@ -91,7 +91,7 @@
     "xlsx": "^0.11.12"
   },
   "scripts": {
-    "dev": "nodemon server.js",
+    "server": "nodemon server.js",
     "test": "jest ./tests/*",
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js",
     "build": "react-scripts build",
