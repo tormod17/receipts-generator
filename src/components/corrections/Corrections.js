@@ -57,11 +57,8 @@ export default class Corrections extends React.Component {
                   name="correctionType"
                   data={corrections[key]}
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                  items={[{ 
-                      name:'Rechnungskorrektur in €',
-                    },{
-                      name:'Auszahlungskorrektur in €',
-                    }]}
+                  items={['Rechnungskorrektur in €', 'Auszahlungskorrektur in €']}
+                  selected={corrections[key]['Rechnung'] === 'X' ? 'Rechnung' : 'Auszahlung'}
                 />
               </Col>
               <Col className="col-4">

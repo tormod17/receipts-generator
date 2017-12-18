@@ -7,7 +7,7 @@ import "./editableField.css";
 
 class EditableField extends Component {
 
-  static propTypes ={
+  static propTypes = {
     updateFieldValue: PropTypes.func,
     placeholder: PropTypes.string,
     name: PropTypes.string,

@@ -160,12 +160,9 @@ class Receipt extends Component {
             <Dropdown
               data={customer}
               name="billType"
-              items={[{ 
-                  name:'Rechnung',
-                },{
-                  name:'Auszahlung',
-                }]}
+              items={['Rechnung', 'Auszahlung']}
               updateFieldValue={this.updateFieldValue} 
+              selected={customer && customer['Rechnung'] === 'X' ? 'Rechnung' : 'Auszahlung'}
 
             />
           </Col>

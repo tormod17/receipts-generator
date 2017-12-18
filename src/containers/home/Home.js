@@ -2,18 +2,19 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import {  Row, Col, Control, Label, FormGroup, Container, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import {  Row, Col, Control,  FormGroup, Container, InputGroup, InputGroupAddon, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
+
 import 'react-day-picker/lib/style.css';
 
-import createReactClass from 'create-react-class';
 import { formatDate } from "../../utils/apiUtils";
 import { createPDF } from '../../utils/createPDF';
 
 import TableData from '../../components/table/Table';
+import Dropdown from '../../components/dropdown/Dropdown';
 import { upload } from "../../actions/upload";
-import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+import { getReceipts, deleteReceipts } from "../../actions/receipts";
 
 
 import 'pdfmake/build/pdfmake.js';
@@ -21,7 +22,34 @@ import 'pdfmake/build/vfs_fonts.js';
   
 import "./home.css";
 
+const TIMESTAMP = new Date();
+
+const MONTH = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+];  
+
+
 class Home extends Component {
+
+  static propTyps = {
+    locked: PropTypes.bool.isRequired,
+  }
+
+  static defaultProps = {
+    locked: false,
+  }
+
   constructor(props) {
     super(props);
     this.state ={
@@ -37,7 +65,8 @@ class Home extends Component {
     this.handleSelect = this.handleSelect.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
-
+    this.updateSelectedMonth = this.updateSelectedMonth.bind(this);
+    this.lockMonthEditing = this.lockMonthEditing.bind(this);
   }
 
   componentWillMount() {
@@ -140,10 +169,19 @@ class Home extends Component {
     this.props.dispatch(upload(data, id));
   }
 
-  render() {
-    const { auth } =this.props;
-    const { selectedDay, receipts } = this.state;
+  updateSelectedMonth(name, value) {
+    const monthNumber = MONTH.indexOf(value) + 1;
+    console.log( 'make request to for date for this month.', monthNumber);
+  }
 
+  lockMonthEditing(){
+    // send a request to lock editing. 
+    console.log('locking');
+  }
+
+  render() {
+    const { auth, locked } =this.props;
+    const { selectedDay, receipts } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -151,18 +189,23 @@ class Home extends Component {
               <h3>Willkommen {auth.username} {auth.email}</h3>
             </Col>
             <Col sm={{ size:4 }}>
-              <InputGroupAddon>
-                <DayPickerInput
-                  value={selectedDay}
-                  onDayChange={this.handleDayChange}
-                  dayPickerProps={{
-                    selectedDays: selectedDay,
-                    disabledDays: {
-                      daysOfWeek: [0, 6]
-                    }
-                  }} 
-                />
-              </InputGroupAddon>
+            <InputGroup>
+               <InputGroupAddon>
+                  <i 
+                    class={`fa ${locked ? 'fa-lock' : 'fa-unlock'} fa-2x`} 
+                    aria-hidden="true"
+                    onClick={this.lockMonthEditing}
+                  >
+                  </i>
+               </InputGroupAddon>
+               <Dropdown
+                 data={TIMESTAMP}
+                 selected={MONTH[TIMESTAMP.getMonth()]}
+                 name="month"
+                 items={[...MONTH]}
+                 updateFieldValue={this.updateSelectedMonth} 
+               />
+            </InputGroup>
             </Col>
           </FormGroup>
         <FormGroup row>

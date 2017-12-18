@@ -4,19 +4,20 @@ import PropTypes from "prop-types";
 
 export default class Example extends React.Component {
   
-  static defaultProps = {
+  static propTyps = {
     name: PropTypes.string.isRequired,
     items: PropTypes.shape([]).isRequired,
     data: PropTypes.shape({}).isRequired,
+    selected: PropTypes.string.isRequired
     //updateFieldValue: PropTypes.func.isRequired,
   }
 
   constructor(props) {
     super(props);
-    const { data } = props;
+    const { data, selected } = props;
     this.state = {
       dropdownOpen: false,
-      selected: data['Rechnung'] === 'X' ? 'Rechnung' : 'Auszahlung',
+      selected,
     };
     this.toggle = this.toggle.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
@@ -49,7 +50,7 @@ export default class Example extends React.Component {
         </DropdownToggle>
         <DropdownMenu>
           { items.map(item => 
-            <DropdownItem onClick={() => this.handleSelectItem(item.name)}>{item.name}</DropdownItem>
+            <DropdownItem onClick={() => this.handleSelectItem(item)}>{item}</DropdownItem>
           )}
         </DropdownMenu>
       </ButtonDropdown>
