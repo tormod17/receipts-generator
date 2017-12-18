@@ -1,4 +1,6 @@
 const ReceiptDB = require('../models/receipts');
+const ClientDB = require('../models/client');
+
 
 const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
@@ -12,16 +14,18 @@ exports.uploadHandler = (req, res) => {
       return;
     }
     const { originalname, filename } = file;
-    const ext = originalname.split('.')[originalname.split('.').length - 1];
+    const ext = originalname
+        .split('.')[originalname.split('.').length - 1];
     if (ext === 'xlsx' || ext === 'csv' || ext === 'xlsm') {
         const workbook = xlsx.read(file.buffer);
         const sheet_name_list = workbook.SheetNames;
-        const jsonResults = xlsx.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        console.log(jsonResults, '>>>>>>>>>>>>>>>>>>>>>', workbook);
-        jsonResults.forEach((receipt) => {
+        const jsonResults = xlsx.utils
+            .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+
+        const bills = jsonResults.map(record => {
             const Rechnungsnummer = uuidv1();
-            const new_receipt = {
-                ...receipt,
+            return {
+                ...record,
                 filename,
                 userId,
                 Rechnungsnummer,
@@ -29,16 +33,66 @@ exports.uploadHandler = (req, res) => {
                 time: DATETIMESTAMP,
                 _id: Rechnungsnummer
             };
-            ReceiptDB.create(new_receipt, function(err) {
-                if (err) return console.log(err);
-                console.log('saved');
-            });
         });
-        res.json(jsonResults);
+
+        const customers = bills.reduce( (p, c) => {
+            const listings = bills.filter(bill => 
+                bill['Kunden-nummer'] ===  c['Kunden-nummer'])
+                .map(bill => bill['Rechnungsnummer']);
+            p[ c['Kunden-nummer']] = {
+                Emailadresse: c['Emailadresse'],
+                Kunde: c['Kunde'],
+                Stadt: c['Stadt'],
+                Straße: c['Straße'],
+                PLZ: c['PLZ'],
+                'Kunden-nummer': c['Kunden-nummer'],
+                _id: c['Kunden-nummer'],
+                listings: [ ...listings] 
+            };
+            return p;
+        }, {}); 
+
+        ReceiptDB.insertMany(bills, err => {
+            let error = false;
+            if(err) { 
+                return res.json( { message: err });
+            } else {
+                Object.values(customers).forEach((client) => {
+                    ClientDB.findById(client._id,(err, oldclient) => {
+                        if (oldclient){
+                            oldclient['Emailadresse']=  client['Emailadresse'],
+                            oldclient['Kunde']=  client['Kunde'],
+                            oldclient['Stadt']=  client['Stadt'],
+                            oldclient['Straße']=  client['Straße'],
+                            oldclient['PLZ']=  client['PLZ'],
+                            oldclient['Kunden-nummer']= client['Kunden-nummer'],
+                            oldclient['_id']=  client['Kunden-nummer'],
+                            client['listings'].forEach(list => {
+                                oldclient['listings'].push(list);
+                            });
+                            oldclient.save((err)=>{
+                                if (err) {
+                                  error = err;
+                                  return console.error(err);  
+                                } 
+                            });
+                        } else {
+                            ClientDB.create( client, (err) => {
+                              if (err) {
+                                error = err;
+                                return console.error(err);  
+                              } 
+                            });
+                        }
+                    });
+                });
+            }
+            if (error) {
+                return res.json({ message: error });
+            } else {
+                return res.json({ message: 'success' });
+            }
+
+        });
     }
-  
 };
-
-
-
-

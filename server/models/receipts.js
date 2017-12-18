@@ -3,19 +3,19 @@ const Client = require('./client.js');
 
 const ReceiptsSchema = new mongoose.Schema({
     _id: {
-      type: Object,
+      type: Object
     },
     userId: {
         type: String,
-        isRequired: true,
+        isRequired: true
     },
     email: {
-        type: String,
+        type: String
     },
     feeds: [mongoose.Schema.Types.Mixed],
     client: {
-        type: Client.schema,
-    },
+        type: Client.schema
+    }
 }, { strict: false });
 
 

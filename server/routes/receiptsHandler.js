@@ -11,7 +11,6 @@ exports.addReceiptsHandler =(req, res) => {
   const { guests, corrections, customer, type }= req.body;   
   const billType =  type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X'};
       
-  console.log(guests, corrections, customer);    
   if (Object.keys(guests|| {}).length >0){
       Object.keys(guests).forEach(key => {
           const Rechnungsnummer = uuidv1();
@@ -26,7 +25,6 @@ exports.addReceiptsHandler =(req, res) => {
               time: DATETIMESTAMP,
               _id: Rechnungsnummer
           };
-          console.log(new_receipt);
           ReceiptDB.create(new_receipt, function(err) {
               if (err) return console.error(err);
               res.json({ message:'Your receipt has been added for guests'});
@@ -55,6 +53,7 @@ exports.addReceiptsHandler =(req, res) => {
           });
       });
   }
+  res.json({message:'No transaction added to database'});
 };
 
 exports.updateReceiptsHandler = (req,res) => {

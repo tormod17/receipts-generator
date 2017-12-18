@@ -76,7 +76,7 @@ describe('Receipt entry form will respond with the correct payloads', () => {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     };
 
     const testUrl = base_url + 'api/receipt?userId='+ userId;
