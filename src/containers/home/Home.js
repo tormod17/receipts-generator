@@ -15,9 +15,10 @@ import TableData from '../../components/table/Table';
 import { upload } from "../../actions/upload";
 import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
+import 'pdfmake/build/pdfmake.js';
+import 'pdfmake/build/vfs_fonts.js';
+  
 import "./home.css";
 
 class Home extends Component {
@@ -239,7 +240,7 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => ({ ...state })
+const mapStateToProps = state => ({ ...state });
 
 
 export default withRouter(connect(mapStateToProps)(Home));

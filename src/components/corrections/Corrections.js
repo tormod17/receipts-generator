@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import { Col, FormGroup, InputGroup, InputGroupAddon, Input } from 'reactstrap';
 import PropTypes from "prop-types";
 import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
@@ -37,7 +37,6 @@ export default class Corrections extends React.Component {
   }
 
   render() {
-    const {  } = this.state;
     const { updateFieldValue, corrections } = this.props;
  
     return (

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import { Col, FormGroup, InputGroupAddon, Label } from 'reactstrap';
 import PropTypes from "prop-types";
-import Dropdown from './../dropdown/Dropdown';
 
 import EditableField from './../editableField/EditableField';
 import DayPickerInput from 'react-day-picker/DayPickerInput';

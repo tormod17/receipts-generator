@@ -94,7 +94,7 @@ exports.getReceiptsHandler  = (req, res) => {
   if (!req.query) return console.error('no userId');
   const { userId } = req.query;
   ReceiptDB.find({ userId })
-      .limit(50)
+      .limit(100)
       .sort({ time: -1 })
       .exec((err, receipts) => {
           if (err) return console.error(err);
