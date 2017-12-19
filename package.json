@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "bcrypt": "^1.0.3",
+    "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "bootstrap": "^4.0.0-beta.2",
     "classnames": "^2.2.5",
@@ -92,7 +93,7 @@
     "xlsx": "^0.11.12"
   },
   "scripts": {
-    "server": "nodemon server.js",
+    "dev": "nodemon server.js",
     "test": "jest ./tests/*",
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js",
     "build": "react-scripts build",

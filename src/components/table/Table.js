@@ -27,37 +27,48 @@ class TableData extends Component {
         />   
       </Label>
 
-    handleClick(receipt){
-      this.props.getReceipt(receipt)
+    handleClick(client){
+      this.props.getClient(client)
     }
 
     createHeaders(){
       return this.header.map(header => <th key={header}> {header}</th>)
     }
 
-    createRows = receipt =>
+    calcTotalListings(listings){
+      const output = listings.reduce((p,c) => {
+          const clientTotal = c['Gesamtumsatz Airgreets'] && Number(c['Gesamtumsatz Airgreets'].replace( /\D+/g, ''));
+          const corrections = c['Ust-Korrektur'] && Number(c['Ust-Korrektur'].replace( /\D+/g, ''));
+          p += clientTotal + corrections;
+          return p;
+        },0);
+      return output;
+    }
+
+    createRows = client =>
         <tr
-          key={receipt._id}
+          key={client._id}
         >
           { this.requiredFields.map(field => {
+            console.log(client);
+
               let output;
               switch(true){
-                case field === 'Belegart':
-                  output = receipt.Rechnung === 'x' ? 'Rechnung' : 'Auszahlung';
+                case field === 'Rechnungsbetrag':
+                  output = this.calcTotalListings(client.listings);
                   break;
                 case field === 'Rechnungs-datum':
-                console.log(receipt['Rechnungs-datum']);               
-                 output = new Date(receipt['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
+                 output = new Date(client['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
                  output = output[0] + ' ' +output[1] + ' ' + output[2] + ' ' + output[3];
                  break;
                 case field === 'select':
-                  output = this.makeCheckBox(receipt._id)
+                  output = this.makeCheckBox(client._id)
                   return <td key={field}>{ output || ' '}</td>
                 default:
-                  output = receipt[field];
+                  output = client[field] + '';
                   break;
               }
-              return <td key={field} onClick={() => this.handleClick(receipt)}>{ output || ' '}</td>
+              return <td key={field} onClick={() => this.handleClick(client)}>{ output || ' '}</td>
           })}
         </tr>
 
@@ -71,8 +82,8 @@ class TableData extends Component {
             </tr>
           </thead>
           <tbody>
-            { data &&  (data.map( receipt => this.createRows(receipt))) }
-            { !data && <h2>Need to add some receipts</h2> }
+            { data &&  (data.map( client => this.createRows(client))) }
+            { !data && <h2>Need to add some clients</h2> }
           </tbody>
         </Table>
       )

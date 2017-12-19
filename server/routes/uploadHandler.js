@@ -16,29 +16,27 @@ exports.uploadHandler = (req, res) => {
     const { originalname, filename } = file;
     const ext = originalname
         .split('.')[originalname.split('.').length - 1];
+        
     if (ext === 'xlsx' || ext === 'csv' || ext === 'xlsm') {
         const workbook = xlsx.read(file.buffer);
         const sheet_name_list = workbook.SheetNames;
         const jsonResults = xlsx.utils
             .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-
         const bills = jsonResults.map(record => {
             const Rechnungsnummer = uuidv1();
             return {
                 ...record,
                 filename,
                 userId,
-                Rechnungsnummer,
-                'Rechnungs-datum': DATETIMESTAMP,
-                time: DATETIMESTAMP,
+                created: DATETIMESTAMP,
+                clientId: record['Kunden-nummer'],
                 _id: Rechnungsnummer
             };
         });
-
+    
         const customers = bills.reduce( (p, c) => {
             const listings = bills.filter(bill => 
-                bill['Kunden-nummer'] ===  c['Kunden-nummer'])
-                .map(bill => bill['Rechnungsnummer']);
+                bill['Kunden-nummer'] ===  c['Kunden-nummer']);
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
                 Kunde: c['Kunde'],
@@ -47,7 +45,12 @@ exports.uploadHandler = (req, res) => {
                 PLZ: c['PLZ'],
                 'Kunden-nummer': c['Kunden-nummer'],
                 _id: c['Kunden-nummer'],
-                listings: [ ...listings] 
+                listings: [ ...listings],
+                created: DATETIMESTAMP,
+                Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
+                Rechnungsnummer: c['Rechnungsnummer'] || 0,
+                'Rechnungs-datum': DATETIMESTAMP,
+                'FR': 0
             };
             return p;
         }, {}); 
@@ -70,29 +73,30 @@ exports.uploadHandler = (req, res) => {
                             client['listings'].forEach(list => {
                                 oldclient['listings'].push(list);
                             });
+                            oldclient['Belegart'] = client['Belegart'],
+                            oldclient['FR'] = client['FR'],
                             oldclient.save((err)=>{
                                 if (err) {
                                   error = err;
-                                  return console.error(err);  
+                                  console.error(err);  
+                                  return res.json({ message: error });
                                 } 
                             });
                         } else {
                             ClientDB.create( client, (err) => {
                               if (err) {
                                 error = err;
-                                return console.error(err);  
+                                console.error(err);  
+                                return res.json({ message: error });
                               } 
                             });
                         }
                     });
                 });
             }
-            if (error) {
-                return res.json({ message: error });
-            } else {
+            if (!error) {
                 return res.json({ message: 'success' });
             }
-
         });
     }
 };

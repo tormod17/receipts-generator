@@ -11,31 +11,41 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
+import ModalComp from "../../components/modal/Modal";
 import Login from "../login/Login";
 import Home from "../home/Home";
 import Signup from "../signup/Signup";
-import Receipt from "../receipt/Receipt";
+import Client from "../client/Client";
 import About from "../about/About";
 import NotFound from "../misc/NotFound";
 
 import { logout } from "../../actions/auth";
 
 import "./app.css";
-import { getReceipts } from "../../actions/receipts";
+import { getClients } from '../../actions/clients';
 
 
 
 class App extends Component {
 
+  constructor(props) {
+    super(props)
+    this.state ={
+      modalOpen: false
+    };
+  }
+
+
+
   componentDidMount(){
     const { id } = this.props.auth;
-    this.props.dispatch(getReceipts(id));
+    //this.props.dispatch(getClients(id));
   }
 
   componentWillReceiveProps(nextProps) {
-    const { receipts, auth } = this.props;
-    if (receipts.message !== nextProps.receipts.message ){
-      this.props.dispatch(getReceipts(auth.id));
+    const { clients, auth } = this.props;
+    if (clients.message !== nextProps.clients.message ){
+      this.props.dispatch(getClients(auth.id));
     }
   }
 
@@ -45,6 +55,7 @@ class App extends Component {
   }
 
   render() {
+    const { modalOpen } = this.state;
     const { auth } = this.props;    
     return (
       <Router>
@@ -57,12 +68,13 @@ class App extends Component {
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
-                <Route path="/receipt/:id" component={() => <Receipt {...this.props} />} />
-                <Route path="/receipt" component={() => <Receipt {...this.props} />} />
+                <Route path="/client/:id" component={() => <Client {...this.props} />} />
+                <Route path="/client" component={() => <Client {...this.props} />} />
                 <Route component={NotFound} />
               </Switch>
             </div>
           </div>
+          <ModalComp open={modalOpen}/>
           <Footer />
         </div>
       </Router>
@@ -80,10 +92,10 @@ App.contextTypes = {
 };
 
 const mapStateToProps = state => {
-  const { auth, receipts } = state;
+  const { auth, clients } = state;
   return {
     auth,
-    receipts
+    clients
   };
 };
 

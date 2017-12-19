@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import { addReceipt } from "../../actions/receipts";
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
 import Dropdown from '../../components/dropdown/Dropdown';
@@ -12,13 +11,12 @@ import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
 import uuidv4 from 'uuid/v4';
 
-
-import { getReceipts, updateReceipt } from "../../actions/receipts";
+import { addClient, getClient, updateClient } from "../../actions/clients";
 
 import 'react-day-picker/lib/style.css';
-import "./receipt.css";
+import "./client.css";
 
-class Receipt extends Component {
+class Client extends Component {
 
   static propTypes = {
     data: PropTypes.shape({})
@@ -44,7 +42,7 @@ class Receipt extends Component {
   }
 
   componentDidMount(){
-    const { data } = this.props.receipts;
+    const { data } = this.props.clients;
     const id = this.props.match.params.id;
     if (id && data) {
       const customerNumber = data[id]['Kunden-nummer'];
@@ -83,17 +81,17 @@ class Receipt extends Component {
   }
 
   handleSubmission(){
-    const { dispatch, auth, receipts } = this.props;
-    const receiptId = this.props.match.params.id;
-    const prevState = receipts.data[receiptId]
+    const { dispatch, auth, clients } = this.props;
+    const clientId = this.props.match.params.id;
+    const prevState = clients.data[clientId]
     
     const data  = {
       ...this.state,
     };
-    if (receiptId) {
-      dispatch(updateReceipt(receiptId, data), this.props.history.push('/'))
+    if (clientId) {
+      dispatch(updateClient(clientId, data), this.props.history.push('/'))
     } else {
-      dispatch(addReceipt(auth.id, data), this.props.history.push('/'))
+      dispatch(addClient(auth.id, data), this.props.history.push('/'))
     }
   }
 
@@ -151,7 +149,6 @@ class Receipt extends Component {
 
   render() {
     const { customer, guests, corrections } = this.state;
-    console.log(guests);
     return (
     <Form clasName="bill">
         <FormGroup row>
@@ -237,5 +234,5 @@ class Receipt extends Component {
 const mapStateToProps = state => ({ ...state })
 
 
-export default withRouter(connect(mapStateToProps)(Receipt));
+export default withRouter(connect(mapStateToProps)(Client));
 

@@ -14,6 +14,8 @@ const app = express();
 const bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
+
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const path =require('path');

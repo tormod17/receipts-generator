@@ -14,7 +14,7 @@ import { createPDF } from '../../utils/createPDF';
 import TableData from '../../components/table/Table';
 import Dropdown from '../../components/dropdown/Dropdown';
 import { upload } from "../../actions/upload";
-import { getReceipts, deleteReceipts } from "../../actions/receipts";
+import { getClients, deleteClients } from "../../actions/clients";
 
 
 import 'pdfmake/build/pdfmake.js';
@@ -39,10 +39,9 @@ const MONTH = [
   'December'
 ];  
 
-
 class Home extends Component {
 
-  static propTyps = {
+  static propTypes = {
     locked: PropTypes.bool.isRequired,
   }
 
@@ -55,13 +54,14 @@ class Home extends Component {
     this.state ={
       value: new Date().toISOString(),
       selectedDay: formatDate(Date.now()),
-      receipts: { ...props.receipts.data },
-      selectedArray: []
+      clients: { ...props.clients.data },
+      selectedArray: [],
+      selectedMonth: TIMESTAMP.getMonth(),
     };
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.handleAddEntry = this.handleAddEntry.bind(this);
-    this.selectReceipt = this.selectReceipt.bind(this);
+    this.selectClient = this.selectClient.bind(this);
     this.handleSelect = this.handleSelect.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
@@ -77,32 +77,42 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if( this.props.receipts !== nextProps.receipts && nextProps.receipts.data) {
+    if( this.props.clients !== nextProps.clients && nextProps.clients.data) {
       this.setState({
-        receipts: { ...nextProps.receipts.data }
+        clients: { ...nextProps.clients.data }
       });
     }
   }
 
   componentDidMount(){
+    const { selectedMonth } = this.state;
     const { auth, dispatch } = this.props;
-    dispatch(getReceipts(auth.id));
+    dispatch(getClients(auth.id, selectedMonth));
   }
 
   handleDayChange(selectedDay, modifiers) {
+    const newClients = {
+      ...this.state.clients,
+    }
+    Object.keys(newClients).forEach((key) => {
+      newClients[key]['Rechnungs-datum'] = selectedDay;
+    });
     this.setState({
-      selectedDay
+      ...this.state,
+      clients: {
+        ...newClients
+      }
     });
   }
 
   handleAddEntry() {
-    this.props.history.push('/receipt');
+    this.props.history.push('/client');
   }
 
   handleDelete() {
     const { selectedArray } = this.state;
     if (selectedArray.length) {
-      this.props.dispatch(deleteReceipts(selectedArray));
+      this.props.dispatch(deleteClients(selectedArray));
     }
   }
 
@@ -151,14 +161,14 @@ class Home extends Component {
   }
 
   handlePDF(){
-    const { receipts } = this.props;
+    const { clients } = this.props;
     const { selectedArray } = this.state;
-    createPDF(receipts, selectedArray);
+    createPDF(clients, selectedArray);
   }
 
-  selectReceipt(receipt) {
+  selectClient(client) {
     const { history } = this.props;
-    history.push('/receipt/'+receipt._id);
+    history.push('/client/'+client._id);
   }
 
   uploadFile(){
@@ -170,18 +180,35 @@ class Home extends Component {
   }
 
   updateSelectedMonth(name, value) {
+    const { dispatch, auth } = this.props;
     const monthNumber = MONTH.indexOf(value) + 1;
-    console.log( 'make request to for date for this month.', monthNumber);
+    this.setState({
+      selectedMonth: monthNumber,
+    }, dispatch(getClients(auth.id, monthNumber)));
   }
 
   lockMonthEditing(){
     // send a request to lock editing. 
     console.log('locking');
+    const newClients = {
+      ...this.state.clients,
+    }
+    Object.keys(newClients).forEach((key) => {
+      newClients[key]['Rechnungsnummer'] = Number(this.state.clients[key]['Rechnungsnummer']) + 1;
+    });
+    this.setState({
+      ...this.state,
+      clients: {
+        ...newClients
+      },
+      locked: !this.state.locked,
+    });
+    /// call back makes request to lock data
   }
 
   render() {
-    const { auth, locked } =this.props;
-    const { selectedDay, receipts } = this.state;
+    const { auth } =this.props;
+    const { selectedDay, clients, locked } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -240,10 +267,10 @@ class Home extends Component {
         </Row>
         <br/>
         <Row>
-          {receipts && 
+          {clients && 
               <TableData
-                data={Object.values(receipts)}
-                getReceipt={this.selectReceipt}
+                data={Object.values(clients)}
+                getClient={this.selectClient}
                 handleSelect={this.handleSelect}
               />
           }

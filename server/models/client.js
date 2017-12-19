@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Listing = require('./listing.js');
+const Receipts = require('./receipts.js');
 
 const ClientSchema = new mongoose.Schema({
     _id: {
@@ -15,8 +15,9 @@ const ClientSchema = new mongoose.Schema({
         type: String
     },
     listings: {
-        type: Array
-    }
+        type: Receipts
+    },
+    feeds: [mongoose.Schema.Types.Mixed]
 }, { strict: false });
 
 var Client = mongoose.model('Client', ClientSchema);
