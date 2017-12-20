@@ -285,6 +285,7 @@ class Home extends Component {
 
 
 const calcTotalListings = (listings) => {
+  if (!listings) return false;
   const output = listings.reduce((p,c) => {
       const clientTotal = (c['Gesamtumsatz Airgreets'] && parseFloat(c['Gesamtumsatz Airgreets'].replace( /,/g, ''))) || 0;
       const corrections = (c['Ust-Korrektur'] && parseFloat(c['Ust-Korrektur'].replace( /,/g, ''))) || 0;
@@ -298,7 +299,7 @@ const mapStateToProps = state => {
   const { clients } = state
   const { message, data, status } = clients
   let total = 0
-  Object.keys(data || {}).map((key) => {
+  data && Object.keys(data || {}).map((key) => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
