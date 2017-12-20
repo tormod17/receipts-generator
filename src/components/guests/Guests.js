@@ -103,7 +103,7 @@ export default class Guests extends React.Component {
                   onDayChange={val => 
                     this.handleValueChange('Abreisedatum', formatDate(val), key )
                   }
-                  value={guests[key].Abreisedatum}
+                  value={guests[key]['Abreisedatum (Leistungsdatum)']}
                 />
               </InputGroupAddon>
             </Col>

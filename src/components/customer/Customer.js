@@ -46,9 +46,18 @@ export default class Customer extends React.Component {
           <Col>
             <EditableField 
               updateFieldValue={this.handleValueChange}
+               name="Emailadresse" 
+               placeholder="Emailadresse" 
+               value={customer.Emailadresse}
+            />
+          </Col>
+          <Col>
+            <EditableField 
+              updateFieldValue={this.handleValueChange}
                name="Rechnungsnummer" 
                placeholder="Fortlaufende Rechnungsnummer" 
-               value={customer.Rechnungsnummer}/>
+               value={customer.Rechnungsnummer}
+            />
           </Col>
         </FormGroup>
         <FormGroup row>

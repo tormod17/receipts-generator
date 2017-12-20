@@ -18,11 +18,14 @@ import Signup from "../signup/Signup";
 import Client from "../client/Client";
 import About from "../about/About";
 import NotFound from "../misc/NotFound";
+import { getClients } from "../../actions/clients";
 
 import { logout } from "../../actions/auth";
 
 import "./app.css";
 import { saveMonth } from '../../actions/clients';
+
+const TIMESTAMP = new Date();
 
 class App extends Component {
 
@@ -38,6 +41,8 @@ class App extends Component {
   }
 
   componentDidMount(){
+    const { auth, dispatch } = this.props;
+    dispatch(getClients(auth.id, TIMESTAMP.getMonth()));
     document.addEventListener('lockMonth', this.handleMonthLock);
   }
 

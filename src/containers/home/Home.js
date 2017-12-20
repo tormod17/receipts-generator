@@ -104,11 +104,7 @@ class Home extends Component {
     }
   }
 
-  componentDidMount(){
-    const { selectedMonth } = this.state;
-    const { auth, dispatch } = this.props;
-    dispatch(getClients(auth.id, selectedMonth));
-  }
+
 
   handleDayChange(selectedDay, modifiers) {
     const newClients = {
@@ -303,7 +299,7 @@ const mapStateToProps = state => {
   const { message, data, status } = clients
   let total = 0
   Object.keys(data || {}).map((key) => {
-    data[key].Rechnungsbetrag = calcTotalListings(data[key].listings); 
+    data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
   const locked = data &&  Object.values(data)[0] && Object.values(data)[0].listings[0].locked;

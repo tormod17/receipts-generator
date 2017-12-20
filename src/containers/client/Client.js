@@ -11,29 +11,30 @@ import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
 import uuidv4 from 'uuid/v4';
 
-import { addClient, getClient, updateClient } from "../../actions/clients";
+import { addClient, getClient, getClients, updateClient } from "../../actions/clients";
 
 import 'react-day-picker/lib/style.css';
 import "./client.css";
 
 class Client extends Component {
 
-  static propTypes = {
-    data: PropTypes.shape({})
-  }
+  // static propTypes = {
+  //   data: PropTypes.shape({})
+  // }
 
-  static defaultProps ={
-    data:{},
-    customer: {},
-  }
+  // static defaultProps ={
+  //   data:{},
+  //   customer: {},
+  // }
 
   constructor(props) {
-    super(props)
+    super(props);
+    const  { guests, corrections, client } = props;
     this.state ={
-      customer: undefined,
-      guests: {},
-      corrections: {},
-    }
+      customer: {...client},
+      guests: { ...guests },
+      corrections: { ...corrections}
+    };
     this.updateFieldValue = this.updateFieldValue.bind(this);    
     this.handleAdd = this.handleAdd.bind(this);
     this.handleDel = this.handleDel.bind(this);
@@ -41,31 +42,16 @@ class Client extends Component {
     this.calculateTotals = this.calculateTotals.bind(this);
   }
 
-  componentDidMount(){
-    const { data } = this.props.clients;
-    const id = this.props.match.params.id;
-    if (id && data) {
-      const customerNumber = data[id]['Kunden-nummer'];
-      const allguests = Object.values(data || {}).filter( trans => customerNumber === trans['Kunden-nummer'])
-      const correctionsList = allguests.filter(trans => trans['Auszhalungskorrektur'] || trans['Rechnungskorrektur'])
-      console.log(allguests);
-      const guests = allguests.reduce((p,c) => {
-        p[c._id] = { ...c }
-        return p;
-      }, {})
-
-      const corrections = correctionsList.reduce((p,c) => {
-        p[c._id] = { ...c }
-        return p;
-      }, {})
+  componentWillReceiveProps(nextProps) {
+    const { guests, client, corrections  } = nextProps;
+    if(nextProps !== this.props){
       this.setState({
-          customer: {
-            ...allguests[0]
-          },
-          guests: {...guests },
-          corrections: {...corrections },
-      })
+        customer: {...client},
+        guests: { ...guests },
+        corrections: { ...corrections}
+      });
     }
+
   }
 
   calculateTotals(type) {
@@ -73,25 +59,24 @@ class Client extends Component {
     const sum =Object.values(guests).reduce((a, b) => {
       let total;
       if(b[type] === 'X') {
-        total = b['TOTAL PAID']
-        return Number(total)
+        total = b['TOTAL PAID'];
+        return Number(total);
       }
     }, 0);
-    return sum 
+    return sum ;
   }
 
   handleSubmission(){
-    const { dispatch, auth, clients } = this.props;
+    const { dispatch, auth } = this.props;
     const clientId = this.props.match.params.id;
-    const prevState = clients.data[clientId]
     
     const data  = {
-      ...this.state,
+      ...this.state
     };
     if (clientId) {
-      dispatch(updateClient(clientId, data), this.props.history.push('/'))
+      dispatch(updateClient(clientId, data), this.props.history.push('/'));
     } else {
-      dispatch(addClient(auth.id, data), this.props.history.push('/'))
+      dispatch(addClient(auth.id, data), this.props.history.push('/'));
     }
   }
 
@@ -105,23 +90,23 @@ class Client extends Component {
           ...obj
         }
       }
-    })
+    });
   }
 
   handleDel(key, type){
     const entries = { ...this.state[type] };
     const newEntries = Object.keys(entries).reduce((p,c) => {
        if (c !== key ){
-        p[c] = { ...entries[c]}
+        p[c] = { ...entries[c]};
        } 
        return p;
-    }, {})
+    }, {});
     
     this.setState({
       [type]: {
-        ...newEntries,
+        ...newEntries
       }
-    })
+    });
   }
 
   updateFieldValue(field, value, type, id){
@@ -131,7 +116,7 @@ class Client extends Component {
            ...prevSate[type],
           [id]: {
             ...prevSate[type][id],
-            [field]: value,
+            [field]: value
           }
         } 
       }));
@@ -139,11 +124,11 @@ class Client extends Component {
         this.setState( prevState => ({
           [type]: {
             ...prevState[type],
-            [field]: value,
+            [field]: value
           }
         }));
     } else  {
-      this.setState( prevState => ({ [field]: value }));
+      this.setState( ()  => ({ [field]: value }));
     }
   }
 
@@ -156,17 +141,17 @@ class Client extends Component {
             <br/>
             <Dropdown
               data={customer}
-              name="billType"
+              name="Belegart"
               items={['Rechnung', 'Auszahlung']}
               updateFieldValue={this.updateFieldValue} 
-              selected={customer && customer['Rechnung'] === 'X' ? 'Rechnung' : 'Auszahlung'}
+              selected={customer['Belegart']}
 
             />
           </Col>
           <Col sm={{ size:1, offset: 6}}>
             <i 
               style={{
-                margin: '10px',
+                margin: '10px'
               }}
               class="fa fa-chevron-left fa-3x"
               aria-hidden="true"
@@ -231,7 +216,22 @@ class Client extends Component {
   }
 }
 
-const mapStateToProps = state => ({ ...state })
+const mapStateToProps = (state, props) => { 
+  const { clients } = state;
+  const { message, data, status } = clients;
+  const id = props.match.params.id;
+  const client = data && data[id];
+  const guests =  client && client.listings.filter(listing => listing['Name des Gastes']);
+  const corrections = client && client.listings.filter(listing => !listing['Name des Gastes']);
+  console.log(guests, corrections);
+  return {
+    client: { ...client},
+    guests: client  && { ...guests},
+    corrections: client && { ...corrections},
+    message,
+    status
+  };
+};
 
 
 export default withRouter(connect(mapStateToProps)(Client));
