@@ -56,12 +56,14 @@ class Client extends Component {
 
   calculateTotals(type) {
     const { guests } = this.state;
+    const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
+    const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
+
     const sum =Object.values(guests).reduce((a, b) => {
-      let total;
-      if(b[type] === 'X') {
-        total = b['TOTAL PAID'];
-        return Number(total);
-      }
+        const clientTotal = (b && b[key1] && parseFloat(b[key1].replace( /,/g, ''))) || 0;
+        const corrections = (b && b[key2] && parseFloat(b[key2].replace( /,/g, ''))) || 0;
+        const total  =  clientTotal+ corrections;
+        return total;
     }, 0);
     return sum ;
   }
@@ -181,7 +183,6 @@ class Client extends Component {
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
             <EditableField 
-              //updateFieldValue={this.updateFieldValue}
               name="Gesamtumsatz Airgreets" 
               placeholder="Gesamt Auszahlungs Betrag"
               value={this.calculateTotals('Auszahlung')}
@@ -189,7 +190,6 @@ class Client extends Component {
           </Col>
           <Col sm={{ size: 4, order: 1 }}>
             <EditableField 
-              //updateFieldValue={this.updateFieldValue}
               name="Auszahlung an Kunde"
               placeholder="Gesamt Rechnungs Betrag"
               value={this.calculateTotals('Rechnungs')}
