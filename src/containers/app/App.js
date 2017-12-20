@@ -22,9 +22,7 @@ import NotFound from "../misc/NotFound";
 import { logout } from "../../actions/auth";
 
 import "./app.css";
-import { getClients } from '../../actions/clients';
-
-
+import { saveMonth } from '../../actions/clients';
 
 class App extends Component {
 
@@ -37,44 +35,43 @@ class App extends Component {
     this.toggleModal =this.toggleModal.bind(this);
     this.handleMonthLock = this.handleMonthLock.bind(this);
     this.modalSubmit = this.modalSubmit.bind(this);
-
   }
 
   componentDidMount(){
-    const { id } = this.props.auth;
-    //this.props.dispatch(getClients(id));
     document.addEventListener('lockMonth', this.handleMonthLock);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { clients, auth } = this.props;
-    if (clients.message !== nextProps.clients.message ){
-      //this.props.dispatch(getClients(auth.id));
-    }
+  componentWillUnmount(){
+    document.removeEventListener('lockMonth', this.handleMonthLock);    
   }
 
-  toggleModal(modalMessage, func){
+  toggleModal(modalMessage){
     this.setState({
       modalOpen: !this.state.modalOpen,
       modalMessage
     });
   }
 
-  handleMonthLock(){
-    const message = 'Are you sure you wish to lock this month?';
+  handleMonthLock(e){
+    const { message, payload, selectedMonth } = e;
+    console.log( e);
     this.toggleModal(message);
     this.setState({
-      modalType: 'lockMonth'
+      modalType: 'lockMonth',
+      payload: {
+        ...payload
+      },
+      selectedMonth
     });
   }
 
   modalSubmit(){
     const { dispatch } = this.props ;
-    const  { modalType } = this.state;
+    const  { modalType, payload, selectedMonth } = this.state;
+    console.log(payload);
     switch (true) {
       case  modalType === 'lockMonth':
-        /// dispatch lock on submit 
-      console.log('great');
+        dispatch(saveMonth(payload, selectedMonth));
       break;
     }
     this.toggleModal();

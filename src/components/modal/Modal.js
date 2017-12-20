@@ -37,8 +37,8 @@ class ModalComp extends React.Component {
             {message}
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={submit}>submit</Button>
             <Button color="secondary" onClick={this.handleCancel}>Cancel</Button>
+            <Button color="primary" onClick={submit}>submit</Button>
           </ModalFooter>
         </Modal>
       </div>

@@ -51,20 +51,20 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
-    console.log(props);
+    const { data, message, total } = props;
     this.state ={
       value: new Date().toISOString(),
       selectedDay: formatDate(Date.now()),
-      clients: { ...props.data } ,
-      message: props.message,
-      selectedArray: [],
+      clients: { ...data } ,
+      message,
       selectedMonth: TIMESTAMP.getMonth(),
+      total,
     };
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.handleAddEntry = this.handleAddEntry.bind(this);
     this.selectClient = this.selectClient.bind(this);
-    this.handleSelect = this.handleSelect.bind(this);
+    this.getSelectedIds = this.getSelectedIds.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
     this.updateSelectedMonth = this.updateSelectedMonth.bind(this);
@@ -82,14 +82,16 @@ class Home extends Component {
     const { selectedMonth, message, clients } = this.state;
     const { auth, dispatch } = this.props;
     const { data } = clients;
+
     if( message !== nextProps.message) {
       this.setState({
         message: nextProps.message || message,
         clients: { 
            ...nextProps.data,
         }
-      }, () => dispatch(getClients(auth.id, selectedMonth)));
+      });
     }
+
     if( data !== nextProps.data) {
       this.setState({
         clients: { 
@@ -97,13 +99,15 @@ class Home extends Component {
          },
       });
     }
+    if (nextProps.status === 'deleted' || nextProps.status ==='uploaded' || nextProps.status ==='saved'  ) {
+      dispatch(getClients(auth.id, selectedMonth))
+    }
   }
 
   componentDidMount(){
     const { selectedMonth } = this.state;
     const { auth, dispatch } = this.props;
     dispatch(getClients(auth.id, selectedMonth));
-    //document.addEventListener('clients', getClients(auth.id, selectedMonth));
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -126,59 +130,19 @@ class Home extends Component {
   }
 
   handleDelete() {
-    const { selectedArray } = this.state;
-    if (selectedArray.length) {
-      this.props.dispatch(deleteClients(selectedArray));
-    }
+    this.props.dispatch(deleteClients(this.getSelectedIds())
+    );
   }
 
-  handleSelectAll(){
-    const { selectedArray } = this.state;
-    let newArr;
-    const selectAll = document.querySelector('#selectAll');
-    const checkBoxes = document.querySelectorAll('.selectCheckBox');    
-    if (selectAll.getAttribute('checked')){
-      for (let i=0; i < checkBoxes.length; i++) {
-        checkBoxes[i].setAttribute('checked', true);
-        selectedArray.push(checkBoxes[i].getAttribute('id'));
-        newArr = [...selectedArray];
-      }
-    } else {
-      for (let i=0; i < checkBoxes.length; i++) {
-        console.log('CALLL ME NOW ', selectAll.getAttribute('checked'));
-        checkBoxes[i].setAttribute('checked', false);
-        newArr = [];
-      }
-    }
-
-    this.setState({
-      selectedArray: newArr
-    });
+  getSelectedIds(){
+    const checkBoxes = document.querySelectorAll('.clientCheck:checked')
+    const selectedIds = [...checkBoxes].map(box => box.getAttribute('id'))
+    return selectedIds
   }
-
-  handleSelect(e) {  // could just add a selected field to each receipt object. 
-    const { selectedArray } = this.state;
-    if(e.target) {
-      const id = e.target.getAttribute('id');
-      if (id ==='selectAll'){
-        this.handleSelectAll();
-      }
-      let newArr ;
-      if (!selectedArray.includes(id)) {
-        selectedArray.push(id);  
-        newArr = [...selectedArray];   
-      } else {
-        newArr = selectedArray.filter(item => item !== id);
-      }
-      this.setState({
-        selectedArray: [...newArr]
-      });
-    }
-  }
-
+  
   handlePDF(){
-    const { selectedArray, clients } = this.state;
-    createPDF(clients, selectedArray);
+    const { clients } = this.state;
+    createPDF(clients, this.getSelectedIds());
   }
 
   selectClient(client) {
@@ -191,7 +155,9 @@ class Home extends Component {
     const { id } = this.props.auth;    
     let data = new FormData();
     data.append('csvdata', file);
-    this.props.dispatch(upload(data, id));
+    this.props.dispatch(upload(data, id),
+      this.props.dispatch(getClients(this.props.auth.id, this.state.selectedMonth))
+    );
   }
 
   updateSelectedMonth(name, value) {
@@ -203,17 +169,11 @@ class Home extends Component {
   }
 
   lockMonthEditing(){
-    // send a request to lock editing. 
-    const e = new Event('lockMonth')
-    document.dispatchEvent(e);
-    console.log('locking');
-    const newClients = {
-      ...this.state.clients,
-    }
-    Object.keys(newClients).forEach((key) => {
-      newClients[key]['Rechnungsnummer'] = Number(this.state.clients[key]['Rechnungsnummer']) + 1;
-    });
-    /// call back makes request to lock data
+    let event = new Event('lockMonth')
+    event.message = 'Bist du sicher?',
+    event.selectedMonth = this.state.selectedMonth;
+    event.payload = { ...this.state.clients }
+    document.dispatchEvent(event);
   }
 
   render() {
@@ -229,7 +189,7 @@ class Home extends Component {
             <InputGroup>
                <InputGroupAddon>
                   <i 
-                    class={`fa ${locked ? 'fa-lock' : 'fa-unlock'} fa-2x`} 
+                    className={`fa ${locked ? 'fa-lock' : 'fa-unlock'} fa-2x`} 
                     aria-hidden="true"
                     onClick={this.lockMonthEditing}
                   >
@@ -256,6 +216,7 @@ class Home extends Component {
                 accept="text/cvs"
                 onChange={this.uploadFile}
                 ref={(input) => { this.newFile = input;}}
+                disabled={locked}
                />        
             </InputGroupAddon>
           </Col>
@@ -272,7 +233,8 @@ class Home extends Component {
                   disabledDays: {
                     daysOfWeek: [0, 6]
                   }
-                }} 
+                }}
+                disabled={locked} 
               />
             </InputGroupAddon>
             </Col>
@@ -284,7 +246,7 @@ class Home extends Component {
         <Row>
           {clients && 
               <TableData
-                data={Object.values(clients)}
+                clients={clients}
                 getClient={this.selectClient}
                 handleSelect={this.handleSelect}
               />
@@ -293,7 +255,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <i onClick={this.handleAddEntry} className="fa fa-plus fa-3x" aria-hidden="true"></i>
+             {!locked &&  <i onClick={this.handleAddEntry} className="fa fa-plus fa-3x" aria-hidden="true"></i> }
             </InputGroup>
           </Col>
           <Col sm={4}>
@@ -306,7 +268,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <i onClick={this.handleDelete} className="fa fa-trash fa-3x" aria-hidden="true"></i>
+              <i onClick={this.handleDelete} className="fa fa-trash fa-3x" aria-hidden="true"></i> 
             </InputGroup>
           </Col>
             <Col sm={4}>
@@ -338,18 +300,20 @@ const calcTotalListings = (listings) => {
 
 const mapStateToProps = state => {
   const { clients } = state
-  const { message, data } = clients
+  const { message, data, status } = clients
   let total = 0
   Object.keys(data || {}).map((key) => {
     data[key].Rechnungsbetrag = calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
+  const locked = data &&  Object.values(data)[0] && Object.values(data)[0].listings[0].locked;
 
   return {
     message,
     data: {...data },
-    total
-
+    total,
+    locked,
+    status
   }
 } 
 

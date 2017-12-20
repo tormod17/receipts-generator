@@ -24,6 +24,56 @@ export const UPLOAD_REQUEST = "UPLOAD_REQUEST";
 export const UPLOAD_SUCCESS = "UPLOAD_SUCCESS";
 export const UPLOAD_FAILURE = "UPLOAD_FAILURE";
 
+
+export const SAVE_MONTH_REQUEST = 'SAVE_MONTH_REQUEST';
+export const SAVE_MONTH_SUCCESS = 'SAVE_MONTH_SUCCESS';
+export const SAVE_MONTH_FAILURE = 'SAVE_MONTH_FAILURE';
+
+
+// Save Month
+
+function saveMonthRequest(month) {
+  return {
+    type: SAVE_MONTH_REQUEST
+  };
+}
+
+function saveMonthSuccess(payload) {
+  return {
+    type: SAVE_MONTH_SUCCESS,
+    payload
+  };
+}
+
+function saveMonthFailure(error) {
+  return {
+    type: SAVE_MONTH_FAILURE,
+    error
+  };
+}
+
+export function saveMonth(data, month) {
+  console.log('>>>>>>>>>' ,data);
+  const config = {
+    method: 'post',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({...data}) // data
+  };
+  return callApi(
+    '/api/savemonth?month='+ month,
+    config,
+    saveMonthRequest(month),
+    saveMonthSuccess,
+    saveMonthFailure
+  );
+}
+
+
+// Upload 
+
 function uploadRequest(user) {
   return {
     type: UPLOAD_REQUEST
@@ -57,6 +107,8 @@ export function upload(data, userId) {
   );
 }
 
+
+/// Client CRUD
 
 function clientsRequest() {
   return {
@@ -110,7 +162,7 @@ function updateClientRequest() {
 function updateClientSuccess(payload) {
   return {
     type: UPDATE_CLIENT_SUCCESS,
-    payload,
+    payload
   };
 }
 
@@ -130,7 +182,7 @@ export function updateClient(id, data) {
     body: JSON.stringify(data)
   };
   return callApi(
-    "/api/CLIENT?CLIENTId=" + id,
+    '/api/CLIENT?CLIENTId='+ id,
     config,
     updateClientRequest(data),
     updateClientSuccess,
@@ -153,7 +205,8 @@ function addClientsSuccess(payload) {
 
 function addClientsFailure(error) {
   return {
-    type: ADD_CLIENT_FAILURE
+    type: ADD_CLIENT_FAILURE,
+    messeage: error
   };
 }
 
@@ -162,13 +215,13 @@ export function addClient(id, data) {
   const config = {
     method: 'post',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   };
   return callApi(
-    "/api/client?userId="+id,
+    '/api/client?userId='+id,
     config,
     addClientsRequest(data),
     addClientsSuccess,

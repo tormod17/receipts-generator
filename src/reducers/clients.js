@@ -14,6 +14,9 @@ import {
     DEL_CLIENT_REQUEST,
     DEL_CLIENT_SUCCESS,
     DEL_CLIENT_FAILURE,
+    SAVE_MONTH_REQUEST,
+    SAVE_MONTH_SUCCESS,
+    SAVE_MONTH_FAILURE,
     SELECTED_CLIENT
 } from '../actions/clients.js';
 
@@ -22,6 +25,24 @@ const initialState = {};
 
 export function clients(state = initialState, action = {}) {
     switch (action.type) {
+        case SAVE_MONTH_REQUEST:
+            return {
+                ...state,
+                saving: true
+            };
+        case SAVE_MONTH_SUCCESS:
+            return {
+                ...state,
+                ...action.payload,
+                saving: false,
+                saved: true,
+                status: 'saved'
+            };
+        case SAVE_MONTH_FAILURE:
+            return {
+                ...state,
+                message: action.error
+            };
         case UPLOAD_REQUEST:
             return {
                 ...state,
@@ -30,9 +51,10 @@ export function clients(state = initialState, action = {}) {
         case UPLOAD_SUCCESS:
             return {
                 ...state,
-                message: action.payload.message,
+                ...action.payload,
                 uploading: false,
-                uploaded: true
+                uploaded: true,
+                status: 'uploaded'
             };
         case UPLOAD_FAILURE:
             return {
@@ -96,7 +118,8 @@ export function clients(state = initialState, action = {}) {
         case DEL_CLIENT_SUCCESS:
             return {
                 ...state,
-                ...action.payload
+                ...action.payload,
+                status: 'deleted'
             };
         case DEL_CLIENT_FAILURE:
             return {

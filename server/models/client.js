@@ -15,7 +15,7 @@ const ClientSchema = new mongoose.Schema({
         type: String
     },
     listings: {
-        type: Receipts
+        type: Array //Receipts
     },
     feeds: [mongoose.Schema.Types.Mixed]
 }, { strict: false });

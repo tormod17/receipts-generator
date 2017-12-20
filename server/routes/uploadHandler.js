@@ -36,7 +36,7 @@ exports.uploadHandler = (req, res, next) => {
     
         const customers = bills.reduce( (p, c) => {
             const listings = bills.filter(bill => 
-                bill['Kunden-nummer'] ===  c['Kunden-nummer']);
+                bill['Kunden-nummer'] ===  c['Kunden-nummer']).map(bill => bill._id);
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
                 Kunde: c['Kunde'],
@@ -77,7 +77,6 @@ exports.uploadHandler = (req, res, next) => {
                                 oldclient['FR'] = client['FR'],
                                 oldclient.save((err)=>{
                                     if (err) {
-                                      console.log('I GET TO HERE first', err);
                                       reject(err);
                                     } else {
                                       resolve();
@@ -97,7 +96,7 @@ exports.uploadHandler = (req, res, next) => {
                     });
                 });
                 Promise.all(promises)
-                    .then(() => res.json({ message: 'success' }))
+                    .then(() => res.json({ message: 'Erfolg' }))
                     .catch((err) => {
                         res.json({ message: '' + err});
                         next();

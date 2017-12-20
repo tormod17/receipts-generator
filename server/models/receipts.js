@@ -12,6 +12,9 @@ const ReceiptsSchema = new mongoose.Schema({
     email: {
         type: String
     },
+    locked: {
+        type: Boolean
+    },
     feeds: [mongoose.Schema.Types.Mixed],
     client: {
         type: Client.schema

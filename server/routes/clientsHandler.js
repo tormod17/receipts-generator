@@ -5,6 +5,16 @@ const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 
 
+exports.saveMonth = (req, res) => {
+  if (!req.query.month) return console.error('no month');
+  const { month } = req.query;
+  console.log(month , req,body);
+  // Alternatively each listing within in a month can be updated with a field that locks the bill. 
+  // A note of the locked months is also stored, to prevent additons . 
+
+};
+
+
 exports.addClientHandler = (req, res) => {
   // 
   if (!req.query.userId) return console.error('no userId');
@@ -112,28 +122,40 @@ exports.getClientsHandler = (req, res) => {
   const { month } = req.query;
   const currentYear = new Date().getFullYear();
 
-  const fromDate =  new Date(currentYear, Number(month), 15).getTime();
-  const toDate = new Date(currentYear, (Number(month) + 1), 15).getTime();  
+  const fromDate =  new Date(currentYear, (Number(month)), 15).getTime();
+  const toDate = new Date(2017, Number(month + 1), 15).getTime();  
 
-  const query = {
+  let query = {
     created: {
      '$gte': fromDate,
      '$lt': toDate
     }
   };
-
-  ClientDB.find( query )
-    .limit(50)
-    .sort({ created: -1 })
-    .exec((err, clients) => {
-      if (err) return console.error(err);
-      const output = clients.map((client) => {
-          const newListings = client.listings.filter(listing => {
-            return Number(listing.created) >= fromDate && Number(listing.created) <= toDate;
-          }); 
-          client.listing = [...newListings];
-          return client;
+  
+  new Promise((resolve, reject) => {
+    ClientDB.find( query )
+      .limit(50)
+      .sort({ created: -1 })
+      .exec((err) => {
+        if (err) return reject(err);
+      }).then((clients) =>{
+         ReceiptDB.find(query)
+          .exec((err, receipts) => {
+            if (err) return reject(err);
+            const output = clients.map(client => {
+              const newListings = client.listings.map(listing => {
+                const receiptIndex = receipts.map(receipt => receipt._id).indexOf(listing);
+                return receipts[receiptIndex];
+              });
+              client.listings = [...newListings];
+              return client;
+            });
+            res.json(output);
+          });
+      }).catch(err =>{
+        res.json({message: err});
       });
-      res.json(output);
-    });
+  });
+
+
 };
