@@ -304,7 +304,7 @@ const mapStateToProps = state => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
-  const locked = data &&  Object.values(data)[0] && Object.values(data)[0].listings[0].locked;
+  const locked = data &&  Object.values(data)[0] && Object.values(data)[0].listings[0] && Object.values(data)[0].listings[0].locked;
 
   return {
     message,
