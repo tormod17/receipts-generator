@@ -93,7 +93,7 @@
     "xlsx": "^0.11.12"
   },
   "scripts": {
-    "dev": "nodemon server.js",
+    "server": "nodemon server.js",
     "test": "jest ./tests/*",
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js",
     "build": "react-scripts build",

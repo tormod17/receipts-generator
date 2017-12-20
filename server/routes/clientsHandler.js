@@ -84,18 +84,25 @@ exports.updateCleintHandler = (req, res) => {
 };
 
 exports.delClientHandler = (req, res) => {
-  // needs to delete the receipt and the number from the client,
-
-
   if (!req.body) return console.error('no body to request');
   const ids = [...req.body];
-  ids.forEach(id => {
-    ReceiptDB.deleteOne({ _id: id }, function(err) {
-      if (err) return console.error(err);
-      console.log('receipt has been removed');
+  const promises = ids.map( id => {
+    return new Promise((resolve, reject) => {
+        ClientDB.deleteOne({ _id: id }, (err) => {
+        if (err) reject(err);
+      }).then(() => {
+        ReceiptDB.remove({clientId: id}, (err) => {
+          if (err) reject(err);
+          resolve();          
+        });
+      });
     });
   });
-  res.json({ message: 'Your receipts have been removed' });
+  Promise.all(promises)
+    .then(res.json({ message: 'Your clients have been removed' }))
+    .catch((err)=>{
+      res.json({ message: '' + err});
+  });
 };
 
 

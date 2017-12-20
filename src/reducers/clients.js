@@ -30,8 +30,7 @@ export function clients(state = initialState, action = {}) {
         case UPLOAD_SUCCESS:
             return {
                 ...state,
-                data: { ...action.data },
-                message: null,
+                message: action.payload.message,
                 uploading: false,
                 uploaded: true
             };

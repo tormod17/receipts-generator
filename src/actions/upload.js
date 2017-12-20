@@ -1,5 +1,5 @@
 import {
-  callApi,
+  callApi
 } from "../utils/apiUtils";
 
 export const UPLOAD_REQUEST = 'UPLOAD_REQUEST';

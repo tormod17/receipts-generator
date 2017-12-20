@@ -33,7 +33,6 @@ class ModalComp extends React.Component {
     return (
       <div>
         <Modal isOpen={open} className={this.props.className}>
-          <ModalHeader>Modal title</ModalHeader>
           <ModalBody>
             {message}
           </ModalBody>

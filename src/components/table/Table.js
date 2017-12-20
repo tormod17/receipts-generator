@@ -35,27 +35,15 @@ class TableData extends Component {
       return this.header.map(header => <th key={header}> {header}</th>)
     }
 
-    calcTotalListings(listings){
-      const output = listings.reduce((p,c) => {
-          const clientTotal = c['Gesamtumsatz Airgreets'] && Number(c['Gesamtumsatz Airgreets'].replace( /\D+/g, ''));
-          const corrections = c['Ust-Korrektur'] && Number(c['Ust-Korrektur'].replace( /\D+/g, ''));
-          p += clientTotal + corrections;
-          return p;
-        },0);
-      return output;
-    }
-
     createRows = client =>
         <tr
           key={client._id}
         >
           { this.requiredFields.map(field => {
-            console.log(client);
-
               let output;
               switch(true){
                 case field === 'Rechnungsbetrag':
-                  output = this.calcTotalListings(client.listings);
+                  output = client[field] + '€';
                   break;
                 case field === 'Rechnungs-datum':
                  output = new Date(client['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
@@ -75,17 +63,20 @@ class TableData extends Component {
     render() {
       const { data } = this.props;
       return  (
-        <Table striped>
-          <thead>
-            <tr>
-              { data && this.createHeaders() }
-            </tr>
-          </thead>
-          <tbody>
-            { data &&  (data.map( client => this.createRows(client))) }
-            { !data && <h2>Need to add some clients</h2> }
-          </tbody>
-        </Table>
+        <div>
+          <Table striped>
+            <thead>
+              <tr>
+                { data && this.createHeaders() }
+              </tr>
+            </thead>
+            <tbody>
+              { data &&  (data.map( client => this.createRows(client))) }
+              { !data && <h2>Need to add some clients</h2> }
+            </tbody>
+          </Table>
+          <div> GESMAT </div>
+        </div>
       )
     }
 }

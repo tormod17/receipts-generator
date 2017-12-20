@@ -51,10 +51,12 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
+    console.log(props);
     this.state ={
       value: new Date().toISOString(),
       selectedDay: formatDate(Date.now()),
-      clients: { ...props.clients.data },
+      clients: { ...props.data } ,
+      message: props.message,
       selectedArray: [],
       selectedMonth: TIMESTAMP.getMonth(),
     };
@@ -77,9 +79,22 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if( this.props.clients !== nextProps.clients && nextProps.clients.data) {
+    const { selectedMonth, message, clients } = this.state;
+    const { auth, dispatch } = this.props;
+    const { data } = clients;
+    if( message !== nextProps.message) {
       this.setState({
-        clients: { ...nextProps.clients.data }
+        message: nextProps.message || message,
+        clients: { 
+           ...nextProps.data,
+        }
+      }, () => dispatch(getClients(auth.id, selectedMonth)));
+    }
+    if( data !== nextProps.data) {
+      this.setState({
+        clients: { 
+          ...nextProps.data,
+         },
       });
     }
   }
@@ -88,6 +103,7 @@ class Home extends Component {
     const { selectedMonth } = this.state;
     const { auth, dispatch } = this.props;
     dispatch(getClients(auth.id, selectedMonth));
+    //document.addEventListener('clients', getClients(auth.id, selectedMonth));
   }
 
   handleDayChange(selectedDay, modifiers) {
@@ -161,8 +177,7 @@ class Home extends Component {
   }
 
   handlePDF(){
-    const { clients } = this.props;
-    const { selectedArray } = this.state;
+    const { selectedArray, clients } = this.state;
     createPDF(clients, selectedArray);
   }
 
@@ -189,6 +204,8 @@ class Home extends Component {
 
   lockMonthEditing(){
     // send a request to lock editing. 
+    const e = new Event('lockMonth')
+    document.dispatchEvent(e);
     console.log('locking');
     const newClients = {
       ...this.state.clients,
@@ -196,19 +213,12 @@ class Home extends Component {
     Object.keys(newClients).forEach((key) => {
       newClients[key]['Rechnungsnummer'] = Number(this.state.clients[key]['Rechnungsnummer']) + 1;
     });
-    this.setState({
-      ...this.state,
-      clients: {
-        ...newClients
-      },
-      locked: !this.state.locked,
-    });
     /// call back makes request to lock data
   }
 
   render() {
-    const { auth } =this.props;
-    const { selectedDay, clients, locked } = this.state;
+    const { auth, total, locked } =this.props;
+    const { selectedDay, message, clients } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -232,7 +242,9 @@ class Home extends Component {
                  items={[...MONTH]}
                  updateFieldValue={this.updateSelectedMonth} 
                />
+            
             </InputGroup>
+
             </Col>
           </FormGroup>
         <FormGroup row>
@@ -247,7 +259,10 @@ class Home extends Component {
                />        
             </InputGroupAddon>
           </Col>
-          <Col sm={{ size:4 , offset: 4 }}>
+          <Col sm={{ size:4 }}>
+            <p>{message}</p>
+          </Col>
+          <Col sm={{ size:4  }}>
             <InputGroupAddon>
               <DayPickerInput
                 value={selectedDay}
@@ -285,7 +300,7 @@ class Home extends Component {
             <h4>Gesmat</h4>
           </Col>
           <Col sm={4}>
-            <h4>1000</h4>
+            <h4>{total}</h4>
           </Col>
         </Row>
         <Row>
@@ -310,7 +325,33 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = state => ({ ...state });
+
+const calcTotalListings = (listings) => {
+  const output = listings.reduce((p,c) => {
+      const clientTotal = (c['Gesamtumsatz Airgreets'] && parseFloat(c['Gesamtumsatz Airgreets'].replace( /,/g, ''))) || 0;
+      const corrections = (c['Ust-Korrektur'] && parseFloat(c['Ust-Korrektur'].replace( /,/g, ''))) || 0;
+      p += clientTotal + corrections;
+      return p;
+    },0);
+  return output;
+}
+
+const mapStateToProps = state => {
+  const { clients } = state
+  const { message, data } = clients
+  let total = 0
+  Object.keys(data || {}).map((key) => {
+    data[key].Rechnungsbetrag = calcTotalListings(data[key].listings); 
+    total += data[key].Rechnungsbetrag 
+  })
+
+  return {
+    message,
+    data: {...data },
+    total
+
+  }
+} 
 
 
 export default withRouter(connect(mapStateToProps)(Home));

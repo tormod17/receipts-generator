@@ -2,8 +2,6 @@
 import { UPLOAD_REQUEST, UPLOAD_SUCCESS, UPLOAD_FAILURE } from "../actions/upload.js"
 
 
-import { loadUserProfile } from "../utils/apiUtils";
-
 const initialState = {
   uploading: false,
   uploadingError: null,
@@ -26,7 +24,7 @@ export default function uploadReceipts(state = initialState, action = {}) {
       return {
         ...state,
         uploadingError: 'Error uploading'
-      }
+      };
     default:
       return state;
   }

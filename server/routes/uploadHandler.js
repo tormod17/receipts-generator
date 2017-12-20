@@ -6,12 +6,11 @@ const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
 const DATETIMESTAMP = Date.now();
 
-exports.uploadHandler = (req, res) => {
+exports.uploadHandler = (req, res, next) => {
     const { file, query } = req;
     const { userId } = query;
     if (!file) {
-      res.json({ error_code: 1, err_desc: 'No file passed' });
-      return;
+      return res.json({ message: 'err_desc: No file passed' });
     }
     const { originalname, filename } = file;
     const ext = originalname
@@ -22,6 +21,7 @@ exports.uploadHandler = (req, res) => {
         const sheet_name_list = workbook.SheetNames;
         const jsonResults = xlsx.utils
             .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
+        
         const bills = jsonResults.map(record => {
             const Rechnungsnummer = uuidv1();
             return {
@@ -54,49 +54,57 @@ exports.uploadHandler = (req, res) => {
             };
             return p;
         }, {}); 
-
+        
         ReceiptDB.insertMany(bills, err => {
-            let error = false;
             if(err) { 
                 return res.json( { message: err });
             } else {
-                Object.values(customers).forEach((client) => {
-                    ClientDB.findById(client._id,(err, oldclient) => {
-                        if (oldclient){
-                            oldclient['Emailadresse']=  client['Emailadresse'],
-                            oldclient['Kunde']=  client['Kunde'],
-                            oldclient['Stadt']=  client['Stadt'],
-                            oldclient['Straße']=  client['Straße'],
-                            oldclient['PLZ']=  client['PLZ'],
-                            oldclient['Kunden-nummer']= client['Kunden-nummer'],
-                            oldclient['_id']=  client['Kunden-nummer'],
-                            client['listings'].forEach(list => {
-                                oldclient['listings'].push(list);
-                            });
-                            oldclient['Belegart'] = client['Belegart'],
-                            oldclient['FR'] = client['FR'],
-                            oldclient.save((err)=>{
-                                if (err) {
-                                  error = err;
-                                  console.error(err);  
-                                  return res.json({ message: error });
-                                } 
-                            });
-                        } else {
-                            ClientDB.create( client, (err) => {
-                              if (err) {
-                                error = err;
-                                console.error(err);  
-                                return res.json({ message: error });
-                              } 
-                            });
-                        }
+                const promises = Object.values(customers).map(client => {
+                    return new Promise((resolve, reject)=> {
+                        ClientDB.findById(client._id,(err, oldclient) => {
+                            if (oldclient){
+                                oldclient['Emailadresse']=  client['Emailadresse'],
+                                oldclient['Kunde']=  client['Kunde'],
+                                oldclient['Stadt']=  client['Stadt'],
+                                oldclient['Straße']=  client['Straße'],
+                                oldclient['PLZ']=  client['PLZ'],
+                                oldclient['Kunden-nummer']= client['Kunden-nummer'],
+                                oldclient['_id']=  client['Kunden-nummer'],
+                                client['listings'].forEach(list => {
+                                    oldclient['listings'].push(list);
+                                });
+                                oldclient['Belegart'] = client['Belegart'],
+                                oldclient['FR'] = client['FR'],
+                                oldclient.save((err)=>{
+                                    if (err) {
+                                      console.log('I GET TO HERE first', err);
+                                      reject(err);
+                                    } else {
+                                      resolve();
+                                    } 
+                                });
+                            } else {
+                                ClientDB.create( client, (err) => {
+                                  if (err) {
+                                    reject(err);
+                                  } else {
+                                    resolve();
+                                  } 
+                                });
+                            }
+                           
+                        });
                     });
                 });
+                Promise.all(promises)
+                    .then(() => res.json({ message: 'success' }))
+                    .catch((err) => {
+                        res.json({ message: '' + err});
+                        next();
+                    });
             }
-            if (!error) {
-                return res.json({ message: 'success' });
-            }
-        });
+        }) ;
+    } else {
+        return res.json({message: 'incorrect file type'});
     }
 };
