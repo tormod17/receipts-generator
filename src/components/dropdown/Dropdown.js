@@ -33,7 +33,8 @@ export default class Example extends React.Component {
     const { name, updateFieldValue } = this.props;
     this.setState({
       selected: item,
-    }, updateFieldValue(name, item))
+    })
+    updateFieldValue(name, item)
   }
 
   render() {

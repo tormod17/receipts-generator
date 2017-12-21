@@ -121,9 +121,17 @@ exports.getClientsHandler = (req, res) => {
   if (!req.query) return console.error('no userId');
   const { month } = req.query;
   const currentYear = new Date().getFullYear();
-
-  const fromDate =  new Date(currentYear, (Number(month)), 15).getTime();
-  const toDate = new Date(2017, Number(month + 1), 15).getTime();  
+  
+  let toMonth = month;
+  let toYear = currentYear;
+  if (month == 11) {
+    toMonth = 0;
+    toYear ++;
+  } else {
+    toMonth ++;
+  }
+  const fromDate =  new Date(currentYear, Number(month), 1).getTime();
+  const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
 
   let query = {
     created: {
@@ -138,7 +146,7 @@ exports.getClientsHandler = (req, res) => {
       .sort({ created: -1 })
       .exec((err) => {
         if (err) return reject(err);
-      }).then((clients) =>{
+      }).then((clients) => {
          ReceiptDB.find(query)
           .exec((err, receipts) => {
             if (err) return reject(err);

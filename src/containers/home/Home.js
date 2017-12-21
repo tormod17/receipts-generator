@@ -42,7 +42,7 @@ const MONTH = [
 class Home extends Component {
 
   static propTypes = {
-    locked: PropTypes.bool.isRequired,
+    locked: PropTypes.bool,
   }
 
   static defaultProps = {
@@ -158,10 +158,11 @@ class Home extends Component {
 
   updateSelectedMonth(name, value) {
     const { dispatch, auth } = this.props;
-    const monthNumber = MONTH.indexOf(value) + 1;
+    const monthNumber = MONTH.indexOf(value);
     this.setState({
       selectedMonth: monthNumber,
-    }, dispatch(getClients(auth.id, monthNumber)));
+    })
+    dispatch(getClients(auth.id, monthNumber));
   }
 
   lockMonthEditing(){
@@ -304,7 +305,11 @@ const mapStateToProps = state => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
-  const locked = data &&  Object.values(data)[0] && Object.values(data)[0].listings[0] && Object.values(data)[0].listings[0].locked;
+  const locked = data &&  
+    Object.values(data) && 
+      Object.values(data)[0] && 
+        Object.values(data)[0].listings[0] &&
+          Object.values(data)[0].listings[0].locked;
 
   return {
     message,

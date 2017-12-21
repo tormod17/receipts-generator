@@ -20,7 +20,11 @@ import {
     SELECTED_CLIENT
 } from '../actions/clients.js';
 
-const initialState = {};
+const initialState = {
+    data: {},
+    message: '',
+    status: ''
+};
 
 
 export function clients(state = initialState, action = {}) {
@@ -68,6 +72,7 @@ export function clients(state = initialState, action = {}) {
             };
         case CLIENTS_SUCCESS:
             return {
+                ...state,
                 data: {
                     ...action.payload
                 },
@@ -129,7 +134,7 @@ export function clients(state = initialState, action = {}) {
         case SELECTED_CLIENT:
             return {
                 ...state,
-                selectedCLIENT: action.selected
+                selectedClient: action.selected
             };
         default:
             return state;
