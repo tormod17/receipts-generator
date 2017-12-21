@@ -59,6 +59,7 @@ export default class Guests extends React.Component {
                 name="Name des Gastes"
                 placeholder="Name des Gastes"
                 value={guests[key]["Name des Gastes"]}
+                required
               />
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
@@ -67,6 +68,7 @@ export default class Guests extends React.Component {
                 name="Airgreets Service Fee (€)"
                 placeholder="Airgreets Service Fee (€)"
                 value={guests[key]['Airgreets Service Fee (€)']}
+                required
               />
             </Col>
           </FormGroup>
@@ -80,17 +82,19 @@ export default class Guests extends React.Component {
                     this.handleValueChange('Anreisedatum', formatDate(val) ,key )
                   }
                   value={guests[key].Anreisedatum}
+                  required
                 />
               </InputGroupAddon>
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField
-                name="CLEANING FARE"
+                name="Reinigungs-gebühr"
                 updateFieldValue={(name, val) => 
                   this.handleValueChange(name, val, key)
                 } 
+                required
                 placeholder="Reinigungs-gebühr"
-                value={guests[key]["CLEANING FARE"]} 
+                value={guests[key]["Reinigungs-gebühr"]} 
               />
             </Col>
           </FormGroup>
@@ -99,20 +103,22 @@ export default class Guests extends React.Component {
               <Label for="Abreisedatum">Abreise-datum</Label>
               <InputGroupAddon>
                 <DayPickerInput 
-                  name="Abreisedatum"
+                  name="Abreisedatum (Leistungsdatum)"
                   onDayChange={val => 
-                    this.handleValueChange('Abreisedatum', formatDate(val), key )
+                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), key )
                   }
                   value={guests[key]['Abreisedatum (Leistungsdatum)']}
+                  required
                 />
               </InputGroupAddon>
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="TOTAL PAID"
+                name="Auszahlung"
                 placeholder="Auszahlung"
-                value={guests[key]["TOTAL PAID"]}
+                value={guests[key]["Auszahlung"]}
+                required
               />
             </Col>
             <Col sm={{ size: 1, order: 1 }}>
@@ -122,6 +128,7 @@ export default class Guests extends React.Component {
                 aria-hidden="true"
                 onClick={() => this.props.handleDelGuest(key, 'guests')}
                 id={guests[key]['guestId']}
+                required
               >
               </i>
             </Col>

@@ -11,6 +11,30 @@ const ClientSchema = new mongoose.Schema({
     Kunde: {
         type: String
     },
+    'Kunden-nummer': {
+        type: String
+    },
+    'Straße':{
+        type: String
+    },
+    'Stadt': {
+        type: String
+    },
+    'PLZ':{
+        type: String
+    },
+    Belegart: {
+        type: String
+    },
+    'Rechnungs-datum': {
+        type: String
+    },
+    'Rechnungsnummer':{
+        type: String
+    },
+    'Emailadresse': {
+        type: String        
+    },
     email: {
         type: String
     },

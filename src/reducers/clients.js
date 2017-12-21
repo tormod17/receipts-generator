@@ -53,9 +53,14 @@ export function clients(state = initialState, action = {}) {
                 uploading: true
             };
         case UPLOAD_SUCCESS:
+            console.log(action.payload);
             return {
                 ...state,
-                ...action.payload,
+                data:{
+                    ...state.data,
+                    ...action.payload.data
+                },
+                message: action.payload.message,
                 uploading: false,
                 uploaded: true,
                 status: 'uploaded'
@@ -74,6 +79,7 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 data: {
+                    ...state.data,
                     ...action.payload
                 },
                 retrieving: false,
@@ -92,6 +98,7 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 data: {
+                    ...state.data,
                     ...action.payload
                 }
             };

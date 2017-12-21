@@ -53,7 +53,6 @@ function saveMonthFailure(error) {
 }
 
 export function saveMonth(data, month) {
-  console.log('>>>>>>>>>' ,data);
   const config = {
     method: 'post',
     headers: {
@@ -174,10 +173,10 @@ function updateClientFailure(error) {
 
 export function updateClient(id, data) {
   const config = {
-    method: "put",
+    method: 'put',
     headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json"
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
   };
@@ -211,7 +210,6 @@ function addClientsFailure(error) {
 }
 
 export function addClient(id, data) {
-  console.log('data', data);
   const config = {
     method: 'post',
     headers: {

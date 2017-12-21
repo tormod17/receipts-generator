@@ -47,7 +47,7 @@ class EditableField extends Component {
   }
 
   render() {
-    const { placeholder, updateFieldValue, type, value, name, label, nolabel } =this.props;
+    const { placeholder, updateFieldValue, type, value, name, label, nolabel, required } =this.props;
     //const name = this.camelCaseName(placeholder);
 
     return (
@@ -64,6 +64,7 @@ class EditableField extends Component {
           onChange={(e) => this.handleOnChange(e,name)}
           //disabled={!!value}
           value={value}
+          required
         />
       </div> 
     );

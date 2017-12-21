@@ -5,79 +5,97 @@ const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 
 
-exports.saveMonth = (req, res) => {
-  if (!req.query.month) return console.error('no month');
-  const { month } = req.query;
-  console.log(month , req,body);
-  // Alternatively each listing within in a month can be updated with a field that locks the bill. 
-  // A note of the locked months is also stored, to prevent additons . 
-
-};
-
-
 exports.addClientHandler = (req, res) => {
   // 
   if (!req.query.userId) return console.error('no userId');
   const { userId } = req.query;
-
-  console.log('ADDING A USER MANUALLY NOT BY UPLOAD');
-  const { guests, corrections, customer, type } = req.body;
-  const billType = type === 'Rechnung' ? { Rechnung: 'X' } : { Auszahlung: 'X' };
-
-  const guestsArr = Object.keys(guests || {});
-
-  if (guestsArr.length > 0) {
-    Object.keys(guests).forEach(key => {
-      const Rechnungsnummer = uuidv1();
-      const new_receipt = {
+  const { guests, corrections, customer, Belegart } = req.body;
+  const _id = uuidv1();
+  console.log('ADDING A USER MANUALLY'); 
+  
+  const listings = [ 
+    ...Object.values(guests || {}),
+    ...Object.values(corrections || {}) 
+    ].map(record =>{
+    return {
         ...customer,
-        ...guests[key],
-        ...billType,
+        ...record,
         filename: 'manual entry',
-        Rechnungsnummer: !guests[key]['Rechnungsnummer'] && Rechnungsnummer,
-        'Rechnungs-datum': customer['Rechnungs-datum'] || DATETIMESTAMP,
         userId,
         created: DATETIMESTAMP,
-        _id: Rechnungsnummer
-      };
-      ReceiptDB.create(new_receipt, function(err) {
-        if (err) return console.error(err);
-        //res.json({ message:'Your receipt has been added for guests'});
-      });
-    });
-  }
-  const correctionsArr = Object.keys(corrections || {});
-
-  if (correctionsArr.length > 0) {
-    correctionsArr.forEach(key => {
-      const Rechnungsnummer = uuidv1();
-      const new_receipt = {
-        ...customer,
-        ...corrections[key],
-        ...billType,
-        filename: 'manual entry',
-        Rechnungsnummer: !corrections[key]['Rechnungsnummer'] || Rechnungsnummer,
-        userId,
-        time: DATETIMESTAMP,
-        _id: Rechnungsnummer
-      };
-      ReceiptDB.create(new_receipt, function(err) {
-        if (err) return console.error(err);
-        //res.json({message:'Your receipt has been added for corrections'});
-      });
-    });
-  }
-  customer.listings = [...guestsArr, ...correctionsArr];
-  ClientDB.create(customer, err => {
-    if (err) {
-      return res.json({ message: err });
-    } else {
-      return res.json({ message: 'Transaction Added' });
-    }
+        clientId: customer['Kunden-nummer'],
+        Rechnungsnummer: _id,
+        Belegart,
+        _id
+    };
+  });
+  ReceiptDB.insertMany(listings, err => {
+      if(err) { 
+          return res.json( { message: err });
+      } else {       
+          const newCustomer = {
+             ...customer,
+            Belegart,
+            created: DATETIMESTAMP,
+            listings: listings.map(listing => listing._id),
+            _id: customer['Kunden-nummer'] || uuidv1(),
+            Rechnungsnummer: customer['Rechnungsnummer'] || 0,
+            'Rechnungs-datum': customer['Rechnungs-datum'] || Date(),
+            'FR': 0
+          };
+          /// Client Numbers must be decided before otherwise will update a previous customer
+          //  Difference between updating an existing client that doesn't have an entry that month and new client
+          ClientDB.findById(newCustomer._id,(err, savedClient) => {
+            if (savedClient){
+                savedClient['Emailadresse']=  newCustomer['Emailadresse'],
+                savedClient['Kunde']=  newCustomer['Kunde'],
+                savedClient['Stadt']=  newCustomer['Stadt'],
+                savedClient['Straße']=  newCustomer['Straße'],
+                savedClient['PLZ']=  newCustomer['PLZ'],
+                savedClient['Kunden-nummer']= newCustomer['Kunden-nummer'],
+                savedClient['_id']=  newCustomer['Kunden-nummer'],
+                savedClient['listings'] = [...savedClient.listings, ...newCustomer.listings];
+                savedClient['Belegart'] = newCustomer['Belegart'],
+                savedClient['FR'] = newCustomer['FR'],
+                savedClient['Rechnungs-datum'] = newCustomer['Rechnungs-datum'],
+                savedClient['Rechnungsnummer'] = newCustomer['Rechnungsnummer'] ,
+                savedClient.save((err, client)=>{
+                    if (err) {
+                      res.json({message: err});
+                    } else {
+                      const newClient ={ 
+                        [newCustomer['_id']]: {
+                          ...newCustomer,
+                          listings: [ ...listings]
+                        }
+                      };
+                      console.log(client, 'update new  client for month !!!!!!!');
+                      res.json(newClient);
+                    } 
+                });
+            } else {
+                ClientDB.create( newCustomer, (err, client) => {
+                  if (err) {
+                    res.json({message: err});
+                  } else {
+                    console.log(client, ' saved new  client !!!!!!!');
+                    const newClient = {
+                      [newCustomer._id]:{
+                        ...newCustomer,
+                        listings: [ ...listings]
+                      }
+                    };
+                    res.json(newClient);
+                  } 
+                });
+            }
+           
+        });
+      }
   });
 };
 
-exports.updateCleintHandler = (req, res) => {
+exports.updateClientHandler = (req, res) => {
   // needs to only update the receipt details not client
 
   // const { type, guests, client, corrections } = req.body;

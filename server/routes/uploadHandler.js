@@ -37,6 +37,7 @@ exports.uploadHandler = (req, res, next) => {
         const customers = bills.reduce( (p, c) => {
             const listings = bills.filter(bill => 
                 bill['Kunden-nummer'] ===  c['Kunden-nummer']).map(bill => bill._id);
+            
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
                 Kunde: c['Kunde'],
@@ -49,7 +50,7 @@ exports.uploadHandler = (req, res, next) => {
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
                 Rechnungsnummer: c['Rechnungsnummer'] || 0,
-                'Rechnungs-datum': DATETIMESTAMP,
+                'Rechnungs-datum': Date(),
                 'FR': 0
             };
             return p;
@@ -96,7 +97,17 @@ exports.uploadHandler = (req, res, next) => {
                     });
                 });
                 Promise.all(promises)
-                    .then(() => res.json({ message: 'Erfolg' }))
+                    .then(() => {
+                        Object.keys(customers).forEach(key => {
+                            customers[key].listings = bills.filter(listing => 
+                                listing['Kunden-nummer'] ===  customers[key]['Kunden-nummer']);
+                        });
+                        console.log('customers', customers);
+                        res.json({ 
+                            data: { ...customers },
+                            message: 'Erfolg' 
+                        });
+                    })
                     .catch((err) => {
                         res.json({ message: '' + err});
                         next();

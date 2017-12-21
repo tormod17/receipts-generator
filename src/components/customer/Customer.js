@@ -39,9 +39,11 @@ export default class Customer extends React.Component {
           <Col>
             <EditableField 
               updateFieldValue={this.handleValueChange}
-               name="Kunde" 
-               placeholder="Name des Kunden" 
-               value={customer.Kunde} />
+              name="Kunde" 
+              placeholder="Name des Kunden" 
+              value={customer.Kunde} 
+              required
+            />
           </Col>
           <Col>
             <EditableField 
@@ -49,14 +51,16 @@ export default class Customer extends React.Component {
                name="Emailadresse" 
                placeholder="Emailadresse" 
                value={customer.Emailadresse}
+               required
             />
           </Col>
           <Col>
             <EditableField 
               updateFieldValue={this.handleValueChange}
-               name="Rechnungsnummer" 
-               placeholder="Fortlaufende Rechnungsnummer" 
-               value={customer.Rechnungsnummer}
+              name="Rechnungsnummer" 
+              placeholder="Fortlaufende Rechnungsnummer" 
+              value={customer.Rechnungsnummer}
+              required
             />
           </Col>
         </FormGroup>
@@ -67,7 +71,9 @@ export default class Customer extends React.Component {
               name="Straße" 
               placeholder="Straße" 
               label="Adresse des Kunden" 
-              value={customer.Straße}/>
+              value={customer.Straße}
+              required
+              />
           </Col>
           <Col>
             <EditableField 
@@ -75,7 +81,9 @@ export default class Customer extends React.Component {
               name="Stadt" 
               placeholder="Stadt" 
               nolabel 
-              value={customer.Stadt}/>
+              value={customer.Stadt}
+              required
+              />
           </Col>
           <Col>
             <EditableField 
@@ -83,7 +91,9 @@ export default class Customer extends React.Component {
               name="PLZ" 
               placeholder="PLZ" 
               nolabel 
-              value={customer.PLZ}/>
+              value={customer.PLZ}
+              required
+            />
           </Col>
         </FormGroup>
         <FormGroup row>
@@ -91,7 +101,9 @@ export default class Customer extends React.Component {
             <EditableField 
               updateFieldValue={this.handleValueChange}
               name="Kunden-nummer" 
-              placeholder="Kunden-nummer" value={customer['Kunden-nummer']}/>
+              placeholder="Kunden-nummer" value={customer['Kunden-nummer']}
+              required
+              />
           </Col>
           <Col>
           <Label for="Rechnungs-datum">Rechnungs-datum</Label>
@@ -99,7 +111,8 @@ export default class Customer extends React.Component {
               <DayPickerInput 
                 name="Rechnungs-datum"
                 onDayChange={(val) => this.handleValueChange('Rechnungs-datum', val, 'customer' )}
-                value={formatDate(customer['Rechnungs-datum'] || Date.now())}
+                value={formatDate(customer['Rechnungs-datum'])}
+                required
               />
             </InputGroupAddon>
           </Col>

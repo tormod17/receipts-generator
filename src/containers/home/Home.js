@@ -99,9 +99,9 @@ class Home extends Component {
          },
       });
     }
-    if (nextProps.status === 'deleted' || nextProps.status ==='uploaded' || nextProps.status ==='saved'  ) {
-      dispatch(getClients(auth.id, selectedMonth))
-    }
+    // if (nextProps.status === 'deleted' || nextProps.status ==='uploaded' || nextProps.status ==='saved'  ) {
+    //   dispatch(getClients(auth.id, selectedMonth))
+    // }
   }
 
 
@@ -301,6 +301,7 @@ const mapStateToProps = state => {
   const { clients } = state
   const { message, data, status } = clients
   let total = 0
+console.log(data,  clients);
   data && Object.keys(data || {}).map((key) => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
@@ -308,6 +309,7 @@ const mapStateToProps = state => {
   const locked = data &&  
     Object.values(data) && 
       Object.values(data)[0] && 
+        Object.values(data)[0].listings &&
         Object.values(data)[0].listings[0] &&
           Object.values(data)[0].listings[0].locked;
 

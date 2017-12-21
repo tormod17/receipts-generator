@@ -16,21 +16,48 @@ import { addClient, getClient, getClients, updateClient } from "../../actions/cl
 import 'react-day-picker/lib/style.css';
 import "./client.css";
 
+let requiredFields = [ 
+  'Belegart',
+  'Kunde',
+  'Emailadresse',
+  'Straße',
+  'Stadt',
+  'PLZ',
+  'Kunden-nummer',
+  'Rechnungs-datum'
+];
+
+let requiredFieldsGuest = [
+  'Name des Gastes',
+  'Abreisedatum (Leistungsdatum)',
+  'Anreisedatum',
+  'Reinigungs-gebühr',
+  'Auszahlung',
+//  'Gesamtumsatz Airgreets',
+  'Airgreets Service Fee (€)'
+];
+
+let requiredFieldsRechnungsCorrection = [
+  'Rechnungskorrektur', 
+  'Rechnungskorrektur in €',
+  'Ust-Korrektur',
+  'Sonstige Leistungsbeschreibung'
+];
+
+let requiredFieldsAuszhalungsCorrection = [
+  'Auszhalungskorrektur', 
+  'Auszahlungskorrektur in €',
+  'Ust-Korrektur',
+  'Sonstige Leistungsbeschreibung'
+];
+
 class Client extends Component {
-
-  // static propTypes = {
-  //   data: PropTypes.shape({})
-  // }
-
-  // static defaultProps ={
-  //   data:{},
-  //   customer: {},
-  // }
 
   constructor(props) {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
+      Belegart: 'Belegart',
       customer: {...client},
       guests: { ...guests },
       corrections: { ...corrections}
@@ -51,7 +78,6 @@ class Client extends Component {
         corrections: { ...corrections}
       });
     }
-
   }
 
   calculateTotals(type) {
@@ -68,13 +94,53 @@ class Client extends Component {
     return sum ;
   }
 
+  checkRequiredFields(data){
+    const { customer, guests, corrections, Belegart } = data;
+    let fields= [];
+    const isGuests = Object.keys(guests).length > 0;
+    const isCorrections = Object.keys(corrections).length > 0;
+
+    const customerKeys = Object.keys(customer);
+    const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
+    const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
+
+    const currentFields = [...customerKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
+    if (Belegart === 'Belegart') {
+      return ['Belegart'];
+    }
+    if( Belegart !== 'Belegart' && !isGuests && !isCorrections) {
+      fields = [ ...requiredFields ];
+    }
+    if( Belegart === 'Auszahlung' && isGuests && !isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsGuest];
+    }
+    if( Belegart === 'Auszahlung' && isGuests && isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection, ...requiredFieldsGuest];
+    }
+    if (Belegart === 'Rechnung' && isGuests && isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection, ...requiredFieldsGuest];
+    }
+    if( Belegart === 'Auszahlung' && isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection];
+    }
+    if (Belegart === 'Rechnung' && isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection ];
+    }
+    console.log(guestsKeys);
+    let missingFields =fields.filter(key => !currentFields.includes(key));
+    return missingFields;
+  }
+
   handleSubmission(){
     const { dispatch, auth } = this.props;
     const clientId = this.props.match.params.id;
-    
     const data  = {
       ...this.state
     };
+    const missingFields = this.checkRequiredFields(data);
+    if (missingFields.length > 0){
+      return console.log(missingFields);
+    }
     if (clientId) {
       dispatch(updateClient(clientId, data), this.props.history.push('/'));
     } else {
@@ -146,7 +212,7 @@ class Client extends Component {
               name="Belegart"
               items={['Rechnung', 'Auszahlung']}
               updateFieldValue={this.updateFieldValue} 
-              selected={customer['Belegart']}
+              selected={customer['Belegart']|| 'Belegart'}
 
             />
           </Col>
@@ -197,7 +263,6 @@ class Client extends Component {
           </Col>
           <Col sm={{ size: 4, order: 1 }}>
             <EditableField 
-              //updateFieldValue={this.updateFieldValue}
               name="Darin enthaltene Umsatzsteuer"
               placeholder="Darin Enthaltene Umsatzsteuer"
               //value={this.calculateTotals()}
