@@ -57,7 +57,7 @@ export default class Guests extends React.Component {
             <Col  sm={{ size: 6, order: 1 }}>
               <EditableField
                 disbaled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Name des Gastes"
                 placeholder="Name des Gastes"
                 value={guests[key]["Name des Gastes"]}
@@ -67,7 +67,7 @@ export default class Guests extends React.Component {
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField
                 disbaled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Airgreets Service Fee (€)"
                 placeholder="Airgreets Service Fee (€)"
                 value={guests[key]['Airgreets Service Fee (€)']}
@@ -82,7 +82,7 @@ export default class Guests extends React.Component {
                 <DayPickerInput 
                   name="Anreisedatum"
                   onDayChange={(val) =>
-                    this.handleValueChange('Anreisedatum', formatDate(val) ,guests[key]._id )
+                    this.handleValueChange('Anreisedatum', formatDate(val) , key)
                   }
                   value={guests[key].Anreisedatum}
                   disbaled={locked}
@@ -95,7 +95,7 @@ export default class Guests extends React.Component {
                 disbaled={locked}
                 name="Reinigungs-gebühr"
                 updateFieldValue={(name, val) => 
-                  this.handleValueChange(name, val, guests[key]._id)
+                  this.handleValueChange(name, val, key)
                 } 
                 required
                 placeholder="Reinigungs-gebühr"
@@ -110,7 +110,7 @@ export default class Guests extends React.Component {
                 <DayPickerInput 
                   name="Abreisedatum (Leistungsdatum)"
                   onDayChange={val => 
-                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), guests[key]._id )
+                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), key )
                   }
                   value={guests[key]['Abreisedatum (Leistungsdatum)']}
                   disbaled={locked}
@@ -121,7 +121,7 @@ export default class Guests extends React.Component {
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField
                 disbaled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Airbnb Einkommen"
                 placeholder="Airbnb Einkommen"
                 value={guests[key]["Airbnb Einkommen"]}

@@ -73,19 +73,19 @@ class Home extends Component {
 
   componentWillReceiveProps(nextProps, nextState) {
     const { message, clients } = this.props;
-    const locked =  Object.values(nextProps.clients)[0]
-      && Object.values(nextProps.clients)[0].listings[0].locked;
+
     
     if( message !== nextProps.message) {
       this.setState({
         message: nextProps.message || message,
         clients: { 
            ...nextProps.clients
-        },
-        locked
+        }
       });
     } 
     if(clients !== nextProps.clients) {
+      const locked =  Object.values(nextProps.clients)[0]
+        && Object.values(nextProps.clients)[0].listings[0].locked;
       this.setState({
         clients: { 
           ...nextProps.clients

@@ -12,19 +12,19 @@ export default class Customer extends React.Component {
   
   static defaultProps = {
     updateFieldValue: PropTypes.func.isRequired,
-    customer: PropTypes.shape({}).isRequired,
+    client: PropTypes.shape({}).isRequired,
   }
 
   // static defaultProps = {
-  //   customer: undefined,
+  //   client: undefined,
   // }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      customer: {
-        ...props.customer
+      client: {
+        ...props.client
       }
     };
     this.handleValueChange = this.handleValueChange.bind(this);
@@ -33,20 +33,20 @@ export default class Customer extends React.Component {
   componentWillReceiveProps(nextProps) {
     if(this.props !== nextProps ){
       this.setState({
-        customer: {
-          ...nextProps.customer
+        client: {
+          ...nextProps.client
         }
       })
     }
   }
 
   handleValueChange(field, val) {
-    this.props.updateFieldValue(field, val, 'customer')
+    this.props.updateFieldValue(field, val, 'client')
   }
 
   render() {
     const { updateFieldValue } = this.props;
-    const { customer } = this.state;
+    const { client } = this.state;
     return (
       <div>
         <FormGroup>
@@ -58,7 +58,7 @@ export default class Customer extends React.Component {
               updateFieldValue={this.handleValueChange}
               name="Kunde" 
               placeholder="Name des Kunden" 
-              value={customer.Kunde} 
+              value={client.Kunde} 
               required
             />
           </Col>
@@ -67,7 +67,7 @@ export default class Customer extends React.Component {
               updateFieldValue={this.handleValueChange}
                name="Emailadresse" 
                placeholder="Emailadresse" 
-               value={customer.Emailadresse}
+               value={client.Emailadresse}
                required
             />
           </Col>
@@ -76,7 +76,7 @@ export default class Customer extends React.Component {
               updateFieldValue={this.handleValueChange}
               name="Rechnungsnummer" 
               placeholder="Fortlaufende Rechnungsnummer" 
-              value={customer.Rechnungsnummer}
+              value={client.Rechnungsnummer}
               required
             />
           </Col>
@@ -88,7 +88,7 @@ export default class Customer extends React.Component {
               name="Straße" 
               placeholder="Straße" 
               label="Adresse des Kunden" 
-              value={customer.Straße}
+              value={client.Straße}
               required
               />
           </Col>
@@ -98,7 +98,7 @@ export default class Customer extends React.Component {
               name="Stadt" 
               placeholder="Stadt" 
               nolabel 
-              value={customer.Stadt}
+              value={client.Stadt}
               required
               />
           </Col>
@@ -108,7 +108,7 @@ export default class Customer extends React.Component {
               name="PLZ" 
               placeholder="PLZ" 
               nolabel 
-              value={customer.PLZ}
+              value={client.PLZ}
               required
             />
           </Col>
@@ -118,7 +118,7 @@ export default class Customer extends React.Component {
             <EditableField 
               updateFieldValue={this.handleValueChange}
               name="Kunden-nummer" 
-              placeholder="Kunden-nummer" value={customer['Kunden-nummer']}
+              placeholder="Kunden-nummer" value={client['Kunden-nummer']}
               required
               />
           </Col>
@@ -127,8 +127,8 @@ export default class Customer extends React.Component {
             <InputGroupAddon>
               <DayPickerInput 
                 name="Rechnungs-datum"
-                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', val, 'customer' )}
-                value={formatDate(customer['Rechnungs-datum'])}
+                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', val, 'client' )}
+                value={formatDate(client['Rechnungs-datum'])}
                 required
               />
             </InputGroupAddon>

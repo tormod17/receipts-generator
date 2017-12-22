@@ -64,7 +64,7 @@ class Client extends Component {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: client['Belegart'],
+      Belegart: client['Belegart'] || 'Belegart',
       client: { ...client },
       guests: { ...guests},
       corrections: {...corrections},
@@ -151,6 +151,7 @@ class Client extends Component {
     const data  = {
       ...this.state
     };
+    console.log(data);
     const missingFields = this.checkRequiredFields(data);
     if (missingFields.length > 0 && !clientId){
       return console.log(missingFields);
@@ -244,7 +245,7 @@ class Client extends Component {
           </Col>
         </FormGroup>
         <Customer 
-          customer={client}
+          client={client}
           updateFieldValue={this.updateFieldValue} 
         />
         <Guests 

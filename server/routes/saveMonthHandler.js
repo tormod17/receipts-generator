@@ -27,7 +27,6 @@ exports.saveMonthHandler = (req, res) => {
         // array of all saved Receipts this needs to be added back to the clients and sent back to the  frontend. 
         const clientPromises = Object.values(clients).map(client => {
           return new Promise((resolve, reject) => {
-            console.log(client._id);
             ClientDB.findByIdAndUpdate( client._id, { $inc: {Rechnungsnummer: 1 } }, {new: true}, (err, model) => {
               if (err) return reject(err);
               resolve(model);
