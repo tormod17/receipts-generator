@@ -24,7 +24,7 @@ exports.addClientHandler = (req, res) => {
         userId,
         created: DATETIMESTAMP,
         clientId: customer['Kunden-nummer'],
-        Rechnungsnummer: _id,
+        Rechnungsnummer: Number(_id),
         Belegart,
         _id
     };
@@ -39,7 +39,7 @@ exports.addClientHandler = (req, res) => {
             created: DATETIMESTAMP,
             listings: listings.map(listing => listing._id),
             _id: customer['Kunden-nummer'] || uuidv1(),
-            Rechnungsnummer: customer['Rechnungsnummer'] || 0,
+            Rechnungsnummer: Number(customer['Rechnungsnummer']) || 0,
             'Rechnungs-datum': customer['Rechnungs-datum'] || Date(),
             'FR': 0
           };
@@ -58,7 +58,7 @@ exports.addClientHandler = (req, res) => {
                 savedClient['Belegart'] = newCustomer['Belegart'],
                 savedClient['FR'] = newCustomer['FR'],
                 savedClient['Rechnungs-datum'] = newCustomer['Rechnungs-datum'],
-                savedClient['Rechnungsnummer'] = newCustomer['Rechnungsnummer'] ,
+                savedClient['Rechnungsnummer'] = Number(newCustomer['Rechnungsnummer']) ,
                 savedClient.save((err, client)=>{
                     if (err) {
                       res.json({message: err});
@@ -97,7 +97,7 @@ exports.addClientHandler = (req, res) => {
 
 exports.updateClientHandler = (req, res) => {
   // needs to only update the receipt details not client
-
+  console.log(req.body);
   // const { type, guests, client, corrections } = req.body;
   // const { receiptId } = req.query;
   // if (!receiptId) return console.error('no receiptId');
@@ -129,7 +129,7 @@ exports.delClientHandler = (req, res) => {
   Promise.all(promises)
     .then(res.json({ 
         data: ids, 
-        message: 'Your clients have been removed' 
+        message: 'entfernt' 
     }))
     .catch((err)=>{
       res.json({ message: '' + err});

@@ -41,24 +41,17 @@ const MONTH = [
 
 class Home extends Component {
 
-  static propTypes = {
-    locked: PropTypes.bool,
-  }
-
-  static defaultProps = {
-    locked: false,
-  }
-
   constructor(props) {
     super(props);
-    const { data, message, total } = props;
+    const { clients, message, total } = props;
     this.state ={
       value: new Date().toISOString(),
       selectedDay: formatDate(Date.now()),
-      clients: { ...data } ,
+      clients: { ...clients } ,
       message,
       selectedMonth: TIMESTAMP.getMonth(),
-      total,
+      locked: true,
+      total
     };
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
@@ -78,34 +71,35 @@ class Home extends Component {
     } 
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { selectedMonth, message, clients } = this.state;
-    const { auth, dispatch } = this.props;
-    const { data } = clients;
-
+  componentWillReceiveProps(nextProps, nextState) {
+    const { message, clients } = this.props;
+    const locked =  Object.values(nextProps.clients)[0]
+      && Object.values(nextProps.clients)[0].listings[0].locked;
+    
     if( message !== nextProps.message) {
       this.setState({
         message: nextProps.message || message,
         clients: { 
-           ...nextProps.data,
-        }
+           ...nextProps.clients
+        },
+        locked
       });
-    }
-
-    if( data !== nextProps.data) {
+    } 
+    if(clients !== nextProps.clients) {
       this.setState({
         clients: { 
-          ...nextProps.data,
-         },
+          ...nextProps.clients
+        },
+        locked
       });
     }
   }
 
 
-  handleDayChange(selectedDay, modifiers) {
+  handleDayChange(selectedDay) {
     const newClients = {
-      ...this.state.clients,
-    }
+      ...this.state.clients
+    };
     Object.keys(newClients).forEach((key) => {
       newClients[key]['Rechnungs-datum'] = selectedDay;
     });
@@ -127,9 +121,9 @@ class Home extends Component {
   }
 
   getSelectedIds(){
-    const checkBoxes = document.querySelectorAll('.clientCheck:checked')
-    const selectedIds = [...checkBoxes].map(box => box.getAttribute('id'))
-    return selectedIds
+    const checkBoxes = document.querySelectorAll('.clientCheck:checked');
+    const selectedIds = [...checkBoxes].map(box => box.getAttribute('id'));
+    return selectedIds;
   }
   
   handlePDF(){
@@ -156,22 +150,22 @@ class Home extends Component {
     const { dispatch, auth } = this.props;
     const monthNumber = MONTH.indexOf(value);
     this.setState({
-      selectedMonth: monthNumber,
-    })
+      selectedMonth: monthNumber
+    });
     dispatch(getClients(auth.id, monthNumber));
   }
 
   lockMonthEditing(){
-    let event = new Event('lockMonth')
+    let event = new Event('lockMonth');
     event.message = 'Bist du sicher?',
     event.selectedMonth = this.state.selectedMonth;
-    event.payload = { ...this.state.clients }
+    event.payload = { ...this.state.clients };
     document.dispatchEvent(event);
   }
 
   render() {
-    const { auth, total, locked } =this.props;
-    const { selectedDay, message, clients } = this.state;
+    const { auth, total } =this.props;
+    const { selectedDay, message, clients, locked } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -195,9 +189,7 @@ class Home extends Component {
                  items={[...MONTH]}
                  updateFieldValue={this.updateSelectedMonth} 
                />
-            
             </InputGroup>
-
             </Col>
           </FormGroup>
         <FormGroup row>
@@ -238,11 +230,11 @@ class Home extends Component {
         <br/>
         <Row>
           {clients && 
-              <TableData
-                clients={clients}
-                getClient={this.selectClient}
-                handleSelect={this.handleSelect}
-              />
+            <TableData
+              clients={clients}
+              getClient={this.selectClient}
+              handleSelect={this.handleSelect}
+            />
           }
         </Row>
         <Row>
@@ -280,10 +272,8 @@ class Home extends Component {
   }
 }
 
-
 const calcTotalListings = (listings) => {
   if (!listings) return false;
-  console.log(listings);
   const output = listings.reduce((p,c) => {
       const clientTotal = (c && c['Gesamtumsatz Airgreets'] && parseFloat(c['Gesamtumsatz Airgreets'].replace( /,/g, ''))) || 0;
       const corrections = (c && c['Ust-Korrektur'] && parseFloat(c['Ust-Korrektur'].replace( /,/g, ''))) || 0;
@@ -291,32 +281,22 @@ const calcTotalListings = (listings) => {
       return p;
     },0);
   return output;
-}
+};
 
 const mapStateToProps = state => {
-  const { clients } = state
-  const { message, data, status } = clients
-  let total = 0
-console.log(data,  clients);
+  const { clients } = state;
+  const { message, data } = clients;
+  let total = 0;
   data && Object.keys(data || {}).map((key) => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
-    total += data[key].Rechnungsbetrag 
-  })
-  // const locked = data &&  
-  //   Object.values(data) && 
-  //     Object.values(data)[0] && 
-  //       Object.values(data)[0].listings &&
-  //       Object.values(data)[0].listings[0] &&
-  //         Object.values(data)[0].listings[0].locked;
+    total += data[key].Rechnungsbetrag;
+  });
 
   return {
     message,
-    data: {...data },
-    total,
-    //locked,
-    status
-  }
-} 
-
+    clients: {...data },
+    total
+  };
+};
 
 export default withRouter(connect(mapStateToProps)(Home));

@@ -23,14 +23,14 @@ exports.uploadHandler = (req, res, next) => {
             .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         
         const bills = jsonResults.map(record => {
-            const Rechnungsnummer = uuidv1();
+            const uuid = uuidv1();
             return {
                 ...record,
                 filename,
                 userId,
                 created: DATETIMESTAMP,
                 clientId: record['Kunden-nummer'],
-                _id: Rechnungsnummer
+                _id: uuid
             };
         });
     
@@ -49,7 +49,7 @@ exports.uploadHandler = (req, res, next) => {
                 listings: [ ...listings],
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
-                Rechnungsnummer: c['Rechnungsnummer'] || 0,
+                Rechnungsnummer: Number(c['Rechnungsnummer']) || 0,
                 'Rechnungs-datum': Date(),
                 'FR': 0
             };
@@ -75,6 +75,8 @@ exports.uploadHandler = (req, res, next) => {
                                     oldclient['listings'].push(list);
                                 });
                                 oldclient['Belegart'] = client['Belegart'],
+                                oldclient['Rechnungsnummer'] = client['Rechnungsnummer'],
+
                                 oldclient['FR'] = client['FR'],
                                 oldclient.save((err)=>{
                                     if (err) {

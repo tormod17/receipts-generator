@@ -181,7 +181,7 @@ export function updateClient(id, data) {
     body: JSON.stringify(data)
   };
   return callApi(
-    '/api/CLIENT?CLIENTId='+ id,
+    '/api/client?clientId='+ id,
     config,
     updateClientRequest(data),
     updateClientSuccess,

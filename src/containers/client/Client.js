@@ -56,20 +56,35 @@ class Client extends Component {
   static defaultProps = {
     client: {},
     guests: {},
-    correctinos: {}
+    correction: {},
+    Belegart: 'Belegart'
   }
 
   constructor(props) {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: client  && (client['Belegart'] || 'Belegart'),
+      Belegart: client['Belegart'],
+      client: { ...client },
+      guests: { ...guests},
+      corrections: {...corrections},
     };
     this.updateFieldValue = this.updateFieldValue.bind(this);    
     this.handleAdd = this.handleAdd.bind(this);
     this.handleDel = this.handleDel.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
     this.calculateTotals = this.calculateTotals.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(this.props !== nextProps){
+      this.setState({
+        Belegart: nextProps['Belegart'],
+        client: { ...nextProps.client },
+        guests: { ...nextProps.guests},
+        corrections: {...nextProps.corrections},
+      })
+    }
   }
 
   calculateTotals(type, tax) {
@@ -95,16 +110,16 @@ class Client extends Component {
   }
 
   checkRequiredFields(data){
-    const { customer, guests, corrections, Belegart } = data;
+    const { client, guests, corrections, Belegart } = data;
     let fields= [];
-    const isGuests = Object.keys(guests).length > 0;
-    const isCorrections = Object.keys(corrections).length > 0;
+    const isGuests = Object.keys(guests || {}).length > 0;
+    const isCorrections = Object.keys(corrections || {}).length > 0;
 
-    const customerKeys = Object.keys(customer);
+    const clientKeys = Object.keys(client);
     const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
     const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
 
-    const currentFields = [...customerKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
+    const currentFields = [...clientKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
     if (Belegart === 'Belegart') {
       return ['Belegart'];
     }
@@ -137,7 +152,7 @@ class Client extends Component {
       ...this.state
     };
     const missingFields = this.checkRequiredFields(data);
-    if (missingFields.length > 0){
+    if (missingFields.length > 0 && !clientId){
       return console.log(missingFields);
     }
     if (clientId) {
@@ -151,6 +166,7 @@ class Client extends Component {
     const entries = this.state[type];
     const newId = uuidv4();
     this.setState({
+      ...entries,
       [type]: {
         ...entries,
         [newId]: {
@@ -177,8 +193,9 @@ class Client extends Component {
   }
 
   updateFieldValue(field, value, type, id){
-    if (id) {
+    if (id && type) {
       this.setState( prevSate => ({ 
+        ...prevSate,
         [type]: {
            ...prevSate[type],
           [id]: {
@@ -187,8 +204,9 @@ class Client extends Component {
           }
         } 
       }));
-    } else if (type) {
+    } else if (type && !id) {
         this.setState( prevState => ({
+          ...prevState,
           [type]: {
             ...prevState[type],
             [field]: value
@@ -200,10 +218,9 @@ class Client extends Component {
   }
 
   render() {
-    const { client, guests, corrections } = this.props;
+    const { client, guests, corrections } = this.state;
     return (
     <Form clasName="bill">
-        {client.Kunde}
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>

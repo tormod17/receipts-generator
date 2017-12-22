@@ -30,7 +30,7 @@ const ClientSchema = new mongoose.Schema({
         type: String
     },
     'Rechnungsnummer':{
-        type: String
+        type: Number
     },
     'Emailadresse': {
         type: String        

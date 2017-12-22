@@ -46,10 +46,12 @@ export function clients(state = initialState, action = {}) {
         case SAVE_MONTH_SUCCESS:
             return {
                 ...state,
-                ...action.payload,
+                data: {
+                    ...action.payload.clients
+                },
+                message: action.payload.message,
                 saving: false,
-                saved: true,
-                status: 'saved'
+                saved: true
             };
         case SAVE_MONTH_FAILURE:
             return {
@@ -62,7 +64,6 @@ export function clients(state = initialState, action = {}) {
                 uploading: true
             };
         case UPLOAD_SUCCESS:
-            console.log(action.payload);
             return {
                 ...state,
                 data:{
@@ -88,7 +89,6 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 data: {
-                    ...state.data,
                     ...action.payload
                 },
                 retrieving: false,

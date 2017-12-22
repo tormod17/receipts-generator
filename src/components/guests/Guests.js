@@ -48,14 +48,16 @@ export default class Guests extends React.Component {
         <h2>Geschäftsvorfall 1: Gastes</h2>
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
+        const locked = guests[key].locked
         return (
         <div
-          key={guests[key].guestId}
-        >
+          key={guests[key]._id}
+          >
           <FormGroup row>
             <Col  sm={{ size: 6, order: 1 }}>
-              <EditableField 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
+              <EditableField
+                disbaled={locked} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
                 name="Name des Gastes"
                 placeholder="Name des Gastes"
                 value={guests[key]["Name des Gastes"]}
@@ -63,8 +65,9 @@ export default class Guests extends React.Component {
               />
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
-              <EditableField 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
+              <EditableField
+                disbaled={locked} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
                 name="Airgreets Service Fee (€)"
                 placeholder="Airgreets Service Fee (€)"
                 value={guests[key]['Airgreets Service Fee (€)']}
@@ -79,18 +82,20 @@ export default class Guests extends React.Component {
                 <DayPickerInput 
                   name="Anreisedatum"
                   onDayChange={(val) =>
-                    this.handleValueChange('Anreisedatum', formatDate(val) ,key )
+                    this.handleValueChange('Anreisedatum', formatDate(val) ,guests[key]._id )
                   }
                   value={guests[key].Anreisedatum}
+                  disbaled={locked}
                   required
                 />
               </InputGroupAddon>
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField
+                disbaled={locked}
                 name="Reinigungs-gebühr"
                 updateFieldValue={(name, val) => 
-                  this.handleValueChange(name, val, key)
+                  this.handleValueChange(name, val, guests[key]._id)
                 } 
                 required
                 placeholder="Reinigungs-gebühr"
@@ -105,16 +110,18 @@ export default class Guests extends React.Component {
                 <DayPickerInput 
                   name="Abreisedatum (Leistungsdatum)"
                   onDayChange={val => 
-                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), key )
+                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), guests[key]._id )
                   }
                   value={guests[key]['Abreisedatum (Leistungsdatum)']}
+                  disbaled={locked}
                   required
                 />
               </InputGroupAddon>
             </Col>
             <Col sm={{ size: 3, order: 1 }}>
-              <EditableField 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
+              <EditableField
+                disbaled={locked} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, guests[key]._id)} 
                 name="Airbnb Einkommen"
                 placeholder="Airbnb Einkommen"
                 value={guests[key]["Airbnb Einkommen"]}
@@ -127,7 +134,7 @@ export default class Guests extends React.Component {
                 class="fa fa-trash fa-3x"
                 aria-hidden="true"
                 onClick={() => this.props.handleDelGuest(key, 'guests')}
-                id={guests[key]['guestId']}
+                id={guests[key]._id}
                 required
               >
               </i>

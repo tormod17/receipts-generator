@@ -17,17 +17,17 @@ export default class Example extends React.Component {
     const { data, selected } = props;
     this.state = {
       dropdownOpen: false,
-      selected,
+      selected: selected,
     };
     this.toggle = this.toggle.bind(this);
     this.handleSelectItem = this.handleSelectItem.bind(this);
   }
 
   componentWillReceiveProps(nextProps){
-    if(this.props !== nextProps){
+    if(this.props.selected !== nextProps.selected){
       const { selected } = nextProps;
       this.setState({
-        selected
+        selected: selected
       })
     }
   }

@@ -6,24 +6,50 @@ const uuidv1 = require('uuid/v1');
 
 
 exports.saveMonthHandler = (req, res) => {
-  if (!req.body) return console.error('no client body');
-  const listofIds = Object.values(req.body).reduce((p,c) => {
+  const clients  = { ...req.body };
+  if (!clients) return console.error('no client body');
+  
+  const listofIds = Object.values(clients).reduce((p,c) => {
       const idArr = c.listings.map(listing => listing._id);
       p.push(...idArr);
       return  p;
   }, []);
     const promises = listofIds.map(id => {
       return new Promise((resolve, reject) => {
-        ReceiptDB.findByIdAndUpdate( id, { locked: true}, (err, model) =>{
-         console.log(model, err);
+        ReceiptDB.findByIdAndUpdate( id, { locked: true}, {new: true}, (err, model) =>{
           if (err) return reject(err);
-
-          resolve();
+          resolve(model);
         });
       });
     });
     Promise.all(promises)
-      .then(() => res.json({ message: 'success' }))
+      .then((updatedReceipts) => {
+        // array of all saved Receipts this needs to be added back to the clients and sent back to the  frontend. 
+        const clientPromises = Object.values(clients).map(client => {
+          return new Promise((resolve, reject) => {
+            console.log(client._id);
+            ClientDB.findByIdAndUpdate( client._id, { $inc: {Rechnungsnummer: 1 } }, {new: true}, (err, model) => {
+              if (err) return reject(err);
+              resolve(model);
+            });
+          });
+        });
+        
+        Promise.all(clientPromises)
+          .then((updatedClients)=>{
+            updatedClients.map(client => {
+              client.listings = updatedReceipts.filter(receipt => 
+                client.listings.includes(receipt._id));
+            });
+            res.json({
+              clients: updatedClients,
+              message: 'Gerettet'
+            });
+          })
+          .catch((err) => {
+            res.json({ message: '' + err});
+          });
+      })
       .catch((err) => {
           res.json({ message: '' + err});
       });
