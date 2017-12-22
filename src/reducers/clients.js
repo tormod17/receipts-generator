@@ -26,6 +26,15 @@ const initialState = {
     status: ''
 };
 
+function removeProperties(ids, data) {
+    if(!ids) return false;
+    ids.forEach(id => {
+        data[id] = undefined;
+        data = JSON.parse(JSON.stringify(data));
+    });
+    return data;
+}
+
 
 export function clients(state = initialState, action = {}) {
     switch (action.type) {
@@ -130,7 +139,10 @@ export function clients(state = initialState, action = {}) {
         case DEL_CLIENT_SUCCESS:
             return {
                 ...state,
-                ...action.payload,
+                data: {
+                    ...removeProperties(action.payload.data, state.data)
+                },
+                message: action.payload.message,
                 status: 'deleted'
             };
         case DEL_CLIENT_FAILURE:

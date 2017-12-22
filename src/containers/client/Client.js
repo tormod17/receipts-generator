@@ -53,14 +53,17 @@ let requiredFieldsAuszhalungsCorrection = [
 
 class Client extends Component {
 
+  static defaultProps = {
+    client: {},
+    guests: {},
+    correctinos: {}
+  }
+
   constructor(props) {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: 'Belegart',
-      customer: {...client},
-      guests: { ...guests },
-      corrections: { ...corrections}
+      Belegart: client  && (client['Belegart'] || 'Belegart'),
     };
     this.updateFieldValue = this.updateFieldValue.bind(this);    
     this.handleAdd = this.handleAdd.bind(this);
@@ -69,29 +72,26 @@ class Client extends Component {
     this.calculateTotals = this.calculateTotals.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { guests, client, corrections  } = nextProps;
-    if(nextProps !== this.props){
-      this.setState({
-        customer: {...client},
-        guests: { ...guests },
-        corrections: { ...corrections}
-      });
-    }
-  }
-
-  calculateTotals(type) {
-    const { guests } = this.state;
+  calculateTotals(type, tax) {
+    const { guests, corrections } = this.props;
     const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
     const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
 
-    const sum =Object.values(guests).reduce((a, b) => {
+    const sumGuests =Object.values(guests|| {}).reduce((a, b) => {
         const clientTotal = (b && b[key1] && parseFloat(b[key1].replace( /,/g, ''))) || 0;
-        const corrections = (b && b[key2] && parseFloat(b[key2].replace( /,/g, ''))) || 0;
-        const total  =  clientTotal+ corrections;
-        return total;
+        a +=  clientTotal 
+        return a;
     }, 0);
-    return sum ;
+    const sumCorr =Object.values(corrections || {}).reduce((a, b) => {
+        const corrections = 
+            (b && b[key2] && parseFloat(b[key2].replace( /,/g, '')) || 0);
+        a +=   corrections;
+        return a;
+    }, 0);
+    if (tax) {
+      return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2)
+    }
+    return sumGuests + sumCorr ;
   }
 
   checkRequiredFields(data){
@@ -126,7 +126,6 @@ class Client extends Component {
     if (Belegart === 'Rechnung' && isCorrections) {
       fields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection ];
     }
-    console.log(guestsKeys);
     let missingFields =fields.filter(key => !currentFields.includes(key));
     return missingFields;
   }
@@ -201,19 +200,19 @@ class Client extends Component {
   }
 
   render() {
-    const { customer, guests, corrections } = this.state;
+    const { client, guests, corrections } = this.props;
     return (
     <Form clasName="bill">
+        {client.Kunde}
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>
             <Dropdown
-              data={customer}
+              data={client}
               name="Belegart"
               items={['Rechnung', 'Auszahlung']}
               updateFieldValue={this.updateFieldValue} 
-              selected={customer['Belegart']|| 'Belegart'}
-
+              selected={client['Belegart']|| 'Belegart'}
             />
           </Col>
           <Col sm={{ size:1, offset: 6}}>
@@ -228,7 +227,7 @@ class Client extends Component {
           </Col>
         </FormGroup>
         <Customer 
-          customer={customer}
+          customer={client}
           updateFieldValue={this.updateFieldValue} 
         />
         <Guests 
@@ -248,15 +247,17 @@ class Client extends Component {
         </div>
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            <EditableField 
-              name="Gesamtumsatz Airgreets" 
-              placeholder="Gesamt Auszahlungs Betrag"
-              value={this.calculateTotals('Auszahlung')}
-            />
+            {client.Belegrat !== 'Rechnung' &&
+              <EditableField 
+                name="Gesamtumsatz Airgreets" 
+                placeholder="Gesamt Auszahlungs Betrag"
+                value={this.calculateTotals('Auszahlung')}
+              />
+            }
           </Col>
           <Col sm={{ size: 4, order: 1 }}>
             <EditableField 
-              name="Auszahlung an Kunde"
+              name="Gesamt Rechnungs Betrag"
               placeholder="Gesamt Rechnungs Betrag"
               value={this.calculateTotals('Rechnungs')}
             />
@@ -265,7 +266,7 @@ class Client extends Component {
             <EditableField 
               name="Darin enthaltene Umsatzsteuer"
               placeholder="Darin Enthaltene Umsatzsteuer"
-              //value={this.calculateTotals()}
+              value={this.calculateTotals('Rechnungs', 'tax')}
             />
           </Col>
         </FormGroup>
@@ -288,9 +289,8 @@ const mapStateToProps = (state, props) => {
   const client = data && data[id];
   const guests =  client && client.listings.filter(listing => listing['Name des Gastes']);
   const corrections = client && client.listings.filter(listing => !listing['Name des Gastes']);
-  console.log(guests, corrections);
   return {
-    client: { ...client},
+    client: client && { ...client},
     guests: client  && { ...guests},
     corrections: client && { ...corrections},
     message,

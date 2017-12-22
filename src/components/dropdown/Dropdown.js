@@ -23,6 +23,15 @@ export default class Example extends React.Component {
     this.handleSelectItem = this.handleSelectItem.bind(this);
   }
 
+  componentWillReceiveProps(nextProps){
+    if(this.props !== nextProps){
+      const { selected } = nextProps;
+      this.setState({
+        selected
+      })
+    }
+  }
+
   toggle() {
     this.setState({
       dropdownOpen: !this.state.dropdownOpen

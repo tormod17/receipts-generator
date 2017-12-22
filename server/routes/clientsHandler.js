@@ -127,7 +127,10 @@ exports.delClientHandler = (req, res) => {
     });
   });
   Promise.all(promises)
-    .then(res.json({ message: 'Your clients have been removed' }))
+    .then(res.json({ 
+        data: ids, 
+        message: 'Your clients have been removed' 
+    }))
     .catch((err)=>{
       res.json({ message: '' + err});
   });

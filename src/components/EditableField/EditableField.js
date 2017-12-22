@@ -28,9 +28,17 @@ class EditableField extends Component {
   constructor(props) {
     super(props)
     this.state ={
-      
+      value: props.value 
     }
     this.handleOnChange = this.handleOnChange.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props.value !== nextProps.value ){
+      this.setState({
+        value: nextProps.value,
+      })
+    }
   }
 
   camelCaseName(name){
@@ -43,11 +51,15 @@ class EditableField extends Component {
   }
   
   handleOnChange(e, name) {
+    this.setState({ 
+      value: e.target.value
+    })
     this.props.updateFieldValue(name, e.target.value)
   }
 
   render() {
-    const { placeholder, updateFieldValue, type, value, name, label, nolabel, required } =this.props;
+    const { placeholder, updateFieldValue, type, name, label, nolabel, required } =this.props;
+    const { value } = this.state
     //const name = this.camelCaseName(placeholder);
 
     return (

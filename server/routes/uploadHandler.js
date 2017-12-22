@@ -102,7 +102,6 @@ exports.uploadHandler = (req, res, next) => {
                             customers[key].listings = bills.filter(listing => 
                                 listing['Kunden-nummer'] ===  customers[key]['Kunden-nummer']);
                         });
-                        console.log('customers', customers);
                         res.json({ 
                             data: { ...customers },
                             message: 'Erfolg' 

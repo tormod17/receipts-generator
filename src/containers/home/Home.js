@@ -99,11 +99,7 @@ class Home extends Component {
          },
       });
     }
-    // if (nextProps.status === 'deleted' || nextProps.status ==='uploaded' || nextProps.status ==='saved'  ) {
-    //   dispatch(getClients(auth.id, selectedMonth))
-    // }
   }
-
 
 
   handleDayChange(selectedDay, modifiers) {
@@ -306,18 +302,18 @@ console.log(data,  clients);
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag 
   })
-  const locked = data &&  
-    Object.values(data) && 
-      Object.values(data)[0] && 
-        Object.values(data)[0].listings &&
-        Object.values(data)[0].listings[0] &&
-          Object.values(data)[0].listings[0].locked;
+  // const locked = data &&  
+  //   Object.values(data) && 
+  //     Object.values(data)[0] && 
+  //       Object.values(data)[0].listings &&
+  //       Object.values(data)[0].listings[0] &&
+  //         Object.values(data)[0].listings[0].locked;
 
   return {
     message,
     data: {...data },
     total,
-    locked,
+    //locked,
     status
   }
 } 

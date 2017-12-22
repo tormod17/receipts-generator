@@ -115,9 +115,9 @@ export default class Guests extends React.Component {
             <Col sm={{ size: 3, order: 1 }}>
               <EditableField 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="Auszahlung"
-                placeholder="Auszahlung"
-                value={guests[key]["Auszahlung"]}
+                name="Airbnb Einkommen"
+                placeholder="Airbnb Einkommen"
+                value={guests[key]["Airbnb Einkommen"]}
                 required
               />
             </Col>

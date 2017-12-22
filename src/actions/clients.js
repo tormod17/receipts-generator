@@ -235,10 +235,9 @@ function delClientsRequest() {
 }
 
 function delClientsSuccess(payload) {
-  console.log(payload, payload);
   return {
     type: DEL_CLIENT_SUCCESS,
-    payload,
+    payload
   };
 }
 

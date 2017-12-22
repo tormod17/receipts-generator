@@ -12,24 +12,41 @@ export default class Customer extends React.Component {
   
   static defaultProps = {
     updateFieldValue: PropTypes.func.isRequired,
-    customer: PropTypes.shape({}),
+    customer: PropTypes.shape({}).isRequired,
   }
+
+  // static defaultProps = {
+  //   customer: undefined,
+  // }
 
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      customer: {
+        ...props.customer
+      }
+    };
     this.handleValueChange = this.handleValueChange.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props !== nextProps ){
+      this.setState({
+        customer: {
+          ...nextProps.customer
+        }
+      })
+    }
   }
 
   handleValueChange(field, val) {
     this.props.updateFieldValue(field, val, 'customer')
-
   }
 
   render() {
-    const { customer, updateFieldValue } = this.props;
-
+    const { updateFieldValue } = this.props;
+    const { customer } = this.state;
     return (
       <div>
         <FormGroup>
