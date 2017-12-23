@@ -29,7 +29,7 @@ class ModalComp extends React.Component {
   }
 
   render() {
-    const {submit, cancel, open, message} = this.props;
+    const {submit, cancel, open, message, noSubmit} = this.props;
     return (
       <div>
         <Modal isOpen={open} className={this.props.className}>
@@ -38,7 +38,7 @@ class ModalComp extends React.Component {
           </ModalBody>
           <ModalFooter>
             <Button color="secondary" onClick={this.handleCancel}>Cancel</Button>
-            <Button color="primary" onClick={submit}>submit</Button>
+            {!noSubmit && <Button color="primary" onClick={submit}>submit</Button> }
           </ModalFooter>
         </Modal>
       </div>

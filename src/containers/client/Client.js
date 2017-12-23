@@ -37,14 +37,14 @@ let requiredFieldsGuest = [
 ];
 
 let requiredFieldsRechnungsCorrection = [
-  'Rechnungskorrektur', 
+  //'Rechnungskorrektur', 
   'Rechnungskorrektur in €',
   'Ust-Korrektur',
   'Sonstige Leistungsbeschreibung'
 ];
 
 let requiredFieldsAuszhalungsCorrection = [
-  'Auszhalungskorrektur', 
+  //'Auszhalungskorrektur', 
   'Auszahlungskorrektur in €',
   'Ust-Korrektur',
   'Sonstige Leistungsbeschreibung'
@@ -153,15 +153,21 @@ class Client extends Component {
       ...this.state
     };
     console.log(data);
+    let eventType  = clientId ? 'updateClient' : 'addClient';
+    let message = 'Bist du sicher?';
     const missingFields = this.checkRequiredFields(data);
+
     if (missingFields.length > 0 && !clientId){
-      return console.log(missingFields);
+      eventType = 'requiredFields';
+      message = 'Wir brauchen diese Felder :- ' + missingFields.join(', ');
     }
-    if (clientId) {
-      dispatch(updateClient(clientId, data), this.props.history.push('/'));
-    } else {
-      dispatch(addClient(auth.id, data), this.props.history.push('/'));
-    }
+  
+    let event = new Event(eventType);
+    event.message = message;
+    event.value = missingFields;
+    event.id = clientId
+    event.payload = { ...data };
+    document.dispatchEvent(event);
   }
 
   handleAdd(type , obj){  
@@ -272,6 +278,8 @@ class Client extends Component {
                 name="Gesamtumsatz Airgreets" 
                 placeholder="Gesamt Auszahlungs Betrag"
                 value={this.calculateTotals('Auszahlung')}
+                disabled
+
               />
             }
           </Col>
@@ -280,6 +288,7 @@ class Client extends Component {
               name="Gesamt Rechnungs Betrag"
               placeholder="Gesamt Rechnungs Betrag"
               value={this.calculateTotals('Rechnungs')}
+              disabled
             />
           </Col>
           <Col sm={{ size: 4, order: 1 }}>
@@ -287,6 +296,7 @@ class Client extends Component {
               name="Darin enthaltene Umsatzsteuer"
               placeholder="Darin Enthaltene Umsatzsteuer"
               value={this.calculateTotals('Rechnungs', 'tax')}
+              disabled
             />
           </Col>
         </FormGroup>
@@ -304,7 +314,7 @@ class Client extends Component {
 
 const mapStateToProps = (state, props) => { 
   const { clients } = state;
-  const { message, data, status } = clients;
+  const { message, data, locked } = clients;
   const id = props.match.params.id;
   const client = data && data[id];
   const guests =  client && client.listings.filter(listing => listing['Name des Gastes']);
@@ -314,7 +324,7 @@ const mapStateToProps = (state, props) => {
     guests: client  && { ...guests},
     corrections: client && { ...corrections},
     message,
-    status
+    locked
   };
 };
 

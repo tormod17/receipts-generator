@@ -51,13 +51,13 @@ class Home extends Component {
       clients: { ...clients } ,
       message,
       selectedMonth: TIMESTAMP.getMonth(),
-      locked: true,
+      locked: false,
       total
     };
     this.handleDayChange = this.handleDayChange.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.handleAddEntry = this.handleAddEntry.bind(this);
-    this.selectClient = this.selectClient.bind(this);
+    this.getClient = this.getClient.bind(this);
     this.getSelectedIds = this.getSelectedIds.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
@@ -72,10 +72,9 @@ class Home extends Component {
     } 
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
+  componentWillReceiveProps(nextProps) {
     const { message, clients } = this.props;
-    
-    if( message !== nextProps.message) {
+    if( message !== nextProps.message || clients !== nextProps.clients ) {
       this.setState({
         message: nextProps.message || message,
         clients: { 
@@ -83,16 +82,6 @@ class Home extends Component {
         }
       });
     } 
-    if(clients !== nextProps.clients) {
-      const locked =  Object.values(nextProps.clients)[0]
-        && Object.values(nextProps.clients)[0].listings[0].locked;
-      this.setState({
-        clients: { 
-          ...nextProps.clients
-        },
-        locked
-      });
-    }
   }
 
 
@@ -131,7 +120,7 @@ class Home extends Component {
     createPDF(clients, this.getSelectedIds());
   }
 
-  selectClient(client) {
+  getClient(client) {
     const { history } = this.props;
     history.push('/client/'+client._id);
   }
@@ -156,16 +145,18 @@ class Home extends Component {
   }
 
   lockMonthEditing(){
+    const { id } = this.props.auth;
     let event = new Event('lockMonth');
     event.message = 'Bist du sicher?',
-    event.selectedMonth = this.state.selectedMonth;
+    event.value = this.state.selectedMonth;
     event.payload = { ...this.state.clients };
+    event.id = id;
     document.dispatchEvent(event);
   }
 
   render() {
-    const { auth, total } =this.props;
-    const { selectedDay, message, clients, locked } = this.state;
+    const { auth, total, locked } =this.props;
+    const { selectedDay, message, clients } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -232,8 +223,9 @@ class Home extends Component {
           {clients && 
             <TableData
               clients={clients}
-              getClient={this.selectClient}
+              getClient={this.getClient}
               handleSelect={this.handleSelect}
+              locked={locked}
             />
           }
         </Row>
@@ -291,11 +283,16 @@ const mapStateToProps = state => {
     data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
     total += data[key].Rechnungsbetrag;
   });
-
+  let locked =true;
+  if (data) {
+    locked =  Object.values(data)[0]
+      && Object.values(data)[0].listings[0].locked;
+  }
   return {
     message,
     clients: {...data },
-    total
+    total,
+    locked
   };
 };
 

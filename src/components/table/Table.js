@@ -67,6 +67,7 @@ class Tableclients extends Component {
     }
 
     render() {
+      const { locked } = this.props;
       const { clients, selectAllChecked } = this.state;
 
       const requiredFields = ['Kunden-nummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select'];

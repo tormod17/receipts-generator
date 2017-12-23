@@ -18,7 +18,7 @@ import Signup from "../signup/Signup";
 import Client from "../client/Client";
 import About from "../about/About";
 import NotFound from "../misc/NotFound";
-import { getClients } from "../../actions/clients";
+import { getClients, updateClient, addClient } from "../../actions/clients";
 
 import { logout } from "../../actions/auth";
 
@@ -36,18 +36,21 @@ class App extends Component {
     };
 
     this.toggleModal =this.toggleModal.bind(this);
-    this.handleMonthLock = this.handleMonthLock.bind(this);
+    this.handleModalValues = this.handleModalValues.bind(this);
     this.modalSubmit = this.modalSubmit.bind(this);
   }
 
   componentDidMount(){
     const { auth, dispatch } = this.props;
     dispatch(getClients(auth.id, TIMESTAMP.getMonth()));
-    document.addEventListener('lockMonth', this.handleMonthLock);
+    document.addEventListener('lockMonth', this.handleModalValues);
+    document.addEventListener('updateClient', this.handleModalValues);
+    document.addEventListener('addClient', this.handleModalValues);
+    document.addEventListener('requiredFields', this.handleModalValues);
   }
 
   componentWillUnmount(){
-    document.removeEventListener('lockMonth', this.handleMonthLock);    
+    document.removeEventListener('lockMonth', this.handleModalValues);    
   }
 
   toggleModal(modalMessage){
@@ -57,38 +60,43 @@ class App extends Component {
     });
   }
 
-  handleMonthLock(e){
-    const { message, payload, selectedMonth } = e;
-    console.log( e);
+  handleModalValues(e){
+    const { message, payload, value, id, type } = e;
     this.toggleModal(message);
     this.setState({
-      modalType: 'lockMonth',
+      modalType: type,
       payload: {
         ...payload
       },
-      selectedMonth
+      value,
+      id
     });
   }
 
   modalSubmit(){
     const { dispatch } = this.props ;
-    const  { modalType, payload, selectedMonth } = this.state;
-    console.log(payload);
+    const  { modalType, payload, value, id } = this.state;
     switch (true) {
       case  modalType === 'lockMonth':
-        dispatch(saveMonth(payload, selectedMonth));
-      break;
+        dispatch(saveMonth(payload, value));
+        break;
+      case modalType === 'updateClient':
+        dispatch(updateClient(id, payload));
+        break;
+      case modalType === 'addClient':
+        dispatch(addClient(id, payload));
+        break;
     }
     this.toggleModal();
   }
 
   handleLogout() {
-    const { user } = this.props;
-    this.props.dispatch(logout(user));
+    const { user, dispatch } = this.props;
+    dispatch(logout(user));
   }
 
   render() {
-    const { modalOpen, modalMessage } = this.state;
+    const { modalOpen, modalMessage, modalType } = this.state;
     const { auth } = this.props;    
     return (
       <Router>
@@ -107,7 +115,13 @@ class App extends Component {
               </Switch>
             </div>
           </div>
-          <ModalComp open={modalOpen} message={modalMessage} cancel={this.toggleModal} submit={this.modalSubmit}/>
+          <ModalComp 
+            open={modalOpen}
+            message={modalMessage} 
+            cancel={this.toggleModal}
+            submit={this.modalSubmit}
+            noSubmit={modalType === 'requiredFields'}
+          />
           <Footer />
         </div>
       </Router>

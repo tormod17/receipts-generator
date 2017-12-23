@@ -50,6 +50,7 @@ export default class Guests extends React.Component {
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
         const locked = guests[key].locked
+        console.log(locked);
         return (
         <div
           key={guests[key]._id}
@@ -57,7 +58,7 @@ export default class Guests extends React.Component {
           <FormGroup row>
             <Col>
               <EditableField
-                disbaled={locked} 
+                disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Name des Gastes"
                 placeholder="Name des Gastes"
@@ -74,7 +75,7 @@ export default class Guests extends React.Component {
                     this.handleValueChange('Anreisedatum', formatDate(val) , key)
                   }
                   value={guests[key].Anreisedatum}
-                  disbaled={locked}
+                  disabled={locked}
                   required
                 />
               </InputGroupAddon>
@@ -88,7 +89,7 @@ export default class Guests extends React.Component {
                     this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), key )
                   }
                   value={guests[key]['Abreisedatum (Leistungsdatum)']}
-                  disbaled={locked}
+                  disabled={locked}
                   required
                 />
               </InputGroupAddon>
@@ -97,7 +98,7 @@ export default class Guests extends React.Component {
           <FormGroup row>
             <Col>
               <EditableField
-                disbaled={locked} 
+                disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Airgreets Service Fee (€)"
                 placeholder="Airgreets Service Fee (€)"
@@ -107,7 +108,7 @@ export default class Guests extends React.Component {
             </Col>
             <Col>
               <EditableField
-                disbaled={locked}
+                disabled={locked}
                 name="Reinigungs-gebühr"
                 updateFieldValue={(name, val) => 
                   this.handleValueChange(name, val, key)
@@ -121,7 +122,7 @@ export default class Guests extends React.Component {
           <FormGroup row>
             <Col>
               <EditableField
-                disbaled={locked} 
+                disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name={typeKey}
                 placeholder={typeKey}
@@ -131,7 +132,7 @@ export default class Guests extends React.Component {
             </Col>
             <Col>
               <EditableField
-                disbaled={locked} 
+                disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Airbnb Einkommen"
                 placeholder="Airbnb Einkommen"
