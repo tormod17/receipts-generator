@@ -23,7 +23,7 @@ function extractToken(req) {
 }
 
 
-exports.signUpHandler = (req,res) => {
+exports.signUpHandler = (req,res, next) => {
   const { username, email, password, confirmPassword } = req.body;
   // confirm that user typed same password twice
   if (password !== confirmPassword) {
@@ -52,7 +52,7 @@ exports.signUpHandler = (req,res) => {
           id_token: jwtToken
       });
   });
-}
+};
 
 
 exports.loginHandler = (req,res) => {
@@ -77,22 +77,21 @@ exports.loginHandler = (req,res) => {
       });
   });
   
-}
+};
 
 exports.logoutHandler = (req,res, next) => {
   const jwtToken = extractToken(req);
   if (!jwtToken) {
-      return res.status(200).json({ message: `logged out` });
+      return res.status(200).json({ message: 'logged out' });
   } else {
       const { username } = jwt.verify(jwtToken, JWT_SECRET);
       return res.status(200).json({ message: `User ${username} logged out` });
   }
-  console.log("jwt verify error", err);
-  return res.status(500).json({ message: "Invalid jwt token" });  
-}
+  //sreturn res.status(500).json({ message: "Invalid jwt token" });  
+};
 
 
-exports.profile =(req, res) => {
+exports.profile =(req, res, next) => {
   User.findById(req.query.userId)
       .exec(function(error, user) {
           if (error) {
