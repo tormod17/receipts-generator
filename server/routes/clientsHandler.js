@@ -127,8 +127,9 @@ exports.updateClientHandler = (req, res) => {
                   'Kunden-nummer': newClient['Kunden-nummer'],
                   '_id':  newClient['Kunden-nummer'],
                   'listings': listings,
-                  'Belegart': newClient['Kunden-nummer'] || Belegart,
+                  'Belegart': newClient['Belegart'] || Belegart,
                   'Rechnungsnummer': newClient['Rechnungsnummer'],
+                  'Rechnungs-datum': newClient['Rechnungs-datum'],
                   'FR': newClient['FR']
                 }
               };
