@@ -116,4 +116,4 @@ exports.profile =(req, res) => {
           }
       });
 
-}
+};

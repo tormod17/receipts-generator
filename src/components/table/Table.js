@@ -94,8 +94,7 @@ class Tableclients extends Component {
                           output = client[field] + '€';
                           break;
                         case field === 'Rechnungs-datum':
-                         output = new Date(client['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
-                         output = output[0] + ' ' +output[1] + ' ' + output[2] + ' ' + output[3];
+                         output = client['Rechnungs-datum']// probably a better way to do this. 
                          break;
                         case field === 'select': 
                           output = this.makeCheckBox(client._id, (selectAllChecked || client.checked), 'clientCheck');

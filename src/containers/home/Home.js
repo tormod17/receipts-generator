@@ -5,22 +5,23 @@ import {withRouter} from "react-router-dom";
 import {  Row, Col, Control,  FormGroup, Container, InputGroup, InputGroupAddon, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
+import { formatDate } from "../../utils/apiUtils";
+
 
 import 'react-day-picker/lib/style.css';
 
-import { formatDate } from "../../utils/apiUtils";
 import { createPDF } from '../../utils/createPDF';
 
 import TableData from '../../components/table/Table';
 import Dropdown from '../../components/dropdown/Dropdown';
-import { upload } from "../../actions/upload";
-import { getClients, deleteClients } from "../../actions/clients";
+import { upload } from '../../actions/upload';
+import { getClients, deleteClients } from '../../actions/clients';
 
 
 import 'pdfmake/build/pdfmake.js';
 import 'pdfmake/build/vfs_fonts.js';
   
-import "./home.css";
+import './home.css';
 
 const TIMESTAMP = new Date();
 
@@ -73,7 +74,6 @@ class Home extends Component {
 
   componentWillReceiveProps(nextProps, nextState) {
     const { message, clients } = this.props;
-
     
     if( message !== nextProps.message) {
       this.setState({
@@ -101,7 +101,7 @@ class Home extends Component {
       ...this.state.clients
     };
     Object.keys(newClients).forEach((key) => {
-      newClients[key]['Rechnungs-datum'] = selectedDay;
+      newClients[key]['Rechnungs-datum'] = formatDate(selectedDay);
     });
     this.setState({
       ...this.state,

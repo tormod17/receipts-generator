@@ -41,7 +41,7 @@ exports.addClientHandler = (req, res) => {
             listings: listings.map(listing => listing._id),
             _id: client['Kunden-nummer'] || uuidv1(),
             Rechnungsnummer: Number(client['Rechnungsnummer']) || 0,
-            'Rechnungs-datum': client['Rechnungs-datum'] || Date(),
+            //'Rechnungs-datum': client['Rechnungs-datum'] || Date(),
             'FR': 0
           };
           /// Client Numbers must be decided before otherwise will update a previous customer

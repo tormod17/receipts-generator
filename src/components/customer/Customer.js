@@ -127,8 +127,8 @@ export default class Customer extends React.Component {
             <InputGroupAddon>
               <DayPickerInput 
                 name="Rechnungs-datum"
-                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', val, 'client' )}
-                value={formatDate(client['Rechnungs-datum'])}
+                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', formatDate(val), 'client' )}
+                value={client['Rechnungs-datum']}
                 required
               />
             </InputGroupAddon>

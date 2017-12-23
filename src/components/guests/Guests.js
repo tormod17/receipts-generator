@@ -41,7 +41,8 @@ export default class Guests extends React.Component {
   }
 
   render() {
-    const { updateFieldValue , guests } = this.props;
+    const { updateFieldValue , guests, Belegart } = this.props;
+    const typeKey = Belegart === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
     return (
     <div>
       <FormGroup>
@@ -54,7 +55,7 @@ export default class Guests extends React.Component {
           key={guests[key]._id}
           >
           <FormGroup row>
-            <Col  sm={{ size: 6, order: 1 }}>
+            <Col>
               <EditableField
                 disbaled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
@@ -64,19 +65,7 @@ export default class Guests extends React.Component {
                 required
               />
             </Col>
-            <Col sm={{ size: 3, order: 1 }}>
-              <EditableField
-                disbaled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="Airgreets Service Fee (€)"
-                placeholder="Airgreets Service Fee (€)"
-                value={guests[key]['Airgreets Service Fee (€)']}
-                required
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Col sm={{ size: 6, order: 1 }}>
+            <Col>
               <Label for="Anreisedatum">Anreise-datum</Label>
               <InputGroupAddon>
                 <DayPickerInput 
@@ -90,21 +79,7 @@ export default class Guests extends React.Component {
                 />
               </InputGroupAddon>
             </Col>
-            <Col sm={{ size: 3, order: 1 }}>
-              <EditableField
-                disbaled={locked}
-                name="Reinigungs-gebühr"
-                updateFieldValue={(name, val) => 
-                  this.handleValueChange(name, val, key)
-                } 
-                required
-                placeholder="Reinigungs-gebühr"
-                value={guests[key]["Reinigungs-gebühr"]} 
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Col sm={{ size: 6, order: 1 }}>
+            <Col >
               <Label for="Abreisedatum">Abreise-datum</Label>
               <InputGroupAddon>
                 <DayPickerInput 
@@ -118,7 +93,43 @@ export default class Guests extends React.Component {
                 />
               </InputGroupAddon>
             </Col>
-            <Col sm={{ size: 3, order: 1 }}>
+          </FormGroup>
+          <FormGroup row>
+            <Col>
+              <EditableField
+                disbaled={locked} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
+                name="Airgreets Service Fee (€)"
+                placeholder="Airgreets Service Fee (€)"
+                value={guests[key]['Airgreets Service Fee (€)']}
+                required
+              />
+            </Col>
+            <Col>
+              <EditableField
+                disbaled={locked}
+                name="Reinigungs-gebühr"
+                updateFieldValue={(name, val) => 
+                  this.handleValueChange(name, val, key)
+                } 
+                required
+                placeholder="Reinigungs-gebühr"
+                value={guests[key]["Reinigungs-gebühr"]} 
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Col>
+              <EditableField
+                disbaled={locked} 
+                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
+                name={typeKey}
+                placeholder={typeKey}
+                value={guests[key][typeKey]}
+                required
+              />
+            </Col>
+            <Col>
               <EditableField
                 disbaled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
@@ -128,7 +139,7 @@ export default class Guests extends React.Component {
                 required
               />
             </Col>
-            <Col sm={{ size: 1, order: 1 }}>
+            <Col>
               <br/>
               <i 
                 class="fa fa-trash fa-3x"

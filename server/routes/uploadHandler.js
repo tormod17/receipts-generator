@@ -1,10 +1,11 @@
 const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
-
+const { formatDate } = require('../helpers/helpers');
 
 const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
 const DATETIMESTAMP = Date.now();
+
 
 exports.uploadHandler = (req, res, next) => {
     const { file, query } = req;
@@ -50,7 +51,7 @@ exports.uploadHandler = (req, res, next) => {
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
                 Rechnungsnummer: Number(c['Rechnungsnummer']) || 0,
-                'Rechnungs-datum': Date(),
+                'Rechnungs-datum': formatDate(DATETIMESTAMP),
                 'FR': 0
             };
             return p;

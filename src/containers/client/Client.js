@@ -32,7 +32,6 @@ let requiredFieldsGuest = [
   'Abreisedatum (Leistungsdatum)',
   'Anreisedatum',
   'Reinigungs-gebühr',
-  'Auszahlung',
 //  'Gesamtumsatz Airgreets',
   'Airgreets Service Fee (€)'
 ];
@@ -88,7 +87,7 @@ class Client extends Component {
   }
 
   calculateTotals(type, tax) {
-    const { guests, corrections } = this.props;
+    const { guests, corrections } = this.state;
     const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
     const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
 
@@ -114,7 +113,6 @@ class Client extends Component {
     let fields= [];
     const isGuests = Object.keys(guests || {}).length > 0;
     const isCorrections = Object.keys(corrections || {}).length > 0;
-
     const clientKeys = Object.keys(client);
     const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
     const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
@@ -127,6 +125,9 @@ class Client extends Component {
       fields = [ ...requiredFields ];
     }
     if( Belegart === 'Auszahlung' && isGuests && !isCorrections) {
+      fields = [ ...requiredFields, ...requiredFieldsGuest];
+    }
+    if( Belegart === 'Rechnung' && isGuests && !isCorrections) {
       fields = [ ...requiredFields, ...requiredFieldsGuest];
     }
     if( Belegart === 'Auszahlung' && isGuests && isCorrections) {
@@ -219,7 +220,7 @@ class Client extends Component {
   }
 
   render() {
-    const { client, guests, corrections } = this.state;
+    const { client, guests, corrections, Belegart } = this.state;
     return (
     <Form clasName="bill">
         <FormGroup row>
@@ -247,6 +248,7 @@ class Client extends Component {
         <Customer 
           client={client}
           updateFieldValue={this.updateFieldValue} 
+          Belegart={Belegart}
         />
         <Guests 
           updateFieldValue={this.updateFieldValue}
