@@ -286,7 +286,8 @@ const mapStateToProps = state => {
   let locked =true;
   if (data) {
     locked =  Object.values(data)[0]
-      && Object.values(data)[0].listings[0].locked;
+      &&  Object.values(data)[0].listings[0]
+        && Object.values(data)[0].listings[0].locked;
   }
   return {
     message,

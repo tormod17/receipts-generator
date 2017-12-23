@@ -99,16 +99,17 @@ exports.addClientHandler = (req, res) => {
 exports.updateClientHandler = (req, res) => {
   // needs to only update the receipt details not client
   const { Belegart, guests, client, corrections } = req.body;
-  console.log(req.body);
 
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
+
+  console.log(listings);
     if(client) {
       client.Belegart = Belegart;
       ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
           if (err) return res.json({message: err +''});
           const promises = listings.map(listing => {
             return new Promise((resolve, reject) => {
-              ReceiptDB.findByIdAndUpdate(listing._id, listings, { new:true} , (err, model) => {
+              ReceiptDB.findByIdAndUpdate(listing._id, listing, { new:true} , (err, model) => {
                 if (err) return reject(err);
                 resolve(model);
               });
@@ -116,7 +117,7 @@ exports.updateClientHandler = (req, res) => {
           });
 
           Promise.all(promises)
-            .then(listings => {
+            .then(newListings => {
               const updatedClient = {
                 [newClient['Kunden-nummer']] : {
                   'Emailadresse':  newClient['Emailadresse'],
@@ -126,7 +127,7 @@ exports.updateClientHandler = (req, res) => {
                   'PLZ':  newClient['PLZ'],
                   'Kunden-nummer': newClient['Kunden-nummer'],
                   '_id':  newClient['Kunden-nummer'],
-                  'listings': listings,
+                  'listings': newListings,
                   'Belegart': newClient['Belegart'] || Belegart,
                   'Rechnungsnummer': newClient['Rechnungsnummer'],
                   'Rechnungs-datum': newClient['Rechnungs-datum'],

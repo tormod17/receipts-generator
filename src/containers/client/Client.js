@@ -227,7 +227,7 @@ class Client extends Component {
   render() {
     const { client, guests, corrections, Belegart } = this.state;
     return (
-    <Form clasName="bill">
+    <Form className="bill">
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>
