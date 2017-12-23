@@ -46,11 +46,10 @@ export default class Guests extends React.Component {
     return (
     <div>
       <FormGroup>
-        <h2>Geschäftsvorfall 1: Gastes</h2>
+        <h5>Geschäftsvorfall 1: Gastes</h5>
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
         const locked = guests[key].locked
-        console.log(locked);
         return (
         <div
           key={guests[key]._id}
@@ -143,7 +142,7 @@ export default class Guests extends React.Component {
             <Col>
               <br/>
               <i 
-                class="fa fa-trash fa-3x"
+                class="fa fa-trash fa-2x"
                 aria-hidden="true"
                 onClick={() => this.props.handleDelGuest(key, 'guests')}
                 id={guests[key]._id}
@@ -163,7 +162,7 @@ export default class Guests extends React.Component {
       <FormGroup row>
         <Col>
           <i 
-            class="fa fa-plus fa-3x"
+            class="fa fa-plus fa-2x"
             aria-hidden="true"
             onClick={() => this.props.handleAddGuest('guests', guests)}
           >

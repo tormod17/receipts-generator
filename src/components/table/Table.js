@@ -74,7 +74,11 @@ class Tableclients extends Component {
       const header = ['Kundenummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll', selectAllChecked)];
 
       return  (
-        <div>
+        <div
+          style={{
+            width: '100%'
+          }}
+        >
           <Table striped>
             <thead>
               <tr>

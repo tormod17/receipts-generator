@@ -152,7 +152,6 @@ class Client extends Component {
     const data  = {
       ...this.state
     };
-    console.log(data);
     let eventType  = clientId ? 'updateClient' : 'addClient';
     let message = 'Bist du sicher?';
     const missingFields = this.checkRequiredFields(data);

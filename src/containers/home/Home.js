@@ -232,7 +232,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-             {!locked &&  <i onClick={this.handleAddEntry} className="fa fa-plus fa-3x" aria-hidden="true"></i> }
+             {!locked &&  <i onClick={this.handleAddEntry} className="fa fa-plus fa-2x" aria-hidden="true"></i> }
             </InputGroup>
           </Col>
           <Col sm={4}>
@@ -245,7 +245,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <i onClick={this.handleDelete} className="fa fa-trash fa-3x" aria-hidden="true"></i> 
+              <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i> 
             </InputGroup>
           </Col>
             <Col sm={4}>

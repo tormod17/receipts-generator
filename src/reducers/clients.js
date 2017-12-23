@@ -124,8 +124,10 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 data: {
-                    ...action.payload
-                }
+                    ...state.data,
+                    ...action.payload.client
+                },
+                message: action.payload.message
             };
         case UPDATE_CLIENT_FAILURE:
             return {

@@ -50,7 +50,7 @@ export default class Customer extends React.Component {
     return (
       <div>
         <FormGroup>
-          <h2>Kunde</h2>
+          <h5>Kunde</h5>
         </FormGroup>
         <FormGroup row>
           <Col>

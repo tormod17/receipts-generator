@@ -43,7 +43,7 @@ export default class Corrections extends React.Component {
       <div>
         <FormGroup row>
           <Col>
-            <h2>Geschäftsvorfall 2: korrektur</h2>
+            <h5>Geschäftsvorfall 2: korrektur</h5>
           </Col>
         </FormGroup>
         { corrections && Object.keys(corrections).map(key =>
@@ -54,6 +54,7 @@ export default class Corrections extends React.Component {
               <Col className="col-4">
                 <hr/>
                 <Dropdown
+                  disabled={corrections[key].locked}
                   name="correctionType"
                   data={corrections[key]}
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
@@ -63,6 +64,7 @@ export default class Corrections extends React.Component {
               </Col>
               <Col className="col-4">
                   <EditableField 
+                    disabled={corrections[key].locked}
                     updateFieldValue={(name, val) => this.handleValueChange(name, val, key)}                     
                     name="Anpassungs-grund"
                     placeholder="Anpassungs grund"
@@ -71,6 +73,7 @@ export default class Corrections extends React.Component {
               </Col>
               <Col className="col-3">
                  <EditableField
+                  disabled={corrections[key].locked}
                   name="Auszahlungskorrektur in €"
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   placeholder="Betrag"
@@ -80,7 +83,7 @@ export default class Corrections extends React.Component {
               <Col className="col-1">
                 <br/>
                 <i 
-                  class="fa fa-trash fa-3x"
+                  class="fa fa-trash fa-2x"
                   aria-hidden="true"
                   onClick={() => this.props.handleDelCorrection(key, 'corrections')}
                   id={corrections[key]['correctionId']}
@@ -92,9 +95,15 @@ export default class Corrections extends React.Component {
               <Col sm={{ size: 4, order: 1 }}>
                 <InputGroup>
                   <InputGroupAddon>
-                    <Input addon type="checkbox" aria-label="Umsatzsteuer" />
+                    <Input 
+                      addon 
+                      type="checkbox"
+                      aria-label="Umsatzsteuer" 
+                    />
                   </InputGroupAddon>
-                  <Input placeholder="Umsatzsteuer" />
+                  <Input                   
+                    placeholder="Umsatzsteuer" 
+                  />
                 </InputGroup>
               </Col>
             </FormGroup>
@@ -106,7 +115,7 @@ export default class Corrections extends React.Component {
         <FormGroup row>
           <Col>
             <i 
-              class="fa fa-plus fa-3x"
+              class="fa fa-plus fa-2x"
               aria-hidden="true"
               onClick={() => this.props.handleAddCorrection('corrections',corr)}
             ></i>
