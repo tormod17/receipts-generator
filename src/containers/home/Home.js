@@ -16,7 +16,7 @@ import TableData from '../../components/table/Table';
 import Dropdown from '../../components/dropdown/Dropdown';
 import { upload } from '../../actions/upload';
 import { getClients, deleteClients } from '../../actions/clients';
-
+import { emailClients } from '../../actions/email';
 
 import 'pdfmake/build/pdfmake.js';
 import 'pdfmake/build/vfs_fonts.js';
@@ -61,6 +61,7 @@ class Home extends Component {
     this.getSelectedIds = this.getSelectedIds.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
+    this.handleEmail = this.handleEmail.bind(this);
     this.updateSelectedMonth = this.updateSelectedMonth.bind(this);
     this.lockMonthEditing = this.lockMonthEditing.bind(this);
   }
@@ -120,6 +121,13 @@ class Home extends Component {
     this.getSelectedIds().forEach(id => {
       createPDF(clients, id);      
     });
+  }
+  handleEmail(e) {  
+    e.preventDefault();
+    const { clients } = this.state;
+    const selectedIds = [...this.getSelectedIds()];
+    const selectedClients =  selectedIds.map(id => clients[id]);
+    this.props.dispatch(emailClients(selectedClients));
   }
 
   getClient(client) {
@@ -257,7 +265,7 @@ class Home extends Component {
           </Col>
             <Col sm={4}>
             <InputGroup>
-              <Button >email</Button>
+              <Button type="button" onClick={this.handleEmail} >email</Button>
             </InputGroup>
           </Col>
         </Row>

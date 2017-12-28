@@ -6,7 +6,7 @@ export const UPLOAD_REQUEST = 'UPLOAD_REQUEST';
 export const UPLOAD_SUCCESS = 'UPLOAD_SUCCESS';
 export const UPLOAD_FAILURE = 'UPLOAD_FAILURE';
 
-function uploadRequest(user) {
+function uploadRequest() {
   return {
     type: UPLOAD_REQUEST
   };
@@ -19,7 +19,7 @@ function uploadSuccess(payload) {
   };
 }
 
-function uploadFailure(error) {
+function uploadFailure() {
   return {
     type: UPLOAD_FAILURE
   };
@@ -28,10 +28,6 @@ function uploadFailure(error) {
 export function upload(data, userId) {
   const config = {
     method: 'post',
-    // headers: {
-    //   Accept: 'multipart/form-data',
-    //   'Content-Type': 'multipart/form-data'
-    // },
     body: data
   };
   return callApi(

@@ -20,6 +20,12 @@ import {
     SELECTED_CLIENT
 } from '../actions/clients.js';
 
+import {
+    EMAIL_REQUEST,
+    EMAIL_SUCCESS,
+    EMAIL_FAILURE
+} from '../actions/email.js';
+
 const initialState = {
     data: {},
     message: '',
@@ -38,6 +44,23 @@ function removeProperties(ids, data) {
 
 export function clients(state = initialState, action = {}) {
     switch (action.type) {
+        case EMAIL_REQUEST:
+            return {
+                ...state,
+                saving: true
+            };
+        case EMAIL_SUCCESS:
+            return {
+                ...state,
+                message: action.message,
+                saving: false,
+                saved: true
+            };
+        case EMAIL_FAILURE:
+            return {
+                ...state,
+                message: action.error
+            };
         case SAVE_MONTH_REQUEST:
             return {
                 ...state,

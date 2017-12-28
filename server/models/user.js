@@ -16,8 +16,8 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-  },
+    required: true
+  }
 });
 
 //authenticate input against database
@@ -25,7 +25,7 @@ UserSchema.statics.authenticate = (email, password, callback) => {
   User.findOne({ email })
     .exec((err, user) => {
       if (err) {
-        return callback(err)
+        return callback(err);
       } else if (!user) {
         const err = new Error('User not found.'); 
         err.status = 401;
@@ -37,9 +37,9 @@ UserSchema.statics.authenticate = (email, password, callback) => {
         } else {
           return callback();
         }
-      })
+      });
     });
-}
+};
 
 UserSchema.statics.addUser = (data, callback) => {
   const { email } = data;

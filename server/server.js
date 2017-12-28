@@ -12,6 +12,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const env = require('env2')('./.env');
 
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');

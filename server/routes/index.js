@@ -20,7 +20,7 @@ const {
 const { uploadHandler } = require('./uploadHandler');
 
 const { saveMonthHandler } = require ('./saveMonthHandler');
-
+const { emailHandler } = require ('./emailHandler');
 
 //auth
 router.post('/api/signup', (req, res, next) => signUpHandler(req,res, next) );
@@ -44,5 +44,8 @@ router.post('/api/deleteclients', (req, res, next) => delClientHandler(req,res, 
 
 // save month
 router.post('/api/savemonth', (req, res) => saveMonthHandler(req, res));
+
+router.post('/api/email', (req, res) => emailHandler(req, res));
+
 
 module.exports = router;
