@@ -60,7 +60,12 @@ export default class Example extends React.Component {
         </DropdownToggle>
         <DropdownMenu>
           { items.map(item => 
-            <DropdownItem onClick={() => this.handleSelectItem(item)}>{item}</DropdownItem>
+            <DropdownItem 
+              key={item}
+              onClick={() => this.handleSelectItem(item)}
+            >
+              {item}
+            </DropdownItem>
           )}
         </DropdownMenu>
       </ButtonDropdown>

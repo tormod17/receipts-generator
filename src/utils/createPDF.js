@@ -11,9 +11,11 @@ export function createPDF(clients, selectedArray) {
   const selectedId = selectedArray[0];
   const client = { ...clients[selectedId] };
   const customerNumber = client['Kunden-nummer'];
+  
   const allguests = Object.values(clients.data || {}).filter(trans =>
     customerNumber === trans['Kunden-nummer']
   );
+
   const letter = {
     title: 'Airgreets Gmbh',
     email: 'hello@Airgreets.com',
@@ -56,16 +58,91 @@ export function createPDF(clients, selectedArray) {
   const titleHeaders = [
     'Name des Gastes',
     'Anreisedatum',
-    'Abreisedatum',
-    'Reinigungs-gebühr',
-    'Airgreets Service Fee (€)',
-    'CLEANING FARE',
-    'TOTAL PAID'
+    'Abreisedatum (Leistungsdatum)',
+    'Leistungsbeschreinung',
+    'Betrag'
+    // 'Reinigungs-gebühr',
+    // 'Airgreets Service Fee (€)',
+    // 'CLEANING FARE',
+    // 'TOTAL PAID'
   ];
 
-  const rows = allguests.map(guest => {
-    return titleHeaders.map( title  => guest[title]);
+  const headers = titleHeaders.map(title => {
+    return {
+      text: title,
+      style: 'tableHeader'
+    };
   });
+
+
+  const requiredFields = [
+    'Name des Gastes',
+    'Anreisedatum',
+    'Abreisedatum (Leistungsdatum)',
+    'Airbnb Einkommen',
+    'Reinigungs-gebühr',
+    'Airgreets Service Fee (€)'
+  ];
+
+  /// check if its a guest or a correction
+  let rows = [];
+  client.listings.forEach(guest => {
+    if (guest['Name des Gastes']) {
+      const newListings = requiredFields.map( title  => {
+          return guest[title];       
+      });
+      rows.push(newListings);
+      return newListings;
+    }
+  });
+
+  const newRows = rows.map(row => {
+    const rowArr = [];
+    const firstRow = [ 
+      {
+        rowSpan: 3,
+        text: row[0]
+
+      },
+      {
+        rowSpan: 3,
+        text: row[1]
+      },
+      { 
+        rowSpan: 3,
+        text: row[2]                
+      },
+      {
+        text: 'Auszahlung:'
+      },
+      {
+        text: row[3]
+      }
+    ];
+    rowArr.push(firstRow);
+    const secondRow =   [ 
+        '',
+        '',
+        '',
+        { text: 'davon: Reinigungs-gebühr', fillColor: '#CCCCCC'},
+        row[4]
+    ];
+    rowArr.push(secondRow);
+    const thirdRow =[
+       '',
+       '',
+       '',
+      { text: 'davon: Airgreets Service Fee (25%)'},
+      row[5]
+    ];
+    rowArr.push(thirdRow);
+    return  rowArr;
+  });
+  
+   
+  //console.log('>>>>' , newRows);
+  //const noBorder = [ false, false, false, false ];
+
   const dd = {
     images: {
       logo: logo
@@ -105,11 +182,14 @@ export function createPDF(clients, selectedArray) {
       },
 
       {
+        style: 'tableExample',
         table: {
           headerRows: 1,
+          widths: [100, 75, 75, 'auto', 50],
+      
           body: [
-            [...titleHeaders],
-            ...rows
+            [...headers],
+            ...[].concat(...newRows)
           ]
         }
       },
@@ -152,11 +232,14 @@ export function createPDF(clients, selectedArray) {
         margin: [0, 10, 0, 5]
       },
       tableExample: {
-        margin: [0, 5, 0, 15]
+        margin: [0, 5, 0, 15],
+        fontSize: 10
       },
       tableHeader: {
         bold: true,
-        fontSize: 13,
+        fontSize: 11,
+        fillColor: '#CCCCCC',
+        border: 'none',
         color: 'black'
       },
       salu: {
