@@ -9,6 +9,8 @@ import EditableField from '../../components/editableField/EditableField';
 import Corrections from '../../components/corrections/Corrections';
 import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
+
+import { calculateTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
 import { addClient, getClient, getClients, updateClient } from "../../actions/clients";
@@ -72,7 +74,6 @@ class Client extends Component {
     this.handleAdd = this.handleAdd.bind(this);
     this.handleDel = this.handleDel.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
-    this.calculateTotals = this.calculateTotals.bind(this);
   }
 
   componentWillReceiveProps(nextProps){
@@ -86,27 +87,7 @@ class Client extends Component {
     }
   }
 
-  calculateTotals(type, tax) {
-    const { guests, corrections } = this.state;
-    const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
-    const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
 
-    const sumGuests =Object.values(guests|| {}).reduce((a, b) => {
-        const clientTotal = (b && b[key1] && parseFloat(b[key1].replace( /,/g, ''))) || 0;
-        a +=  clientTotal 
-        return a;
-    }, 0);
-    const sumCorr =Object.values(corrections || {}).reduce((a, b) => {
-        const corrections = 
-            (b && b[key2] && parseFloat(b[key2].replace( /,/g, '')) || 0);
-        a +=   corrections;
-        return a;
-    }, 0);
-    if (tax) {
-      return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2)
-    }
-    return sumGuests + sumCorr ;
-  }
 
   checkRequiredFields(data){
     const { client, guests, corrections, Belegart } = data;
@@ -276,7 +257,7 @@ class Client extends Component {
               <EditableField 
                 name="Gesamtumsatz Airgreets" 
                 placeholder="Gesamt Auszahlungs Betrag"
-                value={this.calculateTotals('Auszahlung')}
+                value={calculateTotals('Auszahlung', guests, corrections)}
                 disabled
 
               />
@@ -286,7 +267,7 @@ class Client extends Component {
             <EditableField 
               name="Gesamt Rechnungs Betrag"
               placeholder="Gesamt Rechnungs Betrag"
-              value={this.calculateTotals('Rechnungs')}
+              value={calculateTotals('Rechnungs', guests, corrections)}
               disabled
             />
           </Col>
@@ -294,7 +275,7 @@ class Client extends Component {
             <EditableField 
               name="Darin enthaltene Umsatzsteuer"
               placeholder="Darin Enthaltene Umsatzsteuer"
-              value={this.calculateTotals('Rechnungs', 'tax')}
+              value={calculateTotals('Rechnungs', guests, corrections, 'tax')}
               disabled
             />
           </Col>

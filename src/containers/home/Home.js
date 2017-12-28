@@ -117,7 +117,9 @@ class Home extends Component {
   
   handlePDF(){
     const { clients } = this.state;
-    createPDF(clients, this.getSelectedIds());
+    this.getSelectedIds().forEach(id => {
+      createPDF(clients, id);      
+    });
   }
 
   getClient(client) {
@@ -292,7 +294,7 @@ const mapStateToProps = state => {
   return {
     message,
     clients: {...data },
-    total,
+    total: total.toFixed(2),
     locked
   };
 };

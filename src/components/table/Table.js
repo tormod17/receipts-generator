@@ -96,10 +96,10 @@ class Tableclients extends Component {
                       let output;
                       switch(true){
                         case field === 'Rechnungsbetrag':
-                          output = client[field] + '€';
+                          output = client[field].toFixed(2) + '€';
                           break;
                         case field === 'Rechnungs-datum':
-                         output = client['Rechnungs-datum']// probably a better way to do this. 
+                         output = client['Rechnungs-datum'] // probably a better way to do this. 
                          break;
                         case field === 'select': 
                           output = this.makeCheckBox(client._id, (selectAllChecked || client.checked), 'clientCheck');
