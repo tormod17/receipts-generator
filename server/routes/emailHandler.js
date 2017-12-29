@@ -75,7 +75,7 @@ exports.emailHandler = (req, res) => {
 
       const mailOptions = {
         from: emailAddress,
-        to: emailAddress, //client['Emailadresse'],
+        to: emailAddress, //client['Emailadresse'], // emailAddress
         subject,
         html
       };
