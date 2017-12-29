@@ -41,12 +41,14 @@ app.use(session({
   })
 }));
 
-
-
 const port = process.env.PORT || 3001;
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'pug');
 
 // Configure app to use bodyParser to parse json data
 //const server = require("http").createServer(app);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

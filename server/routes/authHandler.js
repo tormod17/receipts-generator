@@ -1,15 +1,7 @@
 const express = require('express');
-const fs = require('fs');
-const router = express.Router();
 const User = require('../models/user');
-const ReceiptDB = require('../models/receipts');
 
 const jwt = require('jsonwebtoken');
-
-const XLSX = require('xlsx');
-const multer = require('multer'); // used for writing file before saving.
-const uuidv1 = require('uuid/v1');
-const path =require('path');
 
 const JWT_SECRET = 'JWT Rocks!';
 
@@ -21,7 +13,6 @@ function extractToken(req) {
     }
     return null;
 }
-
 
 exports.signUpHandler = (req,res, next) => {
   const { username, email, password, confirmPassword } = req.body;

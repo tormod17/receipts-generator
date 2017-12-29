@@ -1,0 +1,65 @@
+- var guestFields = [ 'Name des Gastes', 'Anreisedatum','Abreisedatum (Leistungsdatum)','Airbnb Einkommen','Reinigungs-gebühr','Airgreets Service Fee (€)'];
+- var correctionFields = ['Name des Gastes','Anreisedatum','Abreisedatum (Leistungsdatum)','Sonstige Leistungsbeschreibung','Rechnungskorrektur in €','Auszahlungskorrektur in €'];
+html
+  head
+    style.
+      table {
+        border-collapse: collapse
+      }
+      th, td {
+        border: 1px solid black;
+      }
+      .betrag {
+        text-align: right;
+      }
+      .emptyCell {
+        border: none;
+      }
+  body
+    p Hi #{name}
+    p Kunde-nummer #{customerNumber}
+    p Rechnungsnummer #{Rechnungsnummer} 
+    p Rechnungsdatum #{Rechnungsdatum}
+
+    table
+      tr
+        for heading in headings
+           th= heading
+      for item in guests
+        tr
+          td(rowspan="3")= item[guestFields[0]]
+          td(rowspan="3")= item[guestFields[1]]
+          td(rowspan="3")= item[guestFields[2]]
+          td(colspan="2")= 'Auszahlung'
+          td= item[guestFields[3]]
+        tr
+          td(colspan="2")= 'davon: Reinigungs-gebühr'
+          td(class="betrag")= item[guestFields[4]]
+        tr
+          td(colspan="2")= 'davon: Airgreets Service Fee (25%)'
+          td(class="betrag")= item[guestFields[5]] 
+      for item in corrections
+        tr
+          td(rowspan="3")= item[correctionFields[0]]
+          td(rowspan="3")= item[correctionFields[1]]
+          td(rowspan="3")= item[correctionFields[2]]
+          td(rowspan="3")= item[correctionFields[3]]   
+          td= 'Korrektur'
+          td
+        tr
+          td= 'Auszahlung'
+          td(class="betrag")= item[correctionFields[4]]   
+        tr
+          td= 'Rechnung'
+          td(class="betrag")= item[correctionFields[5]]   
+      for item in totals 
+        tr
+          td(class='emptyCell' colspan="3")
+          th(colspan="2")= item.name
+          th(class="betrag")= item.value
+
+    for item in Object.keys(emailDetails)
+      p= emailDetails[item]
+
+
+    

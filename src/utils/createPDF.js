@@ -77,7 +77,7 @@ export function createPDF(clients, id) {
     'Airgreets Service Fee (€)'
   ];
 
-  const guestRows =  guests.map(guest => 
+  const guestRows = guests.map(guest => 
     guestFields.map( title  => guest[title] )
   );
 
@@ -87,7 +87,6 @@ export function createPDF(clients, id) {
       {
         rowSpan: 3,
         text: row[0]
-
       },
       {
         rowSpan: 3,
@@ -216,16 +215,16 @@ export function createPDF(clients, id) {
 
   let totalFields = [ 
     {
-      label: 'Gesamtauszahlungsbetrag',
-      total: calculateTotals('Auszahlung', guests, corrections) + '€'
+      name: 'Gesamtauszahlungsbetrag',
+      value: calculateTotals('Auszahlung', guests, corrections) + '€'
     },
     {
-      label: 'Gesamtrechnungsbetrag',
-      total: calculateTotals('Rechnungs', guests, corrections) + '€'
+      name: 'Gesamtrechnungsbetrag',
+      value: calculateTotals('Rechnungs', guests, corrections) + '€'
     },
     {
-      label: 'Darin enthaltene Ust. (19%)',
-      total: calculateTotals('Rechnungs', guests, corrections, 'tax') + '€'
+      name: 'Darin enthaltene Ust. (19%)',
+      value: calculateTotals('Rechnungs', guests, corrections, 'tax') + '€'
     }
   ]; 
 
@@ -244,13 +243,13 @@ export function createPDF(clients, id) {
           '',
           '',
           {
-            text: obj.label,
-            bold: obj.label === 'Gesamtauszahlungsbetrag',
+            text: obj.name,
+            bold: obj.name === 'Gesamtauszahlungsbetrag',
             colSpan: 2
           },
           '',
           { 
-            text: obj.total,
+            text: obj.value,
             alignment: 'right'
           }
         ]
@@ -306,7 +305,6 @@ export function createPDF(clients, id) {
         table: {
           headerRows: 1,
           widths: [100, 75, 75, 'auto', 'auto', 50],
-      
           body: [
             [...headers],
             ...[].concat(...newGuestRows),
