@@ -8,6 +8,8 @@ const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 const path = require('path');
 
+const app =require('express');
+
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
 
@@ -25,8 +27,6 @@ exports.emailHandler = (req, res) => {
   if (!clients) return res.json({ message: 'no clients' });
   const promises = Object.values(clients).map(client=> {
     return new Promise ((resolve, reject) => {       
-      //console.log(client.listings);
-
       const htmlTemplate = pug.compileFile('./views/transactions/html.pug');
       
       const guests = client.listings.filter(listing => listing['Name des Gastes']);
