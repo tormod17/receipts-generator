@@ -64,6 +64,10 @@ app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+
+app.get('/views/*', function (req, res) {
+  res.sendFile('./views/transacations/html.pug');
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   const err = new Error('File Not Found');

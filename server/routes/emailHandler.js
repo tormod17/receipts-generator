@@ -31,8 +31,6 @@ exports.emailHandler = (req, res) => {
       
       const guests = client.listings.filter(listing => listing['Name des Gastes']);
       const corrections = client.listings.filter(listing => !listing['Name des Gastes']);
-      
-      console.log( client);
 
       const totalFields = [ 
         {
