@@ -7,9 +7,10 @@ import "./editableField.css";
 
 class EditableField extends Component {
 
-  static propTypes ={
+  static propTypes = {
     updateFieldValue: PropTypes.func,
     placeholder: PropTypes.string,
+    name: PropTypes.string,
     type: PropTypes.string,
     value: PropTypes.string, 
     label: PropTypes.string, 
@@ -26,26 +27,30 @@ class EditableField extends Component {
 
   constructor(props) {
     super(props)
-    this.state ={}
+    this.state ={
+      value: props.value 
+    }
     this.handleOnChange = this.handleOnChange.bind(this);
   }
 
-  camelCaseName(name){
-    return name.split(' ').map(function(word,index){
-    if(index == 0){
-      return word.toLowerCase();
+  componentWillReceiveProps(nextProps) {
+    if(this.props.value !== nextProps.value ){
+      this.setState({
+        value: nextProps.value,
+      })
     }
-      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-    }).join('');
   }
   
   handleOnChange(e, name) {
+    this.setState({ 
+      value: e.target.value
+    })
     this.props.updateFieldValue(name, e.target.value)
   }
 
   render() {
-    const { placeholder, updateFieldValue, type, value, name, label, nolabel } =this.props;
-    //const name = this.camelCaseName(placeholder);
+    const { placeholder, updateFieldValue, type, name, label, nolabel, required, disabled } =this.props;
+    const { value } = this.state
 
     return (
       <div>
@@ -59,8 +64,9 @@ class EditableField extends Component {
           type={type} 
           placeholder={placeholder}
           onChange={(e) => this.handleOnChange(e,name)}
-          disabled={!!value}
+          disabled={disabled}
           value={value}
+          required
         />
       </div> 
     );

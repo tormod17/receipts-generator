@@ -4,78 +4,120 @@ import PropTypes from "prop-types";
 
 
 
-class TableData extends Component { 
+class Tableclients extends Component { 
     constructor(props){
-      super(props)
+      super(props);
       this.state = {
-        selectedArray: [],
+        clients: {
+          ...props.clients
+        },
+        selectAllChecked: false
       };
 
       this.handleClick = this.handleClick.bind(this);
+      this.handleSelect = this.handleSelect.bind(this);
 
-      this.requiredFields = ['Kunden-nummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select']
-      this.header = ['Kundenummer', 'Kunde', 'Belgart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll') ];
     }
 
-    makeCheckBox = id => 
-      <Label check>
-        <Input 
-          className="selectCheckBox"
-          type="checkbox"
-          id={id} 
-          onChange={this.props.handleSelect}
-        />   
-      </Label>
-
-    handleClick(receipt){
-      this.props.getReceipt(receipt)
+    componentWillReceiveProps(nextProps) {
+      if (nextProps !== this.props){
+        this.setState({
+          clients: {
+            ...nextProps.clients
+          }
+        });
+      }
     }
 
-    createHeaders(){
-      return this.header.map(header => <th key={header}> {header}</th>)
+    makeCheckBox(id, checked, cssclass) {
+      return (
+        <Label check>
+          <Input 
+            className={cssclass}
+            type="checkbox"
+            id={id}
+            onChange={() => this.handleSelect(id)}
+            checked={checked}
+          />   
+        </Label>
+        );
     }
 
-    createRows = receipt =>
-        <tr
-          key={receipt._id}
-        >
-          { this.requiredFields.map(field => {
-              let output;
-              switch(true){
-                case field === 'Belgart':
-                  output = receipt.Rechnung === 'x' ? 'Rechnung' : 'Auszahlung';
-                  break;
-                case field === 'Rechnungs-datum':
-                 output = new Date(receipt['Rechnungs-datum']).toString().split(' '); // probably a better way to do this. 
-                 output = output[0] + ' ' +output[1] + ' ' + output[2] + ' ' + output[3];
-                 break;
-                case field === 'select':
-                  output = this.makeCheckBox(receipt._id)
-                  return <td key={field}>{ output || ' '}</td>
-                default:
-                  output = receipt[field];
-                  break;
-              }
-              return <td key={field} onClick={() => this.handleClick(receipt)}>{ output || ' '}</td>
-          })}
-        </tr>
+    handleSelect(id) {
+      if (id ==='selectAll') {
+        this.setState({
+          selectAllChecked: !this.state.selectAllChecked
+        });
+      } else {
+        this.setState({
+          clients: {
+             ...this.state.clients,
+            [id]: {
+              ...this.state.clients[id],
+              checked: !this.state.clients[id].checked
+            }
+          },
+          selectAllChecked: false
+        });
+      }
+    }
+
+    handleClick(client){
+      this.props.getClient(client);
+    }
 
     render() {
-      const { data } = this.props;
+      const { locked } = this.props;
+      const { clients, selectAllChecked } = this.state;
+
+      const requiredFields = ['Kunden-nummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select'];
+      const header = ['Kundenummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll', selectAllChecked)];
+
       return  (
-        <Table striped>
-          <thead>
-            <tr>
-              { data && this.createHeaders() }
-            </tr>
-          </thead>
-          <tbody>
-            { data &&  (data.map( receipt => this.createRows(receipt))) }
-            { !data && <h2>Need to add some receipts</h2> }
-          </tbody>
-        </Table>
-      )
+        <div
+          style={{
+            width: '100%'
+          }}
+        >
+          <Table striped>
+            <thead>
+              <tr>
+                { clients && header.map(header => 
+                    <th key={header}> {header}</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              { clients &&  Object.values(clients).map( client => 
+                <tr
+                  key={client._id}
+                >
+                  { requiredFields.map(field => {
+                      let output;
+                      switch(true){
+                        case field === 'Rechnungsbetrag':
+                          output = client[field].toFixed(2) + '€';
+                          break;
+                        case field === 'Rechnungs-datum':
+                         output = client['Rechnungs-datum']; // probably a better way to do this. 
+                         break;
+                        case field === 'select': 
+                          output = this.makeCheckBox(client._id, (selectAllChecked || client.checked), 'clientCheck');
+                          return <td key={field}>{ output || ' '}</td>;
+                        default:
+                          output = client[field] + '';
+                          break;
+                      }
+                      return <td key={field} onClick={() => this.handleClick(client)}>{ output || ' '}</td>;
+                  })}
+                </tr>
+              )}
+              { !clients && <h2>Need to add some clients</h2> }
+            </tbody>
+          </Table>
+        </div>
+      );
     }
 }
 
-export default TableData;
+export default Tableclients;

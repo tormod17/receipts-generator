@@ -11,62 +11,59 @@ import { HashRouter as Router, Route, Switch } from "react-router-dom";
 import { connect } from "react-redux";
 import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
+import ModalComp from "../../components/modal/Modal";
 import Login from "../login/Login";
-import PrivateRoute from "../misc/PrivateRoute";
 import Home from "../home/Home";
-import UsersPage from "../user/UsersPage";
 import Signup from "../signup/Signup";
-import Receipt from "../receipt/Receipt";
+import Client from "../client/Client";
 import About from "../about/About";
 import NotFound from "../misc/NotFound";
+import { getClients } from "../../actions/clients";
 
 import { logout } from "../../actions/auth";
 
 import "./app.css";
-import { getReceipts, getSingleReceipt, deleteReceipts } from "../../actions/receipts";
+//import { saveMonth } from '../../actions/clients';
 
-
+const TIMESTAMP = new Date();
 
 class App extends Component {
 
-  componentDidMount(){
-    const { id } = this.props.auth;
-    this.props.dispatch(getReceipts(id))
+  constructor(props) {
+    super(props);
+    this.state ={};
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { receipts, auth } = this.props;
-    if (receipts.message !== nextProps.receipts.message ){
-      this.props.dispatch(getReceipts(auth.id))
-    }
+  componentDidMount(){
+    const { auth, dispatch } = this.props;
+    dispatch(getClients(auth.id, TIMESTAMP.getMonth()));
   }
 
   handleLogout() {
-    const { user } = this.props;
-    this.props.dispatch(logout(user));
+    const { user, dispatch } = this.props;
+    dispatch(logout(user));
   }
 
   render() {
-    const { auth } = this.props;
-    const isAuthenticated = true && auth;
-    
+    const { auth } = this.props;    
     return (
       <Router>
         <div>
           <div className="container">
-            <Header user={auth}  handleLogout={() => this.handleLogout()} />
+            <Header auth={auth}  handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
                 <Route exact path="/" render={() => <Home {...this.props}/>} />
                 <Route path="/about" component={About} />
                 <Route path="/login" component={Login} />
                 <Route path="/signup" component={Signup} />
-                <Route path="/receipt/:id" component={() => <Receipt {...this.props} />} />
-                <Route path="/receipt" component={() => <Receipt {...this.props} />} />
+                <Route path="/client/:id" component={() => <Client  {...this.props}/>} />
+                <Route path="/client" component={() => <Client  {...this.props}/>} />
                 <Route component={NotFound} />
               </Switch>
             </div>
           </div>
+          <ModalComp {...this.props}/>
           <Footer />
         </div>
       </Router>
@@ -84,10 +81,9 @@ App.contextTypes = {
 };
 
 const mapStateToProps = state => {
-  const { auth, receipts } = state;
+  const { auth } = state;
   return {
-    auth,
-    receipts,
+    auth
   };
 };
 

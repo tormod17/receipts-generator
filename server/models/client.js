@@ -1,29 +1,48 @@
 const mongoose = require('mongoose');
-const Listing = require('./listing.js');
+const Receipts = require('./receipts.js');
 
 const ClientSchema = new mongoose.Schema({
-    clientId: {
-        type: String,
-        isRequired: true,
+    _id: {
+        type: Object
     },
-    clientName: {
-        type: String,
+    clientId: {
+        type: String
+    },
+    Kunde: {
+        type: String
+    },
+    'Kunden-nummer': {
+        type: String
+    },
+    'Straße':{
+        type: String
+    },
+    'Stadt': {
+        type: String
+    },
+    'PLZ':{
+        type: String
+    },
+    Belegart: {
+        type: String
+    },
+    'Rechnungs-datum': {
+        type: String
+    },
+    'Rechnungsnummer':{
+        type: Number
+    },
+    'Emailadresse': {
+        type: String        
     },
     email: {
-        type: String,
+        type: String
     },
     listings: {
-        type: [Listing.schema],
+        type: Array //Receipts
     },
+    feeds: [mongoose.Schema.Types.Mixed]
 }, { strict: false });
-
-// Do we need this for Clients?
-ClientSchema.statics.checkExisting = function (email, password, callback) {
-  Receipts.findOne({  })
-  .exec((err, Receipts) => {
-
-  })
-};
 
 var Client = mongoose.model('Client', ClientSchema);
 
