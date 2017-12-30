@@ -10,8 +10,7 @@ exports.addClientHandler = (req, res) => {
   if (!req.query.userId) return console.error('no userId');
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
-  const _id = uuidv1();
-  console.log('ADDING A USER MANUALLY', req.body); 
+  console.log('ADDING A USER MANUALLY'); 
   
   const listings = [ 
     ...Object.values(guests || {}),
@@ -31,7 +30,7 @@ exports.addClientHandler = (req, res) => {
   });
   ReceiptDB.insertMany(listings, err => {
       if(err) { 
-        console.log('ADDING A USER MANUALLYcADDED receipts', req.body); 
+        console.log('ADDING A USER MANUALLYcADDED receipts'); 
           return res.json( { message: err });
       } else {       
           const newCustomer = {
@@ -101,8 +100,6 @@ exports.updateClientHandler = (req, res) => {
   const { Belegart, guests, client, corrections } = req.body;
 
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
-
-  console.log(listings);
     if(client) {
       client.Belegart = Belegart;
       ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
@@ -225,6 +222,4 @@ exports.getClientsHandler = (req, res) => {
         res.json({message: err});
       });
   });
-
-
 };

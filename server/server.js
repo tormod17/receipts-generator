@@ -42,7 +42,6 @@ const port = process.env.PORT || 3001;
 app.set('emails', __dirname + '/emails');
 app.set('emails engine', 'pug');
 // Configure app to use bodyParser to parse json data
-//const server = require("http").createServer(app);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // include routes
