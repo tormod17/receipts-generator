@@ -1,14 +1,8 @@
-const ReceiptDB = require('../models/receipts');
-const ClientDB = require('../models/client');
 const { calculateTotals } = require('../helpers/helpers');
 const pug = require('pug');
 
 const nodemailer = require('nodemailer');
-const DATETIMESTAMP = Date.now();
-const uuidv1 = require('uuid/v1');
 const path = require('path');
-
-const app =require('express');
 
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
@@ -21,14 +15,18 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+function createEmailFilePath(filename) {
+  const newpath = process.env.NODE_ENV === 'production' ? 
+    path.resolve('emails', 'transactions', filename) : path.resolve('..','emails', 'transactions', filename);
+  return newpath;
+}
+
 exports.emailHandler = (req, res) => {
-  //const { selectedIds } = req.body;
   const  { clients } = req.body;    
   if (!clients) return res.json({ message: 'no clients' });
   const promises = Object.values(clients).map(client=> {
     return new Promise ((resolve, reject) => {       
-
-      const htmlTemplate = pug.compileFile(path.resolve('views', 'transactions', 'html.pug'));
+      const htmlTemplate = pug.compileFile(createEmailFilePath('html.pug'));
       const guests = client.listings.filter(listing => listing['Name des Gastes']);
       const corrections = client.listings.filter(listing => !listing['Name des Gastes']);
 
@@ -46,6 +44,7 @@ exports.emailHandler = (req, res) => {
           value: calculateTotals('Rechnungs', guests, corrections, 'tax') + '€'
         }
       ]; 
+
       const emailDetails = { 
         title: 'Airgreets Gmbh',
         email: 'hello@Airgreets.com',
@@ -68,7 +67,8 @@ exports.emailHandler = (req, res) => {
           emailDetails: { ...emailDetails}
         });
 
-      const subjectTemplate = pug.compileFile(path.resolve('views', 'transactions', 'subject.pug'));
+   
+      const subjectTemplate = pug.compileFile(createEmailFilePath('subject.pug'));
       const subject = subjectTemplate({ name: client['Kunde']});
 
       const mailOptions = {

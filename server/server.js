@@ -39,8 +39,8 @@ app.use(session({
   })
 }));
 const port = process.env.PORT || 3001;
-app.set('views', __dirname + '/views');
-app.set('view engine', 'pug');
+app.set('emails', __dirname + '/emails');
+app.set('emails engine', 'pug');
 // Configure app to use bodyParser to parse json data
 //const server = require("http").createServer(app);
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -51,7 +51,6 @@ app.use('/', routes);
 const staticFilePath = process.env.NODE_ENV ==='production' ? 'build' : 'public';
 
 app.use(express.static(path.resolve(__dirname, '..', staticFilePath )));
-//app.use(express.static(path.resolve (__dirname,'..', 'views')));
 
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -63,7 +62,7 @@ app.use(function (req, res, next) {
   next(err);
 });
 // define as the last app.use callback
-app.use(function (err, req, res, next) {
+app.use(function (err, req, res) {
   res.status(err.status || 500);
   res.send(err.message);
 });
