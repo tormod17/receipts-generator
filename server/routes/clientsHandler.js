@@ -102,6 +102,10 @@ exports.updateClientHandler = (req, res) => {
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
     if(client) {
       client.Belegart = Belegart;
+      // we only store array of Ids not objects (better for parsing)
+      client.listings = listings.map(listing => listing._id); 
+      console.log(guests, corrections);
+
       ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
           if (err) return res.json({message: err +''});
           const promises = listings.map(listing => {
