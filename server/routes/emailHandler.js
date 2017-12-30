@@ -27,9 +27,8 @@ exports.emailHandler = (req, res) => {
   if (!clients) return res.json({ message: 'no clients' });
   const promises = Object.values(clients).map(client=> {
     return new Promise ((resolve, reject) => {       
-      
-      const htmlTemplate = pug.compileFile('./views/transactions/html.pug');
-      
+
+      const htmlTemplate = pug.compileFile(path.resolve('views', 'transactions', 'html.pug'));
       const guests = client.listings.filter(listing => listing['Name des Gastes']);
       const corrections = client.listings.filter(listing => !listing['Name des Gastes']);
 
@@ -69,7 +68,7 @@ exports.emailHandler = (req, res) => {
           emailDetails: { ...emailDetails}
         });
 
-      const subjectTemplate = pug.compileFile('./views/transactions/subject.pug');
+      const subjectTemplate = pug.compileFile(path.resolve('views', 'transactions', 'subject.pug'));
       const subject = subjectTemplate({ name: client['Kunde']});
 
       const mailOptions = {
