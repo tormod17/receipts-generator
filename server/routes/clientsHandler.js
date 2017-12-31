@@ -121,6 +121,7 @@ exports.updateClientHandler = (req, res) => {
                     } 
                   });
                 } else {
+                  listing.created = DATETIMESTAMP;
                   ReceiptDB.create(listing, (err, model) => {
                     if (err) {
                       reject(err);

@@ -47,6 +47,7 @@ export function clients(state = initialState, action = {}) {
         case EMAIL_REQUEST:
             return {
                 ...state,
+                message: 'Senden',
                 saving: true
             };
         case EMAIL_SUCCESS:
