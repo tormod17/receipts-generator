@@ -130,6 +130,7 @@ class Client extends Component {
   handleSubmission(){
     const { dispatch, auth } = this.props;
     const clientId = this.props.match.params.id;
+    debugger
     const data  = {
       ...this.state
     };
@@ -150,18 +151,16 @@ class Client extends Component {
     document.dispatchEvent(event);
   }
 
-  handleAdd(type , obj){  
-    const entries = this.state[type];
+  handleAdd(type , fields){  
     const newId = uuidv4();
+    const newFields =  Object.values(fields).map(field => field);
+    newFields.push({ _id: newId });
     this.setState({
-      ...entries,
       [type]: {
-        ...entries,
-        [newId]: {
-          ...obj
-        }
+        ...newFields
       }
     });
+    console.log({...newFields}, 'newFields', fields);
   }
 
   handleDel(key, type){
