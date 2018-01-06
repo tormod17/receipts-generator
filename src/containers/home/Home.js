@@ -40,6 +40,16 @@ const MONTH = [
   'December'
 ];  
 
+const YEAR = [
+  '2017',
+  '2018',
+  '2019',
+  '2020',
+  '2021',
+  '2022',
+  '2023'
+]
+
 class Home extends Component {
 
   constructor(props) {
@@ -50,7 +60,8 @@ class Home extends Component {
       selectedDay: formatDate(Date.now()),
       clients: { ...clients } ,
       message,
-      selectedMonth: TIMESTAMP.getMonth(),
+      selectedMonth: MONTH[TIMESTAMP.getMonth()],
+      selectedYear: TIMESTAMP.getFullYear(),
       locked: false,
       total
     };
@@ -62,7 +73,7 @@ class Home extends Component {
     this.handleDelete = this.handleDelete.bind(this);
     this.handlePDF = this.handlePDF.bind(this);
     this.handleEmail = this.handleEmail.bind(this);
-    this.updateSelectedMonth = this.updateSelectedMonth.bind(this);
+    this.updateDropDownValue = this.updateDropDownValue.bind(this);
     this.lockMonthEditing = this.lockMonthEditing.bind(this);
   }
 
@@ -145,13 +156,15 @@ class Home extends Component {
     );
   }
 
-  updateSelectedMonth(name, value) {
+  updateDropDownValue(name, value) {
     const { dispatch, auth } = this.props;
-    const monthNumber = MONTH.indexOf(value);
     this.setState({
-      selectedMonth: monthNumber
+      [name]: value
+    }, () => {
+      const monthNumber = MONTH.indexOf(this.state.selectedMonth);    
+      dispatch(getClients(auth.id, monthNumber, this.state.selectedYear));
     });
-    dispatch(getClients(auth.id, monthNumber));
+
   }
 
   lockMonthEditing(){
@@ -166,7 +179,7 @@ class Home extends Component {
 
   render() {
     const { auth, total, locked } =this.props;
-    const { selectedDay, message, clients } = this.state;
+    const { selectedDay, message, clients, selectedMonth, selectedYear } = this.state;
     return (
       <Container>
           <FormGroup row>
@@ -184,11 +197,16 @@ class Home extends Component {
                   </i>
                </InputGroupAddon>
                <Dropdown
-                 data={TIMESTAMP}
-                 selected={MONTH[TIMESTAMP.getMonth()]}
-                 name="month"
+                 selected={selectedMonth}
+                 name="selectedMonth"
                  items={[...MONTH]}
-                 updateFieldValue={this.updateSelectedMonth} 
+                 updateFieldValue={this.updateDropDownValue} 
+               />
+               <Dropdown
+                 selected={selectedYear}
+                 name="selectedYear"
+                 items={[...YEAR]}
+                 updateFieldValue={this.updateDropDownValue} 
                />
             </InputGroup>
             </Col>

@@ -36,7 +36,7 @@ class App extends Component {
 
   componentDidMount(){
     const { auth, dispatch } = this.props;
-    dispatch(getClients(auth.id, TIMESTAMP.getMonth()));
+    dispatch(getClients(auth.id, TIMESTAMP.getMonth(), TIMESTAMP.getFullYear()));
   }
 
   handleLogout() {

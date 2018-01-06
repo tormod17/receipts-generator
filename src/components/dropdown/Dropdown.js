@@ -14,7 +14,7 @@ export default class Example extends React.Component {
 
   constructor(props) {
     super(props);
-    const { data, selected } = props;
+    const { selected } = props;
     this.state = {
       dropdownOpen: false,
       selected: selected,

@@ -132,12 +132,12 @@ function clientsFailure(error) {
   };
 }
 
-export function getClients(clientId, month) {
+export function getClients(clientId, month, year) {
   const config = {
     method: 'get'
   };
   return callApi(
-    '/api/clients?clientId='+ clientId +'&&month='+month,
+    '/api/clients?clientId='+ clientId +'&month='+month+'&year='+year,
     config,
     clientsRequest,
     clientsSuccess,

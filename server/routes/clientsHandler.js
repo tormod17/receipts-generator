@@ -198,19 +198,18 @@ exports.delClientHandler = (req, res) => {
 exports.getClientsHandler = (req, res) => {
   /// needs to accept time parameters
   if (!req.query) return console.error('no userId');
-  const { month } = req.query;
-  const currentYear = new Date().getFullYear();
-  
-  let toMonth = month;
-  let toYear = currentYear;
-  if (month == 11) {
-    toMonth = 0;
-    toYear ++;
-  } else {
-    toMonth ++;
-  }
-  const fromDate =  new Date(currentYear, Number(month), 1).getTime();
-  const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
+  const { month, year } = req.query;
+  //const currentYear = new Date().getFullYear();
+  let toMonth = month + 1;
+  let toYear = year + 1;
+  // if (month == 11) {
+  //   toMonth = 0;
+  //   toYear ++;
+  // } else {
+  //   toMonth ++;
+  // }
+  const fromDate =  new Date(year, Number(month), 1).getTime();
+  const toDate = new Date(year, Number(toMonth), 1).getTime();  
 
   let query = {
     created: {
@@ -218,7 +217,7 @@ exports.getClientsHandler = (req, res) => {
      '$lt': toDate
     }
   };
-  
+  console.log(query, year, month)
   new Promise((resolve, reject) => {
     ClientDB.find( query )
       .limit(50)
