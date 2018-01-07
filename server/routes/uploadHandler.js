@@ -6,7 +6,6 @@ const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
 const DATETIMESTAMP = Date.now();
 
-
 exports.uploadHandler = (req, res, next) => {
     const { file, query } = req;
     const { userId } = query;
