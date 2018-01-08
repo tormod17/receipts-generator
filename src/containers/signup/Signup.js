@@ -27,7 +27,7 @@ class Signup extends Component {
       username.value,
       email.value,
       password.value,
-      confirmPassword.value,
+      confirmPassword.value
     ));
     username.value = "";
     email.value = "";

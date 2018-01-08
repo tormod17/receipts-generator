@@ -31,6 +31,8 @@ exports.calculateTotals = (type, guests, corrections, tax) => {
       a +=   corrections;
       return a;
   }, 0);
+
+  
   if (tax) {
     return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2);
   }

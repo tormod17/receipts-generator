@@ -88,7 +88,6 @@ class Client extends Component {
   }
 
 
-
   checkRequiredFields(data){
     const { client, guests, corrections, Belegart } = data;
     let fields= [];
@@ -130,7 +129,6 @@ class Client extends Component {
   handleSubmission(){
     const { dispatch, auth } = this.props;
     const clientId = this.props.match.params.id;
-    debugger
     const data  = {
       ...this.state
     };

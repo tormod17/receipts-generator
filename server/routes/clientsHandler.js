@@ -3,7 +3,7 @@ const ClientDB = require('../models/client');
 
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
-
+const mongoose = require('mongoose');
 
 exports.addClientHandler = (req, res) => {
   // 
@@ -204,34 +204,32 @@ exports.getClientsHandler = (req, res) => {
   const toDate = new Date(year, Number(toMonth), 1).getTime();  
 
   let query = {
-    created: {
+    'Rechnungs-datum': {
      '$gte': fromDate,
      '$lt': toDate
     }
   };
-  
-  new Promise((resolve, reject) => {
-    ClientDB.find( query )
-      .limit(50)
-      .sort({ created: -1 })
-      .exec((err) => {
-        if (err) return reject(err);
-      }).then((clients) => {
-         ReceiptDB.find(query)
-          .exec((err, receipts) => {
-            if (err) return reject(err);
-            const output = clients.map(client => {
-              const newListings = client.listings.map(listing => {
-                const receiptIndex = receipts.map(receipt => receipt._id).indexOf(listing);
-                return receipts[receiptIndex];
-              });
-              client.listings = [...newListings];
-              return client;
-            });
-            res.json(output);
-          });
-      }).catch(err =>{
-        res.json({message: err});
+  console.log(query);
+  ReceiptDB.find(query)
+    .exec((err, transactions) => {
+      let clientSet = new Set();
+      transactions.forEach(receipt => {
+        clientSet.add(receipt._doc.clientId);
       });
-  });
+      
+      ClientDB.find({
+        '_id': {
+          '$in': [...clientSet]
+        }
+      }, (err, clients) => {
+          if (err) return res.json({message: err});
+          const results = clients.map(client => {
+            client.listings = client.listings.map(id =>
+              transactions.find((trans) => trans._id === id)
+            );
+            return client;
+          });
+          res.json(results);
+      });
+    });
 };

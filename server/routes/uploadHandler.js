@@ -22,7 +22,7 @@ exports.uploadHandler = (req, res, next) => {
         const jsonResults = xlsx.utils
             .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
         
-        const bills = jsonResults.map(record => {
+        const transactions = jsonResults.map(record => {
             const uuid = uuidv1();
             return {
                 ...record,
@@ -30,14 +30,12 @@ exports.uploadHandler = (req, res, next) => {
                 userId,
                 created: DATETIMESTAMP,
                 clientId: record['Kunden-nummer'],
+                'Rechnungs-datum': DATETIMESTAMP,
                 _id: uuid
             };
         });
     
-        const customers = bills.reduce( (p, c) => {
-            const listings = bills.filter(bill => 
-                bill['Kunden-nummer'] ===  c['Kunden-nummer']).map(bill => bill._id);
-            
+        const customers = transactions.reduce((p, c) => {
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
                 Kunde: c['Kunde'],
@@ -46,39 +44,39 @@ exports.uploadHandler = (req, res, next) => {
                 PLZ: c['PLZ'],
                 'Kunden-nummer': c['Kunden-nummer'],
                 _id: c['Kunden-nummer'],
-                listings: [ ...listings],
+                listings: transactions.filter(bill => bill['Kunden-nummer'] === c['Kunden-nummer']).map(bill => bill._id),
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
                 Rechnungsnummer: Number(c['Rechnungsnummer']) || 0,
-                'Rechnungs-datum': formatDate(DATETIMESTAMP),
+                'Rechnungs-datum': DATETIMESTAMP,
                 'FR': 0
             };
             return p;
         }, {}); 
         
-        ReceiptDB.insertMany(bills, err => {
+        ReceiptDB.insertMany(transactions, err => {
             if(err) { 
                 return res.json( { message: err });
             } else {
                 const promises = Object.values(customers).map(client => {
                     return new Promise((resolve, reject)=> {
-                        ClientDB.findById(client._id,(err, oldclient) => {
-                            if (oldclient){
-                                oldclient['Emailadresse']=  client['Emailadresse'],
-                                oldclient['Kunde']=  client['Kunde'],
-                                oldclient['Stadt']=  client['Stadt'],
-                                oldclient['Straße']=  client['Straße'],
-                                oldclient['PLZ']=  client['PLZ'],
-                                oldclient['Kunden-nummer']= client['Kunden-nummer'],
-                                oldclient['_id']=  client['Kunden-nummer'],
+                        ClientDB.findById(client._id,(err, existingClient) => {
+                            if (existingClient){
+                                existingClient['Emailadresse']=  client['Emailadresse'],
+                                existingClient['Kunde']=  client['Kunde'],
+                                existingClient['Stadt']=  client['Stadt'],
+                                existingClient['Straße']=  client['Straße'],
+                                existingClient['PLZ']=  client['PLZ'],
+                                existingClient['Kunden-nummer']= client['Kunden-nummer'],
+                                existingClient['_id']=  client['Kunden-nummer'],
                                 client['listings'].forEach(list => {
-                                    oldclient['listings'].push(list);
+                                    existingClient['listings'].push(list);
                                 });
-                                oldclient['Belegart'] = client['Belegart'],
-                                oldclient['Rechnungsnummer'] = client['Rechnungsnummer'],
+                                existingClient['Belegart'] = client['Belegart'],
+                                existingClient['Rechnungsnummer'] = client['Rechnungsnummer'],
 
-                                oldclient['FR'] = client['FR'],
-                                oldclient.save((err)=>{
+                                existingClient['FR'] = client['FR'],
+                                existingClient.save((err)=>{
                                     if (err) {
                                       reject(err);
                                     } else {
@@ -101,7 +99,7 @@ exports.uploadHandler = (req, res, next) => {
                 Promise.all(promises)
                     .then(() => {
                         Object.keys(customers).forEach(key => {
-                            customers[key].listings = bills.filter(listing => 
+                            customers[key].listings = transactions.filter(listing => 
                                 listing['Kunden-nummer'] ===  customers[key]['Kunden-nummer']);
                         });
                         res.json({ 

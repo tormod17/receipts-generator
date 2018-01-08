@@ -17,7 +17,6 @@ class Header extends Component {
   render() {
     const pathname = this.props.history.location.pathname;
     const isAuthenticated = this.props.auth.id && true
-    console.log(isAuthenticated, 'isAuthenticated');
 
     const isLoginPage = pathname.indexOf("login") > -1;
     const isUsersPage = pathname.indexOf("users") > -1;

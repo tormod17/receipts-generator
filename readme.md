@@ -72,6 +72,7 @@ Emails are setup to use a gmail account that has had its security lowered to all
 - Date only formatted in presentation components and all dates saved as milliseconds. 
 - Test cases for all endpoints and server side code.
 - Remove create-react-scripts configure webpack correctly.   
+- Node object returned from database shouldn't be making better use of schemas rather than hardcoding the desired values. 
 
 
 

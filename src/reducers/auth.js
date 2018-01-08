@@ -40,7 +40,7 @@ export default function auth(state = initializeState(), action = {}) {
       return {
         ...state,
         ...action.user,
-        role: action.role,
+        role: action.role
       };
     case SIGNUP_FAILURE:
       return {
@@ -49,7 +49,7 @@ export default function auth(state = initializeState(), action = {}) {
         user: null,
         role: null,
         loginError: action.error
-      }
+      };
     case LOGIN_REQUEST:
       return {
         ...state,
@@ -61,7 +61,7 @@ export default function auth(state = initializeState(), action = {}) {
         loggingIn: false,
         ...action.user,
         role: action.role,
-        message: null,
+        message: null
       };
     case LOGIN_FAILURE:
       return {
@@ -87,7 +87,7 @@ export default function auth(state = initializeState(), action = {}) {
         email: null,
         username: null,
         id: null,
-        exp: null,
+        exp: null
       };
     case LOGOUT_FAILURE:
       return {
