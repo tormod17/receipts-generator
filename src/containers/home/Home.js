@@ -264,7 +264,7 @@ class Home extends Component {
             </InputGroup>
           </Col>
           <Col sm={4}>
-            <h4>Gesmat</h4>
+            <h4>Gesamt</h4>
           </Col>
           <Col sm={4}>
             <h4>{total}</h4>

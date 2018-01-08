@@ -49,7 +49,7 @@ Client Page, provides a profile of the client and a record of transactions.
 - Totals for transactions are calculated at the bottom of the page and auto  update with editing. 
 
 
-#Methodolgy.
+# Methodolgy.
 
 Basic login using json webtokens to remember users.  Signup choose password and your automtically in. 
 
@@ -66,7 +66,7 @@ When locking the month a flag is added to every transaction created during that 
 
 Emails are setup to use a gmail account that has had its security lowered to allow nodemailer to send emails from the account. email and passwords are kept as environment variables.  
 
-#Possible Improvements.
+# Possible Improvements.
 
 - Language file, one file where all strings are held and a functions is used with an argument that key that fetches the required string. 
 - Date only formatted in presentation components and all dates saved as milliseconds. 
