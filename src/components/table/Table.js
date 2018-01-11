@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Table, Input, Label } from 'reactstrap';
 import PropTypes from "prop-types";
+import { formatDate } from 'react-day-picker/moment';
 
 
 
@@ -99,7 +100,7 @@ class Tableclients extends Component {
                           output = client[field].toFixed(2) + '€';
                           break;
                         case field === 'Rechnungs-datum':
-                         output = client['Rechnungs-datum'];
+                         output = `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`;
                          break;
                         case field === 'select': 
                           output = this.makeCheckBox(client._id, (selectAllChecked || client.checked), 'clientCheck');

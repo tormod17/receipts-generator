@@ -4,7 +4,12 @@ import PropTypes from "prop-types";
 import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { formatDate } from '../../utils/apiUtils';
+import MomentLocaleUtils, {
+  formatDate,
+  parseDate
+} from 'react-day-picker/moment';
+import 'moment/locale/de';
+//import { formatDate } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
 
@@ -69,11 +74,19 @@ export default class Guests extends React.Component {
               <Label for="Anreisedatum">Anreise-datum</Label>
               <InputGroupAddon>
                 <DayPickerInput 
+                  value={`${formatDate(new Date(guests[key].Anreisedatum), 'LL', 'de')}`}
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  format="LL"
+                  placeholder={`${formatDate(new Date(guests[key].Anreisedatum), 'LL', 'de')}`}
+                  dayPickerProps={{
+                    locale: 'de',
+                    localeUtils: MomentLocaleUtils
+                  }}
                   name="Anreisedatum"
                   onDayChange={(val) =>
-                    this.handleValueChange('Anreisedatum', formatDate(val) , key)
+                    this.handleValueChange('Anreisedatum', val, key)
                   }
-                  value={guests[key].Anreisedatum}
                   disabled={locked}
                   required
                 />
@@ -84,10 +97,18 @@ export default class Guests extends React.Component {
               <InputGroupAddon>
                 <DayPickerInput 
                   name="Abreisedatum (Leistungsdatum)"
+                  value={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)']), 'LL', 'de')}`}
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  format="LL"
+                  placeholder={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)']), 'LL', 'de')}`}
+                  dayPickerProps={{
+                    locale: 'de',
+                    localeUtils: MomentLocaleUtils
+                  }}
                   onDayChange={val => 
-                    this.handleValueChange('Abreisedatum (Leistungsdatum)', formatDate(val), key )
+                    this.handleValueChange('Abreisedatum (Leistungsdatum)', val, key )
                   }
-                  value={guests[key]['Abreisedatum (Leistungsdatum)']}
                   disabled={locked}
                   required
                 />

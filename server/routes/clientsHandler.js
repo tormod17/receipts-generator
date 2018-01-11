@@ -3,6 +3,8 @@ const ClientDB = require('../models/client');
 
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
+const { formatDate } = require('../helpers/helpers');
+
 const mongoose = require('mongoose');
 
 exports.addClientHandler = (req, res) => {
@@ -16,6 +18,16 @@ exports.addClientHandler = (req, res) => {
     ...Object.values(guests || {}),
     ...Object.values(corrections || {}) 
     ].map(record =>{
+    const dates = {};
+    if (record['Rechnungs-datum']) {
+        dates['Rechnungs-datum'] = formatDate(record['Rechnungs-datum'])|| DATETIMESTAMP;
+    }
+    if (record['Anreisedatum']) {
+        dates['Anreisedatum'] = formatDate(record['Anreisedatum'])|| DATETIMESTAMP;
+    } 
+    if (record['Abreisedatum (Leistungsdatum)']) {
+        dates['Abreisedatum (Leistungsdatum)'] = formatDate(record['Abreisedatum (Leistungsdatum)']);
+    }
     return {
         ...client,
         ...record,
@@ -24,6 +36,7 @@ exports.addClientHandler = (req, res) => {
         created: DATETIMESTAMP,
         clientId: client['Kunden-nummer'],
         Rechnungsnummer: uuidv1(),
+        ...dates,
         Belegart,
         _id: uuidv1()
     };
@@ -40,7 +53,7 @@ exports.addClientHandler = (req, res) => {
             listings: listings.map(listing => listing._id),
             _id: client['Kunden-nummer'] || uuidv1(),
             Rechnungsnummer: Number(client['Rechnungsnummer']) || 0,
-            //'Rechnungs-datum': client['Rechnungs-datum'] || Date(),
+            'Rechnungs-datum': formatDate(client['Rechnungs-datum'])|| DATETIMESTAMP,
             'FR': 0
           };
           /// Client Numbers must be decided before otherwise will update a previous customer
@@ -104,7 +117,7 @@ exports.updateClientHandler = (req, res) => {
       client.Belegart = Belegart;
       // we only store array of Ids not objects (better for parsing)
       client.listings = listings.map(listing => listing._id); 
-      console.log(guests,' GUESTS');
+      client['Rechnungs-datum']= formatDate(client['Rechnungs-datum']) || DATETIMESTAMP,
 
       ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
           if (err) return res.json({message: err +''});

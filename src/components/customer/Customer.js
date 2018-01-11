@@ -5,7 +5,14 @@ import PropTypes from "prop-types";
 import EditableField from './../editableField/EditableField';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 
-import { formatDate } from "../../utils/apiUtils";
+//import { formatDate } from "../../utils/apiUtils";
+import MomentLocaleUtils, {
+  formatDate,
+  parseDate
+} from 'react-day-picker/moment';
+import 'moment/locale/de';
+
+const TIMESTAMP = new Date().getTime();
 
 
 export default class Customer extends React.Component {
@@ -14,10 +21,6 @@ export default class Customer extends React.Component {
     updateFieldValue: PropTypes.func.isRequired,
     client: PropTypes.shape({}).isRequired,
   }
-
-  // static defaultProps = {
-  //   client: undefined,
-  // }
 
   constructor(props) {
     super(props);
@@ -118,7 +121,8 @@ export default class Customer extends React.Component {
             <EditableField 
               updateFieldValue={this.handleValueChange}
               name="Kunden-nummer" 
-              placeholder="Kunden-nummer" value={client['Kunden-nummer']}
+              placeholder="Kunden-nummer" 
+              value={client['Kunden-nummer']}
               required
               />
           </Col>
@@ -126,9 +130,19 @@ export default class Customer extends React.Component {
           <Label for="Rechnungs-datum">Rechnungs-datum</Label>
             <InputGroupAddon>
               <DayPickerInput 
+                value={`${formatDate(new Date(Number(client['Rechnungs-datum'])|| TIMESTAMP), 'LL', 'de')}`}
+                formatDate={formatDate}
+                parseDate={parseDate}
+                format="LL"
+                placeholder={`${formatDate(new Date(Number(client['Rechnungs-datum']) || TIMESTAMP), 'LL', 'de')}`}
+                dayPickerProps={{
+                  locale: 'de',
+                  localeUtils: MomentLocaleUtils
+                }}
                 name="Rechnungs-datum"
-                onDayChange={(val) => this.handleValueChange('Rechnungs-datum', formatDate(val), 'client' )}
-                value={client['Rechnungs-datum']}
+                onDayChange={(val) =>
+                  this.handleValueChange('Rechnungs-datum', val, 'client')
+                }
                 required
               />
             </InputGroupAddon>

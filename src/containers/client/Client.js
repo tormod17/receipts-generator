@@ -178,6 +178,10 @@ class Client extends Component {
   }
 
   updateFieldValue(field, value, type, id){
+    if ((/datum/).test(field)) {
+      value = new Date(value).getTime();
+    }
+    console.log(value);
     if (id && type) {
       this.setState( prevSate => ({ 
         ...prevSate,

@@ -1,7 +1,6 @@
 const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
 const { formatDate } = require('../helpers/helpers');
-
 const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
 const DATETIMESTAMP = Date.now();
@@ -21,20 +20,29 @@ exports.uploadHandler = (req, res, next) => {
         const sheet_name_list = workbook.SheetNames;
         const jsonResults = xlsx.utils
             .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
-        
+
         const transactions = jsonResults.map(record => {
             const uuid = uuidv1();
+            const dates = {
+                'Rechnungs-datum': formatDate(record['Rechnungs-datum'])|| DATETIMESTAMP
+            };
+            if (record['Anreisedatum']) {
+                dates['Anreisedatum'] = formatDate(record['Anreisedatum']);
+            } 
+            if (record['Abreisedatum (Leistungsdatum)']) {
+                dates['Abreisedatum (Leistungsdatum)'] = formatDate(record['Abreisedatum (Leistungsdatum)']);
+            }
             return {
                 ...record,
                 filename,
                 userId,
                 created: DATETIMESTAMP,
                 clientId: record['Kunden-nummer'],
-                'Rechnungs-datum': DATETIMESTAMP,
+                ...dates,
                 _id: uuid
             };
         });
-    
+
         const customers = transactions.reduce((p, c) => {
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
@@ -48,7 +56,7 @@ exports.uploadHandler = (req, res, next) => {
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
                 Rechnungsnummer: Number(c['Rechnungsnummer']) || 0,
-                'Rechnungs-datum': DATETIMESTAMP,
+                'Rechnungs-datum': formatDate(jsonResults[0]['Rechnungs-datum'])|| DATETIMESTAMP,
                 'FR': 0
             };
             return p;

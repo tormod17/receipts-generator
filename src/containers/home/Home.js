@@ -5,7 +5,14 @@ import {withRouter} from "react-router-dom";
 import {  Row, Col, Control,  FormGroup, Container, InputGroup, InputGroupAddon, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { formatDate } from "../../utils/apiUtils";
+import MomentLocaleUtils, {
+  formatDate,
+  parseDate
+} from 'react-day-picker/moment';
+
+import 'moment/locale/de';
+
+//import { formatDate } from "../../utils/apiUtils";
 
 
 import 'react-day-picker/lib/style.css';
@@ -48,7 +55,7 @@ const YEAR = [
   '2021',
   '2022',
   '2023'
-]
+];
 
 class Home extends Component {
 
@@ -57,7 +64,7 @@ class Home extends Component {
     const { clients, message, total } = props;
     this.state ={
       value: new Date().toISOString(),
-      selectedDay: formatDate(Date.now()),
+      selectedDay: Date.now(),
       clients: { ...clients } ,
       message,
       selectedMonth: MONTH[TIMESTAMP.getMonth()],
@@ -102,7 +109,8 @@ class Home extends Component {
       ...this.state.clients
     };
     Object.keys(newClients).forEach((key) => {
-      newClients[key]['Rechnungs-datum'] = formatDate(selectedDay);
+      newClients[key]['Rechnungs-datum'] = new Date(selectedDay).getTime();
+     
     });
     this.setState({
       ...this.state,
@@ -230,13 +238,15 @@ class Home extends Component {
           <Col sm={{ size:4  }}>
             <InputGroupAddon>
               <DayPickerInput
-                value={selectedDay}
+                value={`${formatDate(new Date(selectedDay), 'LL', 'de')}`}
                 onDayChange={this.handleDayChange}
+                formatDate={formatDate}
+                parseDate={parseDate}
+                format="LL"
+                placeholder={`${formatDate(new Date(), 'LL', 'de')}`}
                 dayPickerProps={{
-                  selectedDays: selectedDay,
-                  disabledDays: {
-                    daysOfWeek: [0, 6]
-                  }
+                  locale: 'de',
+                  localeUtils: MomentLocaleUtils
                 }}
                 disabled={locked} 
               />
