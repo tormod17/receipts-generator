@@ -152,13 +152,16 @@ class Client extends Component {
   handleAdd(type , fields){  
     const newId = uuidv4();
     const newFields =  Object.values(fields).map(field => field);
-    newFields.push({ _id: newId });
+    newFields.push({ 
+      _id: newId,
+      'Anreisedatum': new Date().getTime(),
+      'Abreisedatum (Leistungsdatum)': new Date().getTime()
+    });
     this.setState({
       [type]: {
         ...newFields
       }
     });
-    console.log({...newFields}, 'newFields', fields);
   }
 
   handleDel(key, type){
@@ -178,10 +181,12 @@ class Client extends Component {
   }
 
   updateFieldValue(field, value, type, id){
+    if (!this.state.client['Rechnungs-datum']) {
+      this.state.client['Rechnungs-datum'] = new Date().getTime();
+    }
     if ((/datum/).test(field)) {
       value = new Date(value).getTime();
     }
-    console.log(value);
     if (id && type) {
       this.setState( prevSate => ({ 
         ...prevSate,
@@ -298,8 +303,8 @@ const mapStateToProps = (state, props) => {
   const { message, data, locked } = clients;
   const id = props.match.params.id;
   const client = data && data[id];
-  const guests =  client && client.listings.filter(listing => listing['Name des Gastes']);
-  const corrections = client && client.listings.filter(listing => !listing['Name des Gastes']);
+  const guests =  client && client.listings.filter(listing => listing && listing['Name des Gastes']);
+  const corrections = client && client.listings.filter(listing =>  listing && !listing['Name des Gastes']);
   return {
     client: client && { ...client},
     guests: client  && { ...guests},

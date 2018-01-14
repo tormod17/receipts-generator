@@ -32,7 +32,7 @@ exports.uploadHandler = (req, res, next) => {
             if (record['Abreisedatum (Leistungsdatum)']) {
                 dates['Abreisedatum (Leistungsdatum)'] = formatDate(record['Abreisedatum (Leistungsdatum)']);
             }
-            return {
+            const newrecord = {
                 ...record,
                 filename,
                 userId,
@@ -41,6 +41,7 @@ exports.uploadHandler = (req, res, next) => {
                 ...dates,
                 _id: uuid
             };
+            return newrecord;
         });
 
         const customers = transactions.reduce((p, c) => {

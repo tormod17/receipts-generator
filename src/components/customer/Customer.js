@@ -35,6 +35,7 @@ export default class Customer extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if(this.props !== nextProps ){
+      const { client } = this.props;
       this.setState({
         client: {
           ...nextProps.client
@@ -44,7 +45,7 @@ export default class Customer extends React.Component {
   }
 
   handleValueChange(field, val) {
-    this.props.updateFieldValue(field, val, 'client')
+    this.props.updateFieldValue(field, val, 'client');
   }
 
   render() {
@@ -80,6 +81,7 @@ export default class Customer extends React.Component {
               name="Rechnungsnummer" 
               placeholder="Fortlaufende Rechnungsnummer" 
               value={client.Rechnungsnummer}
+              disabled
               required
             />
           </Col>

@@ -148,7 +148,6 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 data: {
-                    ...state.data,
                     ...action.payload.client
                 },
                 message: action.payload.message

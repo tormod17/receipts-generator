@@ -12,6 +12,7 @@ import 'moment/locale/de';
 //import { formatDate } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
+const TIMESTAMP = new Date().getTime();
 
 const guest = {
   Abreisedatum: null,
@@ -55,6 +56,7 @@ export default class Guests extends React.Component {
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
         const locked = guests[key].locked
+        if (!guests[key]) return 
         return (
         <div
           key={guests[key]._id}
@@ -74,11 +76,11 @@ export default class Guests extends React.Component {
               <Label for="Anreisedatum">Anreise-datum</Label>
               <InputGroupAddon>
                 <DayPickerInput 
-                  value={`${formatDate(new Date(guests[key].Anreisedatum), 'LL', 'de')}`}
+                  value={`${formatDate(new Date(guests[key].Anreisedatum || TIMESTAMP), 'LL', 'de')}` }
                   formatDate={formatDate}
                   parseDate={parseDate}
                   format="LL"
-                  placeholder={`${formatDate(new Date(guests[key].Anreisedatum), 'LL', 'de')}`}
+                  placeholder={`${formatDate(new Date(guests[key].Anreisedatum || TIMESTAMP), 'LL', 'de')}`}
                   dayPickerProps={{
                     locale: 'de',
                     localeUtils: MomentLocaleUtils
@@ -97,11 +99,11 @@ export default class Guests extends React.Component {
               <InputGroupAddon>
                 <DayPickerInput 
                   name="Abreisedatum (Leistungsdatum)"
-                  value={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)']), 'LL', 'de')}`}
+                  value={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
                   formatDate={formatDate}
                   parseDate={parseDate}
                   format="LL"
-                  placeholder={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)']), 'LL', 'de')}`}
+                  placeholder={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
                   dayPickerProps={{
                     locale: 'de',
                     localeUtils: MomentLocaleUtils

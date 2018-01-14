@@ -5,8 +5,6 @@ const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 const { formatDate } = require('../helpers/helpers');
 
-const mongoose = require('mongoose');
-
 exports.addClientHandler = (req, res) => {
   // 
   if (!req.query.userId) return console.error('no userId');
@@ -111,7 +109,7 @@ exports.addClientHandler = (req, res) => {
 exports.updateClientHandler = (req, res) => {
   // needs to only update the receipt details not client
   const { Belegart, guests, client, corrections } = req.body;
-
+  
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
     if(client) {
       client.Belegart = Belegart;
@@ -123,30 +121,25 @@ exports.updateClientHandler = (req, res) => {
           if (err) return res.json({message: err +''});
           const promises = listings.map(listing => {
             return new Promise((resolve, reject) => {
-              ReceiptDB.findById(listing._id, (err, model) => {
+              ReceiptDB.findByIdAndUpdate(listing._id, listing, { new: true }, (err, model) => {
                 if (err) return reject(err);
-                if (model) {
-                  model.save(err => {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      resolve(model);
-                    } 
-                  });
-                } else {
+                if (!model) {
                   listing.created = DATETIMESTAMP;
-                  ReceiptDB.create(listing, (err, model) => {
+                  listing.Belegart = Belegart;
+                  listing['Rechnungs-datum'] = client['Rechnungs-datum'];
+                  ReceiptDB.create(listing, err => {
                     if (err) {
                       reject(err);
                     } else {
-                      resolve(model);
+                      resolve(listing);
                     }                 
                   });
+                } else {
+                  resolve(model);
                 }
               });
             }); 
           });
-
           Promise.all(promises)
             .then(newListings => {
               const updatedClient = {
@@ -207,14 +200,20 @@ exports.delClientHandler = (req, res) => {
   });
 };
 
-
 exports.getClientsHandler = (req, res) => {
   /// needs to accept time parameters
   if (!req.query) return console.error('no userId');
   const { month, year } = req.query;
-  let toMonth = month + 1;
+  let toMonth = Number(month) + 1;
+  let toYear = year;
+  
+  if (toMonth === 12) {
+    toMonth = 0;
+    toYear = Number(toYear) + 1;
+  } 
+
   const fromDate =  new Date(year, Number(month), 1).getTime();
-  const toDate = new Date(year, Number(toMonth), 1).getTime();  
+  const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
 
   let query = {
     'Rechnungs-datum': {
@@ -222,14 +221,12 @@ exports.getClientsHandler = (req, res) => {
      '$lt': toDate
     }
   };
-  console.log(query);
-  ReceiptDB.find(query)
-    .exec((err, transactions) => {
+  ReceiptDB.find(query) // why is this only getting John Berrie if by range
+   .exec((err, transactions) => {
       let clientSet = new Set();
       transactions.forEach(receipt => {
         clientSet.add(receipt._doc.clientId);
       });
-      
       ClientDB.find({
         '_id': {
           '$in': [...clientSet]

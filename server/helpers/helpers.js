@@ -16,8 +16,10 @@ exports.formatTimeStamp = (timeStamp) => {
   return newDate;
 };
 
-exports.formatDate = date => (/\D+/).test(date) ? new Date(date.replace(/([0-9]+)\/([0-9]+)/,'$2/$1')).getTime() : date;
-
+exports.formatDate = date => {
+  const timestamp = (/\D+/).test(date) ? new Date(date).getTime() : date;
+  return timestamp;
+};
 
 exports.calculateTotals = (type, guests, corrections, tax) => {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
