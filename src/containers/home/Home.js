@@ -33,19 +33,19 @@ import './home.css';
 const TIMESTAMP = new Date();
 
 const MONTH = [
-  'January',
-  'February',
-  'March',
+  'Januar',
+  'Februar',
+  'Marz', 
   'April',
-  'May',
-  'June',
-  'July',
-  'August',
+  'Mai', 
+  'Juni',
+  'Juli', 
+  'August', 
   'September',
-  'October',
+  'Oktober',
   'November',
-  'December'
-];  
+  'Dezember'
+];
 
 const YEAR = [
   '2007',
@@ -62,10 +62,10 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
-    const { clients, message, total } = props;
+    const { clients, message, total, currentDate } = props;
     this.state ={
       value: new Date().toISOString(),
-      selectedDay: Date.now(),
+      selectedDay: currentDate || Date.now(),
       clients: { ...clients } ,
       message,
       selectedMonth: MONTH[TIMESTAMP.getMonth()],
@@ -93,10 +93,11 @@ class Home extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { message, clients } = this.props;
+    const { message, clients, currentDate } = this.props;
     if( message !== nextProps.message || clients !== nextProps.clients ) {
       this.setState({
         message: nextProps.message || message,
+        selectedDay: currentDate || Date.now(),
         clients: { 
            ...nextProps.clients
         }
@@ -181,14 +182,17 @@ class Home extends Component {
     let event = new Event('lockMonth');
     event.message = 'Bist du sicher?',
     event.value = this.state.selectedMonth;
+    console.log(this.state.clients);
     event.payload = { ...this.state.clients };
     event.id = id;
     document.dispatchEvent(event);
   }
 
   render() {
-    const { auth, total, locked } =this.props;
+    const { auth, total, locked, currentDate } =this.props;
     const { selectedDay, message, clients, selectedMonth, selectedYear } = this.state;
+    const germanDate = `${formatDate(new Date(selectedDay || currentDate), 'LL', 'de')}`;
+    
     return (
       <Container>
           <FormGroup row>
@@ -206,13 +210,13 @@ class Home extends Component {
                   </i>
                </InputGroupAddon>
                <Dropdown
-                 selected={selectedMonth}
+                 selected={currentDate ? MONTH[new Date(currentDate).getMonth()] : selectedMonth}
                  name="selectedMonth"
                  items={[...MONTH]}
                  updateFieldValue={this.updateDropDownValue} 
                />
                <Dropdown
-                 selected={selectedYear}
+                 selected={currentDate ? new Date(currentDate).getFullYear() : selectedYear}
                  name="selectedYear"
                  items={[...YEAR]}
                  updateFieldValue={this.updateDropDownValue} 
@@ -239,12 +243,12 @@ class Home extends Component {
           <Col sm={{ size:4  }}>
             <InputGroupAddon>
               <DayPickerInput
-                value={`${formatDate(new Date(selectedDay), 'LL', 'de')}`}
+                value={germanDate}
                 onDayChange={this.handleDayChange}
                 formatDate={formatDate}
                 parseDate={parseDate}
                 format="LL"
-                placeholder={`${formatDate(new Date(), 'LL', 'de')}`}
+                placeholder={germanDate}
                 dayPickerProps={{
                   locale: 'de',
                   localeUtils: MomentLocaleUtils
@@ -323,15 +327,20 @@ const mapStateToProps = state => {
     total += data[key].Rechnungsbetrag;
   });
   let locked =true;
+  let currentDate;
   if (data) {
     locked =  Object.values(data)[0]
       &&  Object.values(data)[0].listings[0]
         && Object.values(data)[0].listings[0].locked;
+    currentDate = Object.values(data)[0]
+      &&  Object.values(data)[0].listings[0]
+        && Object.values(data)[0].listings[0]['Rechnungs-datum'];
   }
   return {
     message,
     clients: {...data },
     total: total.toFixed(2),
+    currentDate,
     locked
   };
 };

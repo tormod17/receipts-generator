@@ -1,14 +1,10 @@
 const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
 
-const DATETIMESTAMP = Date.now();
-const uuidv1 = require('uuid/v1');
-
-
 exports.saveMonthHandler = (req, res) => {
   const clients  = { ...req.body };
   if (!clients) return console.error('no client body');
-  
+  console.log(clients);
   const listofIds = Object.values(clients).reduce((p,c) => {
       const idArr = c.listings.map(listing => listing._id);
       p.push(...idArr);

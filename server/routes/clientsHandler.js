@@ -221,7 +221,7 @@ exports.getClientsHandler = (req, res) => {
      '$lt': toDate
     }
   };
-  ReceiptDB.find(query) // why is this only getting John Berrie if by range
+  ReceiptDB.find(query) 
    .exec((err, transactions) => {
       let clientSet = new Set();
       transactions.forEach(receipt => {
@@ -236,7 +236,7 @@ exports.getClientsHandler = (req, res) => {
           const results = clients.map(client => {
             client.listings = client.listings.map(id =>
               transactions.find((trans) => trans._id === id)
-            );
+            ).filter(listing => listing && listing );
             return client;
           });
           res.json(results);
