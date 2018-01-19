@@ -31,7 +31,7 @@ export function createPDF(clients, id) {
     userText: 'Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto',
     salu: 'Beste Grüße',
     userName: 'Florian',
-    finfo: 'IBAN: DE49700700240017773300, SWIFT-BIC: DEUTDEDBMUC',
+    finfo: 'IBAN: DE22700700240017773301, SWIFT-BIC: DEUTDEDBMUC',
     finfo1: 'Geschäftsführung: Julian Ritter, Sebastian Drescher',
     finfo2: 'Florian Bogenschütz Handelsregister: Amtsgericht München, HRB-Nr. 227243',
     finfo3: 'Sitz der Gesellschaft: München Steuernr: 143/112/10719',
