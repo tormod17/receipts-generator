@@ -132,8 +132,9 @@ class Home extends Component {
   }
 
   getSelectedIds(){
-    const checkBoxes = document.querySelectorAll('.clientCheck:checked');
+    const checkBoxes = document.querySelectorAll('.clientChecked:checked');
     const selectedIds = [...checkBoxes].map(box => box.getAttribute('id'));
+    console.log(selectedIds, 'selectAllChecked');
     return selectedIds;
   }
   

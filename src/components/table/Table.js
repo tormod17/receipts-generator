@@ -4,6 +4,19 @@ import PropTypes from "prop-types";
 import { formatDate } from 'react-day-picker/moment';
 
 
+const CheckBox = (props) => {
+  return (
+    <Label check>
+      <Input 
+        className={props.cssClass}
+        type="checkbox"
+        id={props.id}
+        onChange={() => props.func(props.id)}
+        checked={props.checked}
+      />   
+    </Label>
+  );
+};
 
 class Tableclients extends Component { 
     constructor(props){
@@ -14,10 +27,9 @@ class Tableclients extends Component {
         },
         selectAllChecked: false
       };
-
       this.handleClick = this.handleClick.bind(this);
       this.handleSelect = this.handleSelect.bind(this);
-
+      this.handleSelectAll = this.handleSelectAll.bind(this);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -30,37 +42,34 @@ class Tableclients extends Component {
       }
     }
 
-    makeCheckBox(id, checked, cssclass) {
-      return (
-        <Label check>
-          <Input 
-            className={cssclass}
-            type="checkbox"
-            id={id}
-            onChange={() => this.handleSelect(id)}
-            checked={checked}
-          />   
-        </Label>
-        );
+    handleSelectAll(){
+      let newClients = {};
+      Object.keys(this.state.clients).forEach(key => {
+        this.state.clients[key].checked = !this.state.selectAllChecked;
+        newClients = {
+          [key]: { ...this.state.clients[key] }
+        };
+      });
+      this.setState({
+        clients: {
+          ...this.state.clients,
+          ...newClients
+        },
+        selectAllChecked: !this.state.selectAllChecked
+      });
     }
 
     handleSelect(id) {
-      if (id ==='selectAll') {
-        this.setState({
-          selectAllChecked: !this.state.selectAllChecked
-        });
-      } else {
-        this.setState({
-          clients: {
-             ...this.state.clients,
-            [id]: {
-              ...this.state.clients[id],
-              checked: !this.state.clients[id].checked
-            }
-          },
-          selectAllChecked: false
-        });
-      }
+      this.setState({
+        clients: {
+           ...this.state.clients,
+          [id]: {
+            ...this.state.clients[id],
+            checked: !this.state.clients[id].checked
+          }
+        },
+        selectAllChecked: undefined
+      });
     }
 
     handleClick(client){
@@ -68,11 +77,11 @@ class Tableclients extends Component {
     }
 
     render() {
-      const { locked } = this.props;
       const { clients, selectAllChecked } = this.state;
-
-      const requiredFields = ['Kunden-nummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungs-datum', 'Rechnungsbetrag', 'select'];
-      const header = ['Kundenummer', 'Kunde', 'Belegart', 'Rechnungsnummer', 'Rechnungsdatum', 'Rechnungsbetrag', this.makeCheckBox('selectAll', selectAllChecked)];
+      const hoptions ={
+        checked: selectAllChecked,
+        func: this.handleSelectAll
+      };
 
       return  (
         <div
@@ -83,36 +92,41 @@ class Tableclients extends Component {
           <Table striped>
             <thead>
               <tr>
-                { clients && header.map(header => 
-                    <th key={header}> {header}</th>
-                )}
+                <th>Kunden-nummer</th>
+                <th>Kunde</th>
+                <th>Belegart</th>
+                <th>Rechnungsnummer</th>     
+                <th>Rechnungs-datum</th> 
+                <th>Rechnungsbetrag</th>
+                <th>
+                  <CheckBox {...hoptions} />
+                </th>               
               </tr>
             </thead>
             <tbody>
-              { clients &&  Object.values(clients).map( client => 
-                <tr
-                  key={client._id}
-                >
-                  { requiredFields.map(field => {
-                      let output;
-                      switch(true){
-                        case field === 'Rechnungsbetrag':
-                          output = client[field].toFixed(2) + '€';
-                          break;
-                        case field === 'Rechnungs-datum':
-                         output = `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`;
-                         break;
-                        case field === 'select': 
-                          output = this.makeCheckBox(client._id, (selectAllChecked || client.checked), 'clientCheck');
-                          return <td key={field}>{ output || ' '}</td>;
-                        default:
-                          output = client[field] + '';
-                          break;
-                      }
-                      return <td key={field} onClick={() => this.handleClick(client)}>{ output || ' '}</td>;
-                  })}
-                </tr>
-              )}
+              { clients &&  Object.values(clients).map( client => {
+                const options = {
+                  id: client._id,
+                  checked: selectAllChecked || client.checked,
+                  func: this.handleSelect,
+                  cssClass: 'clientChecked'
+                };  
+                return (
+                  <tr
+                    key={client._id}
+                  >
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Kunden-nummer']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Kunde']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Belegart']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsnummer']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsbetrag'].toFixed(2)}€`}</td>
+                    <td> 
+                      <CheckBox {...options} />
+                    </td>
+                  </tr>
+                );
+              })}
               { !clients && <h2>Need to add some clients</h2> }
             </tbody>
           </Table>
