@@ -157,7 +157,7 @@ export default class Guests extends React.Component {
                 disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                 name="Airbnb Einkommen"
-                placeholder="Airbnb Einkommen"
+                placeholder="Airbnb-Einkommen"
                 value={guests[key]["Airbnb Einkommen"]}
                 required
               />

@@ -262,7 +262,7 @@ class Client extends Component {
             {client.Belegrat !== 'Rechnung' &&
               <EditableField 
                 name="Gesamtumsatz Airgreets" 
-                placeholder="Gesamt Auszahlungs Betrag"
+                placeholder="Gesamtauszahlungsbetrag"
                 value={calculateTotals('Auszahlung', guests, corrections)}
                 disabled
 
@@ -272,7 +272,7 @@ class Client extends Component {
           <Col sm={{ size: 4, order: 1 }}>
             <EditableField 
               name="Gesamt Rechnungs Betrag"
-              placeholder="Gesamt Rechnungs Betrag"
+              placeholder="Gesamtrechnungsbetrag"
               value={calculateTotals('Rechnungs', guests, corrections)}
               disabled
             />

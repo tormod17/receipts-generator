@@ -105,7 +105,6 @@ class Home extends Component {
     } 
   }
 
-
   handleDayChange(selectedDay) {
     const newClients = {
       ...this.state.clients
@@ -134,7 +133,6 @@ class Home extends Component {
   getSelectedIds(){
     const checkBoxes = document.querySelectorAll('.clientChecked:checked');
     const selectedIds = [...checkBoxes].map(box => box.getAttribute('id'));
-    console.log(selectedIds, 'selectAllChecked');
     return selectedIds;
   }
   
@@ -183,7 +181,6 @@ class Home extends Component {
     let event = new Event('lockMonth');
     event.message = 'Bist du sicher?',
     event.value = this.state.selectedMonth;
-    console.log(this.state.clients);
     event.payload = { ...this.state.clients };
     event.id = id;
     document.dispatchEvent(event);
