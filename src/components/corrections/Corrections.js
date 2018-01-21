@@ -3,17 +3,17 @@ import { Col, FormGroup, InputGroup, InputGroupAddon, Input } from 'reactstrap';
 import PropTypes from "prop-types";
 import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
-import uuidv4 from 'uuid/v4';
 
+//import uuidv4 from 'uuid/v4';
 
-const corr = {
-  'billType': null,
-  'Sonstige Leistungsbeschreibung': null,
-  'Auszahlungskorrektur in €': null,
-  'Rechnungskorrektur in €': null,
-  'Ust-Korrektur': null,
-  'correctionId': uuidv4(),
-};
+// const corr = {
+//   'billType': null,
+//   'Sonstige Leistungsbeschreibung': null,
+//   'Auszahlungskorrektur in €': null,
+//   'Rechnungskorrektur in €': null,
+//   'Ust-Korrektur': null,
+//   'correctionId': uuidv4(),
+// };
 
 export default class Corrections extends React.Component {
   
@@ -28,16 +28,27 @@ export default class Corrections extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      Belegart: 'Auszahlungskorrektur in €'
+    };
     this.handleValueChange = this.handleValueChange.bind(this)
   }
 
+  addTax(){
+    
+  }
+
   handleValueChange(name, value, id) {
+    if (name  === 'Belegart') {
+      this.setState({
+        Belegart: value
+      })
+    }
     this.props.updateFieldValue(name, value, 'corrections', id)
   }
 
   render() {
-    const { updateFieldValue, corrections, locked } = this.props;
+    const { corrections, locked } = this.props;
  
     return (
       <div>
@@ -55,7 +66,7 @@ export default class Corrections extends React.Component {
                 <hr/>
                 <Dropdown
                   disabled={locked}
-                  name="correctionType"
+                  name="Belegart"
                   data={corrections[key]}
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   items={['Rechnungskorrektur in €', 'Auszahlungskorrektur in €']}
@@ -66,18 +77,19 @@ export default class Corrections extends React.Component {
                   <EditableField 
                     disabled={locked}
                     updateFieldValue={(name, val) => this.handleValueChange(name, val, key)}                     
-                    name="Anpassungs-grund"
+                    name="Sonstige Leistungsbeschreinung"
+                    label="Anpassungs grund"
                     placeholder="Anpassungs grund"
-                    value={corrections[key]['Sonstige Leistungsbeschreibung']} 
+                    value={corrections[key]['Sonstige Leistungsbeschreinung']} 
                   />
               </Col>
               <Col className="col-3">
                  <EditableField
                   disabled={locked}
-                  name="Auszahlungskorrektur in €"
+                  name={this.state.Belegart}
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   placeholder="Betrag"
-                  value={corrections[key]['Rechnungskorrektur in €'] || corrections[key]['Auszahlungskorrektur in €']}
+                  value={corrections[key][this.state.Belegart]}
                 />
               </Col>
               <Col className="col-1">
@@ -101,6 +113,8 @@ export default class Corrections extends React.Component {
                       addon 
                       type="checkbox"
                       aria-label="Umsatzsteuer" 
+                      onChange={() => this.addTax()}
+                      //checked
                     />
                   </InputGroupAddon>
                   <Input                   

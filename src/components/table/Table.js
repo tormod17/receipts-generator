@@ -19,6 +19,11 @@ const CheckBox = (props) => {
 };
 
 class Tableclients extends Component { 
+
+    static propTypes = {
+      clients: PropTypes.shape({})
+    }
+
     constructor(props){
       super(props);
       this.state = {

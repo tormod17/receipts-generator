@@ -1,9 +1,9 @@
 import {
   callApi,
   ID_TOKEN,
-  loadIdToken,
+  //loadIdToken,
   setIdToken,
-  removeIdToken,
+  //removeIdToken,
   decodeUserProfile
 } from "../utils/apiUtils";
 
@@ -47,7 +47,7 @@ export function signup(username, email, password, confirmPassword ) {
       email,
       username,
       password,
-      confirmPassword,
+      confirmPassword
     })
   };
   return callApi(

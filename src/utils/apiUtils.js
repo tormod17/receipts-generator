@@ -36,17 +36,17 @@ export function calculateTotals(type, guests, corrections, tax) {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
 
-  const sumGuests =Object.values(guests|| {}).reduce((a, b) => {
-      const clientTotal = (b && b[key1] && parseFloat(b[key1].replace( /,/g, ''))) || 0;
-      a +=  clientTotal;
+  const sumUpTotals = (transactions, fieldName) =>
+    Object.values(transactions || {}).reduce((a, b) => {
+      const transactions = 
+          (b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, '')) || 0);
+      a +=   transactions;
       return a;
-  }, 0);
-  const sumCorr =Object.values(corrections || {}).reduce((a, b) => {
-      const corrections = 
-          (b && b[key2] && parseFloat(b[key2].replace( /,/g, '')) || 0);
-      a +=   corrections;
-      return a;
-  }, 0);
+    }, 0);
+
+  const sumGuests = sumUpTotals(guests, key1);
+  const sumCorr = sumUpTotals(corrections, key2);
+
   if (tax) {
     return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2);
   }

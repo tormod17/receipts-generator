@@ -41,7 +41,7 @@ const requiredFieldsGuest = [
 const requiredFieldsRechnungsCorrection = [
   //'Rechnungskorrektur', 
   'Rechnungskorrektur in €',
-  'Ust-Korrektur',
+  //'Ust-Korrektur',
   'Sonstige Leistungsbeschreibung'
 ];
 
@@ -49,7 +49,7 @@ const requiredFieldsAuszhalungsCorrection = [
   //'Auszhalungskorrektur', 
   'Auszahlungskorrektur in €',
   'Ust-Korrektur',
-  'Sonstige Leistungsbeschreibung'
+  'Sonstige Leistungsbeschreinung'
 ];
 
 class Client extends Component {
@@ -263,13 +263,12 @@ class Client extends Component {
         />
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            {client.Belegrat !== 'Rechnung' &&
+            { Belegart !== 'Rechnung' &&
               <EditableField 
                 name="Gesamtumsatz Airgreets" 
                 placeholder="Gesamtauszahlungsbetrag"
                 value={calculateTotals('Auszahlung', guests, corrections)}
                 disabled
-
               />
             }
           </Col>
