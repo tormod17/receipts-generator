@@ -138,7 +138,7 @@ export function createPDF(clients, id) {
         { text: 'davon: Reinigungs-gebühr', fillColor: '#CCCCCC', colSpan: 2},
         '',
         {
-          text: row[4],
+          text: row[5],
           alignment: 'right',
           border: [ false, false, true, false]
         }
@@ -152,7 +152,7 @@ export function createPDF(clients, id) {
       { text: 'davon: Airgreets Service Fee (25%)', colSpan: 2},
       '',
       {
-        text: row[5]  + '€',
+        text: row[6]  + '€',
         alignment: 'right',
         border: [ false, false, true, true]
 
@@ -217,7 +217,7 @@ export function createPDF(clients, id) {
         'Auszahlung',
         {
           text: (row[6] || 0) + '€',
-          color: (/-/).test(row[5]) && 'red',
+          color: (/-/).test(row[6]) && 'red',
           alignment: 'right',
           border: [ false, false, true, false]
         }
@@ -233,7 +233,7 @@ export function createPDF(clients, id) {
        'Rechnung',
       { 
         text: (row[5] || 0) + '€',
-        color: (/-/).test(row[4]) && 'red',
+        color: (/-/).test(row[5]) && 'red',
         alignment: 'right',
         border: [ false, false, true, true]
       }
@@ -316,7 +316,7 @@ export function createPDF(clients, id) {
         style: 'heading'
       },
       {
-        text: 'München, den  ' + formatDate(new Date(Number(client['Rechnungs-datum'])),  'LL', 'de'), // formatDate(new Date(selectedDay || currentDate), 'LL', 'de')
+        text: 'München, den  ' + formatDate(new Date(Number(client['Rechnungs-datum'])),  'LL', 'de'),
         alignment: 'right'
       },
       {

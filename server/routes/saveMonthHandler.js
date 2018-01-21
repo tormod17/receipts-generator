@@ -4,7 +4,6 @@ const ClientDB = require('../models/client');
 exports.saveMonthHandler = (req, res) => {
   const clients  = { ...req.body };
   if (!clients) return console.error('no client body');
-  console.log(clients);
   const listofIds = Object.values(clients).reduce((p,c) => {
       const idArr = c.listings.map(listing => listing._id);
       p.push(...idArr);
@@ -20,7 +19,7 @@ exports.saveMonthHandler = (req, res) => {
     });
     Promise.all(promises)
       .then((updatedReceipts) => {
-        // array of all saved Receipts this needs to be added back to the clients and sent back to the  frontend. 
+        // array of all saved Receipts this needs to be added back to the clients and sent back to the frontend. 
         const clientPromises = Object.values(clients).map(client => {
           return new Promise((resolve, reject) => {
             ClientDB.findByIdAndUpdate( client._id, { $inc: {Rechnungsnummer: 1 } }, {new: true}, (err, model) => {

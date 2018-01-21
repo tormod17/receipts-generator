@@ -287,7 +287,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              {!locked && <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i> }
+              <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i>
             </InputGroup>
           </Col>
             <Col sm={4}>
