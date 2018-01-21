@@ -37,7 +37,7 @@ export default class Corrections extends React.Component {
   }
 
   render() {
-    const { updateFieldValue, corrections } = this.props;
+    const { updateFieldValue, corrections, locked } = this.props;
  
     return (
       <div>
@@ -54,7 +54,7 @@ export default class Corrections extends React.Component {
               <Col className="col-4">
                 <hr/>
                 <Dropdown
-                  disabled={corrections[key].locked}
+                  disabled={locked}
                   name="correctionType"
                   data={corrections[key]}
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
@@ -64,7 +64,7 @@ export default class Corrections extends React.Component {
               </Col>
               <Col className="col-4">
                   <EditableField 
-                    disabled={corrections[key].locked}
+                    disabled={locked}
                     updateFieldValue={(name, val) => this.handleValueChange(name, val, key)}                     
                     name="Anpassungs-grund"
                     placeholder="Anpassungs grund"
@@ -73,7 +73,7 @@ export default class Corrections extends React.Component {
               </Col>
               <Col className="col-3">
                  <EditableField
-                  disabled={corrections[key].locked}
+                  disabled={locked}
                   name="Auszahlungskorrektur in €"
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
                   placeholder="Betrag"
@@ -82,13 +82,15 @@ export default class Corrections extends React.Component {
               </Col>
               <Col className="col-1">
                 <br/>
-                <i 
-                  class="fa fa-trash fa-2x"
-                  aria-hidden="true"
-                  onClick={() => this.props.handleDelCorrection(key, 'corrections')}
-                  id={corrections[key]['correctionId']}
-                >
-                </i>
+                {!locked &&
+                  <i 
+                    class="fa fa-trash fa-2x"
+                    aria-hidden="true"
+                    onClick={() => this.props.handleDelCorrection(key, 'corrections')}
+                    id={corrections[key]['correctionId']}
+                  >
+                  </i>
+                }
               </Col>
             </FormGroup>
             <FormGroup row>
@@ -114,11 +116,13 @@ export default class Corrections extends React.Component {
         }
         <FormGroup row>
           <Col>
+          {!locked &&
             <i 
               class="fa fa-plus fa-2x"
               aria-hidden="true"
-              onClick={() => this.props.handleAddCorrection('corrections',corr)}
+              onClick={() => this.props.handleAddCorrection('corrections', corrections)}
             ></i>
+          }
           </Col>
         </FormGroup>
       </div>

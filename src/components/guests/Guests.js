@@ -47,7 +47,7 @@ export default class Guests extends React.Component {
   }
 
   render() {
-    const { updateFieldValue , guests, Belegart } = this.props;
+    const { updateFieldValue , guests, Belegart, locked } = this.props;
     const typeKey = Belegart === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
     return (
     <div>
@@ -55,7 +55,7 @@ export default class Guests extends React.Component {
         <h5>Geschäftsvorfall 1: Gastes</h5>
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
-        const locked = guests[key].locked
+        //const locked = guests[key].locked
         if (!guests[key]) return 
         return (
         <div
@@ -164,14 +164,16 @@ export default class Guests extends React.Component {
             </Col>
             <Col>
               <br/>
-              <i 
-                class="fa fa-trash fa-2x"
-                aria-hidden="true"
-                onClick={() => this.props.handleDelGuest(key, 'guests')}
-                id={guests[key]._id}
-                required
-              >
-              </i>
+              {!locked &&
+                <i 
+                  class="fa fa-trash fa-2x"
+                  aria-hidden="true"
+                  onClick={() => this.props.handleDelGuest(key, 'guests')}
+                  id={guests[key]._id}
+                  required
+                >
+                </i>
+              }
             </Col>
           </FormGroup>
           <hr/>
@@ -184,12 +186,14 @@ export default class Guests extends React.Component {
       }
       <FormGroup row>
         <Col>
-          <i 
+          {!locked &&
+            <i 
             class="fa fa-plus fa-2x"
             aria-hidden="true"
             onClick={() => this.props.handleAddGuest('guests', guests)}
-          >
-          </i>
+            >
+            </i>
+          }
         </Col>
       </FormGroup>
     </div>

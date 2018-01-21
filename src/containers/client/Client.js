@@ -18,7 +18,7 @@ import { addClient, getClient, getClients, updateClient } from "../../actions/cl
 import 'react-day-picker/lib/style.css';
 import "./client.css";
 
-let requiredFields = [ 
+const requiredFields = [ 
   'Belegart',
   'Kunde',
   'Emailadresse',
@@ -29,7 +29,7 @@ let requiredFields = [
   'Rechnungs-datum'
 ];
 
-let requiredFieldsGuest = [
+const requiredFieldsGuest = [
   'Name des Gastes',
   'Abreisedatum (Leistungsdatum)',
   'Anreisedatum',
@@ -38,14 +38,14 @@ let requiredFieldsGuest = [
   'Airgreets Service Fee (€)'
 ];
 
-let requiredFieldsRechnungsCorrection = [
+const requiredFieldsRechnungsCorrection = [
   //'Rechnungskorrektur', 
   'Rechnungskorrektur in €',
   'Ust-Korrektur',
   'Sonstige Leistungsbeschreibung'
 ];
 
-let requiredFieldsAuszhalungsCorrection = [
+const requiredFieldsAuszhalungsCorrection = [
   //'Auszhalungskorrektur', 
   'Auszahlungskorrektur in €',
   'Ust-Korrektur',
@@ -152,10 +152,13 @@ class Client extends Component {
   handleAdd(type , fields){  
     const newId = uuidv4();
     const newFields =  Object.values(fields).map(field => field);
+    const dates = (type === 'guests') && { 
+      'Anreisedatum': new Date().getTime(),
+      'Abreisedatum (Leistungsdatum)': new Date().getTime()      
+    }
     newFields.push({ 
       _id: newId,
-      'Anreisedatum': new Date().getTime(),
-      'Abreisedatum (Leistungsdatum)': new Date().getTime()
+      ...dates
     });
     this.setState({
       [type]: {
@@ -213,6 +216,7 @@ class Client extends Component {
 
   render() {
     const { client, guests, corrections, Belegart } = this.state;
+    const { locked } = this.props;
     return (
     <Form className="bill">
         <FormGroup row>
@@ -241,22 +245,22 @@ class Client extends Component {
           client={client}
           updateFieldValue={this.updateFieldValue} 
           Belegart={Belegart}
+          locked={locked}
         />
         <Guests 
           updateFieldValue={this.updateFieldValue}
           guests={guests}
           handleDelGuest={this.handleDel}
           handleAddGuest={this.handleAdd}
-
+          locked={locked}
         />
-        <div>
-          <Corrections 
-            updateFieldValue={this.updateFieldValue} 
-            corrections={corrections}
-            handleDelCorrection ={this.handleDel}
-            handleAddCorrection ={this.handleAdd}
-          />
-        </div>
+        <Corrections 
+          updateFieldValue={this.updateFieldValue} 
+          corrections={corrections}
+          handleDelCorrection ={this.handleDel}
+          handleAddCorrection ={this.handleAdd}
+          locked={locked}
+        />
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
             {client.Belegrat !== 'Rechnung' &&
@@ -300,11 +304,12 @@ class Client extends Component {
 
 const mapStateToProps = (state, props) => { 
   const { clients } = state;
-  const { message, data, locked } = clients;
+  const { message, data } = clients;
   const id = props.match.params.id;
   const client = data && data[id];
   const guests =  client && client.listings.filter(listing => listing && listing['Name des Gastes']);
   const corrections = client && client.listings.filter(listing =>  listing && !listing['Name des Gastes']);
+  const locked = guests && Object.values(guests)[0] && Object.values(guests)[0].locked;
   return {
     client: client && { ...client},
     guests: client  && { ...guests},

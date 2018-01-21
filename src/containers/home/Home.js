@@ -142,6 +142,7 @@ class Home extends Component {
       createPDF(clients, id);      
     });
   }
+  
   handleEmail(e) {  
     e.preventDefault();
     const { clients } = this.state;
@@ -278,7 +279,7 @@ class Home extends Component {
           </Col>
           <Col sm={4}>
             <h4>Gesamt</h4>
-          </Col>
+          </Col>  
           <Col sm={4}>
             <h4>{total}</h4>
           </Col>
@@ -286,7 +287,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i> 
+              {!locked && <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i> }
             </InputGroup>
           </Col>
             <Col sm={4}>
