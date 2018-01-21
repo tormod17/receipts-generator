@@ -42,14 +42,16 @@ const requiredFieldsRechnungsCorrection = [
   //'Rechnungskorrektur', 
   'Rechnungskorrektur in €',
   //'Ust-Korrektur',
+  //'total',
   'Sonstige Leistungsbeschreibung'
 ];
 
 const requiredFieldsAuszhalungsCorrection = [
   //'Auszhalungskorrektur', 
   'Auszahlungskorrektur in €',
-  'Ust-Korrektur',
-  'Sonstige Leistungsbeschreinung'
+  // 'Ust-Korrektur',
+  //'total',
+  'Sonstige Leistungsbeschreibung'
 ];
 
 class Client extends Component {
@@ -86,7 +88,6 @@ class Client extends Component {
       })
     }
   }
-
 
   checkRequiredFields(data){
     const { client, guests, corrections, Belegart } = data;
@@ -132,6 +133,7 @@ class Client extends Component {
     const data  = {
       ...this.state
     };
+    console.log(data);
     let eventType  = clientId ? 'updateClient' : 'addClient';
     let message = 'Bist du sicher?';
     const missingFields = this.checkRequiredFields(data);
@@ -140,7 +142,7 @@ class Client extends Component {
       eventType = 'requiredFields';
       message = 'Wir brauchen diese Felder :- ' + missingFields.join(', ');
     }
-  
+    
     let event = new Event(eventType);
     event.message = message;
     event.value = missingFields;
@@ -175,7 +177,6 @@ class Client extends Component {
        } 
        return p;
     }, {});
-    
     this.setState({
       [type]: {
         ...newEntries
@@ -216,6 +217,7 @@ class Client extends Component {
 
   render() {
     const { client, guests, corrections, Belegart } = this.state;
+    console.log(Belegart);
     const { locked } = this.props;
     return (
     <Form className="bill">
@@ -235,7 +237,7 @@ class Client extends Component {
               style={{
                 margin: '10px'
               }}
-              class="fa fa-chevron-left fa-3x"
+              className="fa fa-chevron-left fa-3x"
               aria-hidden="true"
               onClick={() => this.props.history.push('/')}
             />
@@ -252,6 +254,7 @@ class Client extends Component {
           guests={guests}
           handleDelGuest={this.handleDel}
           handleAddGuest={this.handleAdd}
+          Belegart={Belegart}
           locked={locked}
         />
         <Corrections 
@@ -259,6 +262,7 @@ class Client extends Component {
           corrections={corrections}
           handleDelCorrection ={this.handleDel}
           handleAddCorrection ={this.handleAdd}
+          Belegart={Belegart}
           locked={locked}
         />
         <FormGroup row>

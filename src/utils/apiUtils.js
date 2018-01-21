@@ -34,7 +34,7 @@ export function formatDate(timeStamp) {
 
 export function calculateTotals(type, guests, corrections, tax) {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
-  const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €': 'Rechnungskorrektur in €';
+  const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
 
   const sumUpTotals = (transactions, fieldName) =>
     Object.values(transactions || {}).reduce((a, b) => {

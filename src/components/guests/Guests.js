@@ -12,6 +12,8 @@ import 'moment/locale/de';
 //import { formatDate } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
+import Guest from './Guest.js';
+
 const TIMESTAMP = new Date().getTime();
 
 const guest = {
@@ -38,6 +40,7 @@ export default class Guests extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+
     };
     this.handleValueChange = this.handleValueChange.bind(this)
   }
@@ -48,137 +51,23 @@ export default class Guests extends React.Component {
 
   render() {
     const { updateFieldValue , guests, Belegart, locked } = this.props;
-    const typeKey = Belegart === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
     return (
     <div>
       <FormGroup>
         <h5>Geschäftsvorfall 1: Gastes</h5>
       </FormGroup>
       { guests && Object.keys(guests).map(key => {
-        //const locked = guests[key].locked
-        if (!guests[key]) return 
-        return (
-        <div
-          key={guests[key]._id}
-          >
-          <FormGroup row>
-            <Col>
-              <EditableField
-                disabled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="Name des Gastes"
-                placeholder="Name des Gastes"
-                value={guests[key]["Name des Gastes"]}
-                required
-              />
-            </Col>
-            <Col>
-              <Label for="Anreisedatum">Anreise-datum</Label>
-              <InputGroupAddon>
-                <DayPickerInput 
-                  value={`${formatDate(new Date(guests[key].Anreisedatum || TIMESTAMP), 'LL', 'de')}` }
-                  formatDate={formatDate}
-                  parseDate={parseDate}
-                  format="LL"
-                  placeholder={`${formatDate(new Date(guests[key].Anreisedatum || TIMESTAMP), 'LL', 'de')}`}
-                  dayPickerProps={{
-                    locale: 'de',
-                    localeUtils: MomentLocaleUtils
-                  }}
-                  name="Anreisedatum"
-                  onDayChange={(val) =>
-                    this.handleValueChange('Anreisedatum', val, key)
-                  }
-                  disabled={locked}
-                  required
-                />
-              </InputGroupAddon>
-            </Col>
-            <Col >
-              <Label for="Abreisedatum">Abreise-datum</Label>
-              <InputGroupAddon>
-                <DayPickerInput 
-                  name="Abreisedatum (Leistungsdatum)"
-                  value={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
-                  formatDate={formatDate}
-                  parseDate={parseDate}
-                  format="LL"
-                  placeholder={`${formatDate(new Date(guests[key]['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
-                  dayPickerProps={{
-                    locale: 'de',
-                    localeUtils: MomentLocaleUtils
-                  }}
-                  onDayChange={val => 
-                    this.handleValueChange('Abreisedatum (Leistungsdatum)', val, key )
-                  }
-                  disabled={locked}
-                  required
-                />
-              </InputGroupAddon>
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Col>
-              <EditableField
-                disabled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="Airgreets Service Fee (€)"
-                placeholder="Airgreets Service Fee (€)"
-                value={guests[key]['Airgreets Service Fee (€)']}
-                required
-              />
-            </Col>
-            <Col>
-              <EditableField
-                disabled={locked}
-                name="Reinigungs-gebühr"
-                updateFieldValue={(name, val) => 
-                  this.handleValueChange(name, val, key)
-                } 
-                required
-                placeholder="Reinigungs-gebühr"
-                value={guests[key]["Reinigungs-gebühr"]} 
-              />
-            </Col>
-          </FormGroup>
-          <FormGroup row>
-            <Col>
-              <EditableField
-                disabled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name={typeKey}
-                placeholder={typeKey}
-                value={guests[key][typeKey]}
-                required
-              />
-            </Col>
-            <Col>
-              <EditableField
-                disabled={locked} 
-                updateFieldValue={(name, val) => this.handleValueChange(name, val, key)} 
-                name="Airbnb Einkommen"
-                placeholder="Airbnb-Einkommen"
-                value={guests[key]["Airbnb Einkommen"]}
-                required
-              />
-            </Col>
-            <Col>
-              <br/>
-              {!locked &&
-                <i 
-                  class="fa fa-trash fa-2x"
-                  aria-hidden="true"
-                  onClick={() => this.props.handleDelGuest(key, 'guests')}
-                  id={guests[key]._id}
-                  required
-                >
-                </i>
-              }
-            </Col>
-          </FormGroup>
-          <hr/>
-      </div>
-    )})}
+        return(
+          <Guest
+            guestNumber={key}
+            Belegart={Belegart}
+            locked={locked}
+            guest={guests[key]} 
+            updateFieldValue={updateFieldValue}
+            handleDelGuest={this.props.handleDelGuest}
+          />
+        )
+      })}
       { Object.keys(guests).length === 0 &&
         <div>
           <p>No Gastes</p>
