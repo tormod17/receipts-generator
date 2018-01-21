@@ -5,17 +5,6 @@ import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
 import Correction from './Correction';
 
-//import uuidv4 from 'uuid/v4';
-
-// const corr = {
-//   'billType': null,
-//   'Sonstige Leistungsbeschreibung': null,
-//   'Auszahlungskorrektur in €': null,
-//   'Rechnungskorrektur in €': null,
-//   'Ust-Korrektur': null,
-//   'correctionId': uuidv4(),
-// };
-
 export default class Corrections extends React.Component {
   
   static defaultProps = {

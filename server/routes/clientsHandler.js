@@ -109,14 +109,12 @@ exports.addClientHandler = (req, res) => {
 exports.updateClientHandler = (req, res) => {
   // needs to only update the receipt details not client
   const { Belegart, guests, client, corrections } = req.body;
-  
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
     if(client) {
       client.Belegart = Belegart;
       // we only store array of Ids not objects (better for parsing)
       client.listings = listings.map(listing => listing._id); 
-      client['Rechnungs-datum']= formatDate(client['Rechnungs-datum']) || DATETIMESTAMP,
-
+      client['Rechnungs-datum']= Number(formatDate(client['Rechnungs-datum']) || DATETIMESTAMP),
       ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
           if (err) return res.json({message: err +''});
           const promises = listings.map(listing => {
@@ -126,7 +124,7 @@ exports.updateClientHandler = (req, res) => {
                 if (!model) {
                   listing.created = DATETIMESTAMP;
                   listing.Belegart = Belegart;
-                  listing['Rechnungs-datum'] = client['Rechnungs-datum'];
+                  listing['Rechnungs-datum'] = Number(client['Rechnungs-datum']);
                   ReceiptDB.create(listing, err => {
                     if (err) {
                       reject(err);
@@ -221,9 +219,10 @@ exports.getClientsHandler = (req, res) => {
      '$lt': toDate
     }
   };
+  // get transactions in a given date range. Can't be done on Clients as they may have been created months ago.
   ReceiptDB.find(query) 
    .exec((err, transactions) => {
-      let clientSet = new Set();
+      let clientSet = new Set(); 
       transactions.forEach(receipt => {
         clientSet.add(receipt._doc.clientId);
       });

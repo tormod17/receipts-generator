@@ -14,7 +14,7 @@ import uuidv4 from 'uuid/v4';
 
 const TIMESTAMP = new Date().getTime();
 
-export default class Guests extends React.Component {
+export default class Guest extends React.Component {
   
   static defaultProps = {
     updateFieldValue: PropTypes.func.isRequired,
@@ -202,7 +202,7 @@ export default class Guests extends React.Component {
               <br/>
               {!locked &&
                 <i 
-                  class="fa fa-trash fa-2x"
+                  className="fa fa-trash fa-2x"
                   aria-hidden="true"
                   onClick={() => this.props.handleDelGuest(guestNumber, 'guests')}
                   id={this.state._id}

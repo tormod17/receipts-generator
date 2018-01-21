@@ -133,7 +133,6 @@ class Client extends Component {
     const data  = {
       ...this.state
     };
-    console.log(data);
     let eventType  = clientId ? 'updateClient' : 'addClient';
     let message = 'Bist du sicher?';
     const missingFields = this.checkRequiredFields(data);
@@ -217,7 +216,6 @@ class Client extends Component {
 
   render() {
     const { client, guests, corrections, Belegart } = this.state;
-    console.log(Belegart);
     const { locked } = this.props;
     return (
     <Form className="bill">
