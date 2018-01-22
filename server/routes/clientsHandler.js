@@ -6,7 +6,7 @@ const uuidv1 = require('uuid/v1');
 const { formatDate } = require('../helpers/helpers');
 
 exports.addClientHandler = (req, res) => {
-  // 
+  // Check if customer already exists 
   if (!req.query.userId) return console.error('no userId');
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
@@ -69,7 +69,7 @@ exports.addClientHandler = (req, res) => {
                 savedClient['Belegart'] = newCustomer['Belegart'],
                 savedClient['FR'] = newCustomer['FR'],
                 savedClient['Rechnungs-datum'] = newCustomer['Rechnungs-datum'],
-                savedClient['Rechnungsnummer'] = Number(newCustomer['Rechnungsnummer']) ,
+                savedClient['Rechnungsnummer'] = Number(savedClient['Rechnungsnummer']) + 1,
                 savedClient.save((err, savedClient)=>{
                     if (err) {
                       res.json({message: err});

@@ -82,7 +82,7 @@ exports.uploadHandler = (req, res, next) => {
                                     existingClient['listings'].push(list);
                                 });
                                 existingClient['Belegart'] = client['Belegart'],
-                                existingClient['Rechnungsnummer'] = client['Rechnungsnummer'],
+                                existingClient['Rechnungsnummer'] = Number(existingClient['Rechnungsnummer']) + 1,
 
                                 existingClient['FR'] = client['FR'],
                                 existingClient.save((err)=>{

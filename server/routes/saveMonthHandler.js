@@ -9,43 +9,28 @@ exports.saveMonthHandler = (req, res) => {
       p.push(...idArr);
       return  p;
   }, []);
-    const promises = listofIds.map(id => {
-      return new Promise((resolve, reject) => {
-        ReceiptDB.findByIdAndUpdate( id, { locked: true}, {new: true}, (err, model) =>{
-          if (err) return reject(err);
-          resolve(model);
-        });
+  const promises = listofIds.map(id => {
+    return new Promise((resolve, reject) => {
+      ReceiptDB.findByIdAndUpdate( id, { locked: true}, {new: true}, (err, model) =>{
+        if (err) return reject(err);
+        resolve(model);
       });
     });
-    Promise.all(promises)
-      .then((updatedReceipts) => {
-        // array of all saved Receipts this needs to be added back to the clients and sent back to the frontend. 
-        const clientPromises = Object.values(clients).map(client => {
-          return new Promise((resolve, reject) => {
-            ClientDB.findByIdAndUpdate( client._id, { $inc: {Rechnungsnummer: 1 } }, {new: true}, (err, model) => {
-              if (err) return reject(err);
-              resolve(model);
-            });
+  });
+  Promise.all(promises)
+    .then((updatedReceipts) => {
+          const updatedClients = Object.keys(clients).map(keys => {
+            clients[keys].listings = updatedReceipts.filter(receipt =>
+              listofIds.includes(receipt._id));
+            return clients[keys];
           });
-        });
-        
-        Promise.all(clientPromises)
-          .then((updatedClients)=>{
-            updatedClients.map(client => {
-              client.listings = updatedReceipts.filter(receipt => 
-                client.listings.includes(receipt._id));
-            });
-            res.json({
-              clients: updatedClients,
-              message: 'Gerettet'
-            });
-          })
-          .catch((err) => {
-            res.json({ message: '' + err});
+          console.log(updatedReceipts, 'Update Receipts');
+          res.json({
+            clients: updatedClients,
+            message: 'Gerettet'
           });
-      })
-      .catch((err) => {
+        })
+        .catch((err) => {
           res.json({ message: '' + err});
-      });
-};
-
+        });
+    };
