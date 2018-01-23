@@ -191,7 +191,8 @@ class Home extends Component {
     const { auth, total, locked, currentDate } =this.props;
     const { selectedDay, message, clients, selectedMonth, selectedYear } = this.state;
     const germanDate = `${formatDate(new Date(selectedDay || currentDate), 'LL', 'de')}`;
-    
+    const currentMonth = currentDate ? MONTH[new Date(currentDate).getMonth()] : selectedMonth;
+    const currentYear = currentDate ? new Date(currentDate).getFullYear() : selectedYear;
     return (
       <Container>
           <FormGroup row>
@@ -209,13 +210,13 @@ class Home extends Component {
                   </i>
                </InputGroupAddon>
                <Dropdown
-                 selected={currentDate ? MONTH[new Date(currentDate).getMonth()] : selectedMonth}
+                 selected={currentMonth}
                  name="selectedMonth"
                  items={[...MONTH]}
                  updateFieldValue={this.updateDropDownValue} 
                />
                <Dropdown
-                 selected={currentDate ? new Date(currentDate).getFullYear() : selectedYear}
+                 selected={currentYear}
                  name="selectedYear"
                  items={[...YEAR]}
                  updateFieldValue={this.updateDropDownValue} 

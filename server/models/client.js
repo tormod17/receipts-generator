@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Receipts = require('./receipts.js');
 
 const ClientSchema = new mongoose.Schema({
     _id: {
@@ -30,7 +29,7 @@ const ClientSchema = new mongoose.Schema({
         type: String
     },
     'Rechnungsnummer':{
-        type: Number
+        type: Array
     },
     'Emailadresse': {
         type: String        

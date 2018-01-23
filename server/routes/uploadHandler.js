@@ -43,7 +43,6 @@ exports.uploadHandler = (req, res, next) => {
             };
             return newrecord;
         });
-
         const customers = transactions.reduce((p, c) => {
             p[ c['Kunden-nummer']] = {
                 Emailadresse: c['Emailadresse'],
@@ -56,8 +55,8 @@ exports.uploadHandler = (req, res, next) => {
                 listings: transactions.filter(bill => bill['Kunden-nummer'] === c['Kunden-nummer']).map(bill => bill._id),
                 created: DATETIMESTAMP,
                 Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
-                Rechnungsnummer: Number(c['Rechnungsnummer']) || 0,
-                'Rechnungs-datum': formatDate(jsonResults[0]['Rechnungs-datum'])|| DATETIMESTAMP,
+                Rechnungsnummer: [formatDate(c['Rechnungs-datum']) || DATETIMESTAMP],
+                'Rechnungs-datum': formatDate(c['Rechnungs-datum']) || DATETIMESTAMP,
                 'FR': 0
             };
             return p;
@@ -82,7 +81,7 @@ exports.uploadHandler = (req, res, next) => {
                                     existingClient['listings'].push(list);
                                 });
                                 existingClient['Belegart'] = client['Belegart'],
-                                existingClient['Rechnungsnummer'] = Number(existingClient['Rechnungsnummer']) + 1,
+                                existingClient['Rechnungsnummer'].push(...client['Rechnungsnummer']);
 
                                 existingClient['FR'] = client['FR'],
                                 existingClient.save((err)=>{
@@ -108,6 +107,13 @@ exports.uploadHandler = (req, res, next) => {
                 Promise.all(promises)
                     .then(() => {
                         Object.keys(customers).forEach(key => {
+                            const invDate = new Date(customers[key]['Rechnungs-datum']);
+                            const date = `${invDate.getMonth()}${invDate.getFullYear()}`;
+                            
+                            const invoiceNumber = customers[key]['Rechnungsnummer'].map(num => 
+                              `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
+                            
+                            customers[key]['Rechnungsnummer'] = invoiceNumber;
                             customers[key].listings = transactions.filter(listing => 
                                 listing['Kunden-nummer'] ===  customers[key]['Kunden-nummer']);
                         });

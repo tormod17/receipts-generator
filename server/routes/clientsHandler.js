@@ -33,7 +33,7 @@ exports.addClientHandler = (req, res) => {
         userId,
         created: DATETIMESTAMP,
         clientId: client['Kunden-nummer'],
-        Rechnungsnummer: uuidv1(),
+        //Rechnungsnummer: uuidv1(),
         ...dates,
         Belegart,
         _id: uuidv1()
@@ -41,7 +41,6 @@ exports.addClientHandler = (req, res) => {
   });
   ReceiptDB.insertMany(listings, err => {
       if(err) { 
-        console.log('ADDING A USER MANUALLYcADDED receipts'); 
           return res.json( { message: err });
       } else {       
           const newCustomer = {
@@ -50,7 +49,7 @@ exports.addClientHandler = (req, res) => {
             created: DATETIMESTAMP,
             listings: listings.map(listing => listing._id),
             _id: client['Kunden-nummer'] || uuidv1(),
-            Rechnungsnummer: Number(client['Rechnungsnummer']) || 0,
+            Rechnungsnummer: [client['Rechnungs-datum']],
             'Rechnungs-datum': formatDate(client['Rechnungs-datum'])|| DATETIMESTAMP,
             'FR': 0
           };
@@ -69,14 +68,21 @@ exports.addClientHandler = (req, res) => {
                 savedClient['Belegart'] = newCustomer['Belegart'],
                 savedClient['FR'] = newCustomer['FR'],
                 savedClient['Rechnungs-datum'] = newCustomer['Rechnungs-datum'],
-                savedClient['Rechnungsnummer'] = Number(savedClient['Rechnungsnummer']) + 1,
+                savedClient['Rechnungsnummer'].push(...newCustomer['Rechnungsnummer']);
                 savedClient.save((err, savedClient)=>{
                     if (err) {
                       res.json({message: err});
                     } else {
+                      
+                      const invDate = new Date(newCustomer['Rechnungs-datum']) ;
+                      const date = `${invDate.getMonth()}${invDate.getFullYear()}`;
+                    
+                      const invoiceNumber = savedClient['Rechnungsnummer'].map(num => 
+                      `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
                       const newClient ={ 
                         [newCustomer['_id']]: {
                           ...newCustomer,
+                          'Rechnungsnummer': invoiceNumber,
                           listings: [ ...listings]
                         }
                       };
@@ -90,6 +96,15 @@ exports.addClientHandler = (req, res) => {
                     res.json({message: err});
                   } else {
                     console.log(savedClient, ' saved new  client !!!!!!!');
+
+                    const invDate = new Date(newCustomer['Rechnungs-datum']);
+                    const date = `${invDate.getMonth()}${invDate.getFullYear()}`;
+                    
+                    const invoiceNumber = newCustomer['Rechnungsnummer'].map(num => 
+                      `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
+                    
+                    newCustomer['Rechnungsnummer'] = invoiceNumber;
+
                     const newClient = {
                       [newCustomer._id]:{
                         ...newCustomer,
@@ -219,7 +234,8 @@ exports.getClientsHandler = (req, res) => {
      '$lt': toDate
     }
   };
-  // get transactions in a given date range. Can't be done on Clients as they may have been created months ago.
+  // get transactions in a given date range. 
+  // Can't be done on Clients as they may have been created months ago.
   ReceiptDB.find(query) 
    .exec((err, transactions) => {
       let clientSet = new Set(); 
@@ -236,6 +252,11 @@ exports.getClientsHandler = (req, res) => {
             client.listings = client.listings.map(id =>
               transactions.find((trans) => trans._id === id)
             ).filter(listing => listing && listing );
+            
+            const date = `${month}${year}`;
+            const invoiceNumber = client['Rechnungsnummer'].map(num => 
+              `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
+            client['Rechnungsnummer'] = invoiceNumber;
             return client;
           });
           res.json(results);

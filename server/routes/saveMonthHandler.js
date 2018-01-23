@@ -1,5 +1,4 @@
 const ReceiptDB = require('../models/receipts');
-const ClientDB = require('../models/client');
 
 exports.saveMonthHandler = (req, res) => {
   const clients  = { ...req.body };
@@ -19,10 +18,11 @@ exports.saveMonthHandler = (req, res) => {
   });
   Promise.all(promises)
     .then((updatedReceipts) => {
-          const updatedClients = Object.keys(clients).map(keys => {
-            clients[keys].listings = updatedReceipts.filter(receipt =>
+          const updatedClients = Object.keys(clients).map(key => {
+            clients[key].listings = updatedReceipts.filter(receipt =>
               listofIds.includes(receipt._id));
-            return clients[keys];
+            clients[key]['Rechnungsnummer'] = Number(clients[key]['Rechnungsnummer']) + 1;
+            return clients[key];
           });
           console.log(updatedReceipts, 'Update Receipts');
           res.json({

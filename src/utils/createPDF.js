@@ -91,7 +91,7 @@ export function createPDF(clients, id) {
         } else if ( field === '#') {
           return (Number(index) + 1) + numberOfRows;
         } else {
-          return guest[field];
+          return (/\d+/).test(guest[field]) ? guest[field].replace('€', '') + '€': guest[field];
         }
       })
     );
@@ -152,7 +152,7 @@ export function createPDF(clients, id) {
       { text: 'davon: Airgreets Service Fee (25%)', colSpan: 2},
       '',
       {
-        text: row[6]  + '€',
+        text: row[6],
         alignment: 'right',
         border: [ false, false, true, true]
 
@@ -216,7 +216,7 @@ export function createPDF(clients, id) {
         '', 
         'Auszahlung',
         {
-          text: (row[6] || 0) + '€',
+          text: (row[6] || 0),
           color: (/-/).test(row[6]) && 'red',
           alignment: 'right',
           border: [ false, false, true, false]
@@ -232,7 +232,7 @@ export function createPDF(clients, id) {
        '',
        'Rechnung',
       { 
-        text: (row[5] || 0) + '€',
+        text: (row[5] || 0),
         color: (/-/).test(row[5]) && 'red',
         alignment: 'right',
         border: [ false, false, true, true]

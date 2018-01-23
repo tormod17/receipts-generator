@@ -82,6 +82,7 @@ class Tableclients extends Component {
     }
 
     render() {
+      const { currentDate } = this.props;
       const { clients, selectAllChecked } = this.state;
       const hoptions ={
         checked: selectAllChecked,
@@ -115,7 +116,7 @@ class Tableclients extends Component {
                   checked: selectAllChecked || client.checked,
                   func: this.handleSelect,
                   cssClass: 'clientChecked'
-                };  
+                };
                 return (
                   <tr
                     key={client._id}

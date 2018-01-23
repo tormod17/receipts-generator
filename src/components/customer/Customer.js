@@ -49,8 +49,9 @@ export default class Customer extends React.Component {
   }
 
   render() {
-    const { updateFieldValue } = this.props;
+    const { updateFieldValue, currentDate } = this.props;
     const { client } = this.state;
+
     return (
       <div>
         <FormGroup>
