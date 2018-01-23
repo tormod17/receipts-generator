@@ -4,6 +4,8 @@ const pug = require('pug');
 const nodemailer = require('nodemailer');
 const path = require('path');
 
+const { formatDate } = require('react-day-picker/moment');
+
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
 
@@ -58,7 +60,7 @@ exports.emailHandler = (req, res) => {
           name: client['Kunde'],
           customerNumber: client['Kunden-nummer'],
           Rechnungsnummer: client['Rechnungsnummer'],
-          Rechnungsdatum: client['Rechnungs-datum'],
+          Rechnungsdatum: `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`,
           headings: ['Name des Gastes',  'Anreisedatum', 'Abreisedatum', 'Leistungsbeschreinung', '', 'Betrag'],
           listings: [...client.listings],
           guests: [...guests],
