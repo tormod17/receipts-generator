@@ -112,9 +112,10 @@ export function clients(state = initialState, action = {}) {
         case CLIENTS_SUCCESS:
             return {
                 ...state,
-                data: {
-                    ...action.payload
-                },
+                data: [
+                    ...action.payload.invoices
+                ],
+                message: action.payload.message,
                 retrieving: false,
                 retrieved: true
             };
@@ -132,8 +133,9 @@ export function clients(state = initialState, action = {}) {
                 ...state,
                 data: {
                     ...state.data,
-                    ...action.payload
-                }
+                    ...action.payload.invoice
+                },
+                message: action.payload.message
             };
         case ADD_CLIENT_FAILURE:
             return {

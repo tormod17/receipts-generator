@@ -1,4 +1,9 @@
 require ('isomorphic-fetch');
+
+const ClientDB = require('../models/client');
+const ReceiptDB = require('../models/receipts');
+
+
 //const { addReceipt } = require ('../../src/actions/clients');
 
 function checkStatus(response) {
@@ -40,7 +45,7 @@ describe('Returns index.html file from serve in dev mode', () => {
 describe('clients entry form will respond with the correct payloads', () => {
   it('responds with status 200 from clients endpoint', () => {
     const config ={
-      method: 'get',
+      method: 'get'
     };
 
     const testUrl = base_url + 'api/clients?userId='+ userId;
@@ -50,19 +55,26 @@ describe('clients entry form will respond with the correct payloads', () => {
   it.only('Test api/client post responds with correct status code 200' , () => {
       const userId ='5a327139dd4b790d7d17e0e5';
 
-      const data =    { 
-        customer: { 
+      const data =  { 
+        client: { 
           Kunde: 'Tormod Smith',
           Emailadresse: 'tormodsmith@gmail.com',
           'Straße': 'Flat 205',
           Stadt: 'London',
           PLZ: 'SW3 3DS' ,
-          'Kunden-nummer': '100443'
-
+          'Kunden-nummer': '990443',
+          'Rechnungs-datum': 1516745716606
         },
         guests:{ 
-          'df571922-ffc6-4c2a-803f-f5ac5b8c48a3': { 
-            'Name des Gastes': 'Micky Mouse'
+          '0': {
+            '_id': 'df571922-fgc6-4c2a-803f-f5ac5b8c48a3',
+            'Name des Gastes': 'Micky Mouse',
+            'Abreisedatum (Leistungsdatum)': 1516745908222,
+            'Airbnb Einkommen':"22",
+            'Airgreets Service Fee (€)':"22",
+            'Anreisedatum': 1516745908222,
+            'Auszahlung an Kunde': "-22",
+            'Gesamtumsatz Airgreets': "44"
           } 
         },
         corrections: {},
@@ -82,25 +94,34 @@ describe('clients entry form will respond with the correct payloads', () => {
     request(testUrl, config, (json) => { console.log(json)});
   });
 
-  it.only('Test api/client post responds with correct status code 200' , () => {
+  it('Test api/client post same Client responds with correct status code 200' , () => {
       const userId ='5a327139dd4b790d7d17e0e5';
-      const data =    { 
-        customer: { 
+      const data =  { 
+        client: { 
           Kunde: 'Tormod Smith',
           Emailadresse: 'tormodsmith@gmail.com',
           'Straße': 'Flat 205',
           Stadt: 'London',
           PLZ: 'SW3 3DS' ,
-          'Kunden-nummer': '1003'
+          'Kunden-nummer': '100443',
+          'Rechnungs-datum': 1516745716606
         },
         guests:{ 
-          'df571922-ffc6-4c2a-803f-f5ac5b8c48a3': { 
-            'Name des Gastes': 'Mini Mouse'
+          '0': {
+            '_id': 'df51922-ffc6-4c2a-803f-f5ac5b8c48a3',
+            'Name des Gastes': 'Mini Mouse',
+            'Abreisedatum (Leistungsdatum)': 1516745908222,
+            'Airbnb Einkommen':"22",
+            'Airgreets Service Fee (€)':"22",
+            'Anreisedatum': 1516745908222,
+            'Auszahlung an Kunde': "-22",
+            'Gesamtumsatz Airgreets': "44"
           } 
         },
         corrections: {},
         Belegart: 'Rechnung' 
       };
+
     
     const config ={
       method: 'post',
@@ -111,11 +132,18 @@ describe('clients entry form will respond with the correct payloads', () => {
       body: JSON.stringify(data)
     };
     const testUrl = base_url + 'api/client?userId='+ userId;
-    request(testUrl, config, (json) => { console.log(json) });
+    request(testUrl, config, (json) => { 
+      console.log(json);
+      ClientDB.remove({});
+      ReceiptDB.remove({});
+    });
+ 
   });
 
 
-  it.only('Test api/client post responds with correct status code 200' , () => {
+
+
+  it('Test api/client post responds with correct status code 200' , () => {
       const userId ='5a327139dd4b790d7d17e0e5';
       const data =    { 
         customer: { 

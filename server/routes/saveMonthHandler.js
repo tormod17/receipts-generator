@@ -1,8 +1,20 @@
 const ReceiptDB = require('../models/receipts');
+const InvoiceDB = require('../models/invoice');
+const { formatDate, getDateQuery } = require('../helpers/helpers');
+
 
 exports.saveMonthHandler = (req, res) => {
   const clients  = { ...req.body };
+  const { month, year } = req.query;
   if (!clients) return console.error('no client body');
+
+  InvoiceDB.find(getDateQuery(month, year))
+    .exec((err, invoices) => {
+    /// updated all invoices to be saved. 
+    });
+
+
+
   const listofIds = Object.values(clients).reduce((p,c) => {
       const idArr = c.listings.map(listing => listing._id);
       p.push(...idArr);

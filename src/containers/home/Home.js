@@ -151,9 +151,9 @@ class Home extends Component {
     this.props.dispatch(emailClients(selectedClients));
   }
 
-  getClient(client) {
+  getClient(invoice) {
     const { history } = this.props;
-    history.push('/client/'+client._id);
+    history.push('/client/'+invoice.clientId);
   }
 
   uploadFile(){
@@ -181,7 +181,7 @@ class Home extends Component {
     const { id } = this.props.auth;
     let event = new Event('lockMonth');
     event.message = 'Bist du sicher?',
-    event.value = this.state.selectedMonth;
+    event.value = MONTH.indexOf(this.state.selectedMonth) + '-' +this.state.selectedYear;
     event.payload = { ...this.state.clients };
     event.id = id;
     document.dispatchEvent(event);
@@ -319,6 +319,7 @@ const calcTotalListings = (listings) => {
 };
 
 const mapStateToProps = state => {
+  console.log(state, state);
   const { clients } = state;
   const { message, data } = clients;
   let total = 0;

@@ -52,7 +52,8 @@ function saveMonthFailure(error) {
   };
 }
 
-export function saveMonth(data, month) {
+export function saveMonth(data, monthNyear) {
+  const [ month, year ] = monthNyear.split('-');
   const config = {
     method: 'post',
     headers: {
@@ -62,7 +63,7 @@ export function saveMonth(data, month) {
     body: JSON.stringify({...data}) // data
   };
   return callApi(
-    '/api/savemonth?month='+ month,
+    '/api/savemonth?month='+ month +'&year=' + year,
     config,
     saveMonthRequest(month),
     saveMonthSuccess,
@@ -116,13 +117,9 @@ function clientsRequest() {
 }
 
 function clientsSuccess(payload) {
-  const object = Object.values(payload).reduce((p,c) => {
-    p[c._id] = {...c};
-    return  p;
-  }, {});
   return {
     type: CLIENTS_SUCCESS,
-    payload: object
+    payload: payload
   };
 }
 

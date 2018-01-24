@@ -124,7 +124,7 @@ class Tableclients extends Component {
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Kunden-nummer']}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Kunde']}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Belegart']}`}</td>
-                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsnummer']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungs-nummer']}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsbetrag'].toFixed(2)}€`}</td>
                     <td> 

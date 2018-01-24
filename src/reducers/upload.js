@@ -1,5 +1,5 @@
 
-import { UPLOAD_REQUEST, UPLOAD_SUCCESS, UPLOAD_FAILURE } from "../actions/upload.js"
+import { UPLOAD_REQUEST, UPLOAD_SUCCESS, UPLOAD_FAILURE } from "../actions/upload.js";
 
 
 const initialState = {
@@ -18,6 +18,10 @@ export default function uploadReceipts(state = initialState, action = {}) {
     case UPLOAD_SUCCESS:
       return {
         ...state,
+        data: [
+            ...action.payload.invoices
+        ],
+        message: action.payload.message,
         uploaded: true
       };
     case UPLOAD_FAILURE:

@@ -47,7 +47,6 @@ class ModalComp extends React.Component {
   handleModalValues(e){
     e.preventDefault();
     const { message, payload, value, id, type } = e;
-    console.log(e);
     this.setState({
       modalType: type,
       message,

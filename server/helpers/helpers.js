@@ -43,3 +43,24 @@ exports.calculateTotals = (type, guests, corrections, tax) => {
   }
   return (sumGuests + sumCorr).toFixed(2) ;
 };
+
+exports.getDateQuery = (month, year) => {
+    let toMonth = Number(month) + 1;
+    let toYear = year;
+    
+    if (toMonth === 12) {
+      toMonth = 0;
+      toYear = Number(toYear) + 1;
+    } 
+
+    const fromDate =  new Date(year, Number(month), 1).getTime();
+    const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
+
+    let query = {
+      'Rechnungs-datum': {
+       '$gte': fromDate,
+       '$lt': toDate
+      }
+    };
+    return query;
+  }

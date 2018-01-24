@@ -1,21 +1,29 @@
 const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
+const InvoiceDB = require('../models/invoice');
 
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
-const { formatDate } = require('../helpers/helpers');
+const { formatDate, getDateQuery } = require('../helpers/helpers');
 
 exports.addClientHandler = (req, res) => {
   // Check if customer already exists 
-  if (!req.query.userId) return console.error('no userId');
+  if (!req.query.userId && !client) return console.error('no userId'); 
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
+  client._id = client['Kunden-nummer'];
+
   console.log('ADDING A USER MANUALLY'); 
-  
-  const listings = [ 
+
+  const month =  new Date(Number(client['Rechnungs-datum'])).getMonth();
+  const year = new Date(Number(client['Rechnungs-datum'])).getFullYear();
+
+  const transactions = [ 
     ...Object.values(guests || {}),
     ...Object.values(corrections || {}) 
-    ].map(record =>{
+    ];
+
+  const listings = transactions.map(record =>{
     const dates = {};
     if (record['Rechnungs-datum']) {
         dates['Rechnungs-datum'] = formatDate(record['Rechnungs-datum'])|| DATETIMESTAMP;
@@ -33,91 +41,92 @@ exports.addClientHandler = (req, res) => {
         userId,
         created: DATETIMESTAMP,
         clientId: client['Kunden-nummer'],
-        //Rechnungsnummer: uuidv1(),
         ...dates,
-        Belegart,
-        _id: uuidv1()
+        Belegart
     };
   });
-  ReceiptDB.insertMany(listings, err => {
-      if(err) { 
-          return res.json( { message: err });
-      } else {       
-          const newCustomer = {
-             ...client,
-            Belegart,
-            created: DATETIMESTAMP,
-            listings: listings.map(listing => listing._id),
-            _id: client['Kunden-nummer'] || uuidv1(),
-            Rechnungsnummer: [client['Rechnungs-datum']],
-            'Rechnungs-datum': formatDate(client['Rechnungs-datum'])|| DATETIMESTAMP,
-            'FR': 0
-          };
-          /// Client Numbers must be decided before otherwise will update a previous customer
-          //  Difference between updating an existing client that doesn't have an entry that month and new client
-          ClientDB.findById(newCustomer._id,(err, savedClient) => {
-            if (savedClient){
-                savedClient['Emailadresse']=  newCustomer['Emailadresse'],
-                savedClient['Kunde']=  newCustomer['Kunde'],
-                savedClient['Stadt']=  newCustomer['Stadt'],
-                savedClient['Straße']=  newCustomer['Straße'],
-                savedClient['PLZ']=  newCustomer['PLZ'],
-                savedClient['Kunden-nummer']= newCustomer['Kunden-nummer'],
-                savedClient['_id']=  newCustomer['Kunden-nummer'],
-                savedClient['listings'] = [...savedClient.listings, ...newCustomer.listings];
-                savedClient['Belegart'] = newCustomer['Belegart'],
-                savedClient['FR'] = newCustomer['FR'],
-                savedClient['Rechnungs-datum'] = newCustomer['Rechnungs-datum'],
-                savedClient['Rechnungsnummer'].push(...newCustomer['Rechnungsnummer']);
-                savedClient.save((err, savedClient)=>{
-                    if (err) {
-                      res.json({message: err});
-                    } else {
-                      
-                      const invDate = new Date(newCustomer['Rechnungs-datum']) ;
-                      const date = `${invDate.getMonth()}${invDate.getFullYear()}`;
-                    
-                      const invoiceNumber = savedClient['Rechnungsnummer'].map(num => 
-                      `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
-                      const newClient ={ 
-                        [newCustomer['_id']]: {
-                          ...newCustomer,
-                          'Rechnungsnummer': invoiceNumber,
-                          listings: [ ...listings]
-                        }
-                      };
-                      console.log(savedClient, 'update new  client for month !!!!!!!');
-                      res.json(newClient);
-                    } 
+
+const transactionsKeys = transactions.map(trans => trans._id);
+const dateQuery = getDateQuery(month, year);
+
+
+ReceiptDB.insertMany(listings, err => {
+  if(err) { 
+      return res.json( { message: err });
+  } else {   
+    InvoiceDB.find(dateQuery)
+      .where('clientId').equals(client['Kunden-nummer'])
+      .exec((err, invoice) => {
+          if(invoice.length) {
+           // update invoice with more transactions. 
+            console.log('invoice update >>>>');
+            const currentInvoice = { ...invoice[0] };
+            currentInvoice.transactions =  [...invoice[0].transactions, ...transactionsKeys];
+            InvoiceDB.update({_id: currentInvoice._id }, currentInvoice, err => {
+            if (err) return res.json({ message: err });
+            res.json({
+              message: 'entfernt',
+              client: {
+                ...currentInvoice
+              }
+            });
+          });
+                  
+         } else {
+          // Create a new Invoice 
+          InvoiceDB.find({ clientId: invoice.clientId}).exec((err, invoices) => {
+            const newInvoice = {
+              _id: uuidv1(),
+              clientId: client['Kunden-nummer'],
+              'Rechnungs-datum': client['Rechnungs-datum'],
+              transactions: transactionsKeys,
+              'Rechnungs-nummer': (invoices.length + 1),
+              Belegart
+            };
+            console.log(newInvoice);
+            if (invoices.length) {  
+                console.log('New invoice only');
+                // Only Invoice and add increment
+                InvoiceDB.create(newInvoice, err => {
+                newInvoice['transactions'] = listings.map(listing => {
+                  if (newInvoice.transactions.includes(listing._id)){
+                    return listing;
+                  }
                 });
+                res.json({
+                  message: 'entfernt',
+                  invoice: {
+                    ...client,
+                    ...newInvoice
+                  }
+                });
+              });   
             } else {
-                ClientDB.create( newCustomer, (err, savedClient) => {
-                  if (err) {
-                    res.json({message: err});
-                  } else {
-                    console.log(savedClient, ' saved new  client !!!!!!!');
-
-                    const invDate = new Date(newCustomer['Rechnungs-datum']);
-                    const date = `${invDate.getMonth()}${invDate.getFullYear()}`;
-                    
-                    const invoiceNumber = newCustomer['Rechnungsnummer'].map(num => 
-                      `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
-                    
-                    newCustomer['Rechnungsnummer'] = invoiceNumber;
-
-                    const newClient = {
-                      [newCustomer._id]:{
-                        ...newCustomer,
-                        listings: [ ...listings]
-                      }
-                    };
-                    res.json(newClient);
-                  } 
+              // new invoice and client
+              InvoiceDB.create(newInvoice, err => {
+                if (err) return res.json({ message: err });
+                ClientDB.create(client, err => {
+                  if (err) return res.json({ message: err });
+                  console.log('New invoice and Client', newInvoice.transactions, listings);
+                  newInvoice['transactions'] = listings.map(listing => {
+                    if (newInvoice.transactions.includes(listing._id)){
+                      return listing;
+                    }
+                  });
+                  res.json({
+                    message: 'entfernt',
+                    invoice: {
+                      ...client,
+                      ...newInvoice
+                    }
+                  });
                 });
+              });  
             }
-           
-        });
-      }
+          });
+         }
+      });
+    }
   });
 };
 
@@ -217,49 +226,40 @@ exports.getClientsHandler = (req, res) => {
   /// needs to accept time parameters
   if (!req.query) return console.error('no userId');
   const { month, year } = req.query;
-  let toMonth = Number(month) + 1;
-  let toYear = year;
-  
-  if (toMonth === 12) {
-    toMonth = 0;
-    toYear = Number(toYear) + 1;
-  } 
-
-  const fromDate =  new Date(year, Number(month), 1).getTime();
-  const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
-
-  let query = {
-    'Rechnungs-datum': {
-     '$gte': fromDate,
-     '$lt': toDate
-    }
-  };
-  // get transactions in a given date range. 
-  // Can't be done on Clients as they may have been created months ago.
-  ReceiptDB.find(query) 
-   .exec((err, transactions) => {
-      let clientSet = new Set(); 
-      transactions.forEach(receipt => {
-        clientSet.add(receipt._doc.clientId);
+  // get invoices in a date range
+  InvoiceDB.find(getDateQuery(month, year)) 
+    .exec((err, invoices) => {
+      // for each invoice get all their invoices. 
+      const invPromises = invoices.map( invoice => {
+        return new Promise((resolve, reject) => {
+          ClientDB.findById(invoice.clientId)
+            .then(client => {
+              ReceiptDB.find({ clientId: invoice.clientId})
+                .exec((err, trans) => {
+                  if (err) return reject(err);
+                  console.log(client._doc);
+                  const newInvoice = {
+                    ...client._doc,
+                    ...invoice._doc,
+                    listings: [ ...trans]
+                  };
+                   resolve(newInvoice);
+                });
+            })
+            .catch(err => {
+              reject(err);
+            });
+        });
       });
-      ClientDB.find({
-        '_id': {
-          '$in': [...clientSet]
-        }
-      }, (err, clients) => {
-          if (err) return res.json({message: err});
-          const results = clients.map(client => {
-            client.listings = client.listings.map(id =>
-              transactions.find((trans) => trans._id === id)
-            ).filter(listing => listing && listing );
-            
-            const date = `${month}${year}`;
-            const invoiceNumber = client['Rechnungsnummer'].map(num => 
-              `${new Date(num).getMonth()}${new Date(num).getFullYear()}`).indexOf(date) + 1;
-            client['Rechnungsnummer'] = invoiceNumber;
-            return client;
+      Promise.all(invPromises)
+        .then(invs => {
+          res.json({ 
+            invoices: [...invs], 
+            message: 'entfernt' 
           });
-          res.json(results);
-      });
+        })
+        .catch((err)=>{
+          res.json({ message: '' + err});
+        });
     });
 };
