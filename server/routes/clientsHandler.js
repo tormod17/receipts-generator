@@ -49,7 +49,6 @@ exports.addClientHandler = (req, res) => {
 const transactionsKeys = transactions.map(trans => trans._id);
 const dateQuery = getDateQuery(month, year);
 
-
 ReceiptDB.insertMany(listings, err => {
   if(err) { 
       return res.json( { message: err });
@@ -83,7 +82,6 @@ ReceiptDB.insertMany(listings, err => {
               'Rechnungs-nummer': (invoices.length + 1),
               Belegart
             };
-            console.log(newInvoice);
             if (invoices.length) {  
                 console.log('New invoice only');
                 // Only Invoice and add increment
@@ -130,18 +128,36 @@ ReceiptDB.insertMany(listings, err => {
   });
 };
 
-exports.updateClientHandler = (req, res) => {
+exports.updateInvoiceHandler = (req, res) => {
   // needs to only update the receipt details not client
   const { Belegart, guests, client, corrections } = req.body;
+  const { invoiceId } = req.query;
+
   const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
-    if(client) {
+    if(!client && invoiceId ) return  res.json({ message: 'fail no invoice Id or client details' });
       client.Belegart = Belegart;
       // we only store array of Ids not objects (better for parsing)
       client.listings = listings.map(listing => listing._id); 
-      client['Rechnungs-datum']= Number(formatDate(client['Rechnungs-datum']) || DATETIMESTAMP),
-      ClientDB.findByIdAndUpdate(client._id, client, { new: true}, (err, newClient)=> {
-          if (err) return res.json({message: err +''});
-          const promises = listings.map(listing => {
+
+      const updatedInvoice = {
+        _id: invoiceId,
+        Belegart,
+        clientId: client.clientId,
+        'Rechnungs-nummer': client['Rechnungs-nummer'],
+        'Rechnungs-datum': client['Rechnungs-datum'],
+        transactions: [...client.listings]
+      };
+      const updatedClient = {
+        PLZ: client.PLZ,
+        Stadt: client.Stadt,
+        Straße: client.Straße,
+        Emailadresse: client.Emailadresse
+      };
+      // update invoice
+      InvoiceDB.findByIdAndUpdate(invoiceId, updatedInvoice)
+        .then(() => {
+          //update listings
+          const updatedTransactions = listings.map(listing => {
             return new Promise((resolve, reject) => {
               ReceiptDB.findByIdAndUpdate(listing._id, listing, { new: true }, (err, model) => {
                 if (err) return reject(err);
@@ -160,41 +176,36 @@ exports.updateClientHandler = (req, res) => {
                   resolve(model);
                 }
               });
-            }); 
+            });     
           });
-          Promise.all(promises)
-            .then(newListings => {
-              const updatedClient = {
-                [newClient['Kunden-nummer']] : {
-                  'Emailadresse':  newClient['Emailadresse'],
-                  'Kunde':  newClient['Kunde'],
-                  'Stadt':  newClient['Stadt'],
-                  'Straße':  newClient['Straße'],
-                  'PLZ':  newClient['PLZ'],
-                  'Kunden-nummer': newClient['Kunden-nummer'],
-                  '_id':  newClient['Kunden-nummer'],
-                  'listings': newListings,
-                  'Belegart': newClient['Belegart'] || Belegart,
-                  'Rechnungsnummer': newClient['Rechnungsnummer'],
-                  'Rechnungs-datum': newClient['Rechnungs-datum'],
-                  'FR': newClient['FR']
+          return Promise.all(updatedTransactions);
+        })
+        .then(() => {
+          // update client
+          ClientDB.findByIdAndUpdate(client._id, updatedClient, { new: true}, err => {
+            if (err) return res.json({message: err +''});
+            client.listings = [...listings];
+            res.json({ 
+              message: 'entfernt',
+              invoice: { 
+                [invoiceId]: {
+                  ...client
                 }
-              };
-              res.json({ 
-                message: 'entfernt',
-                client: {
-                  ...updatedClient
-                }
-              });
-            })
-            .catch(err =>{
-              res.json({ message: '' + err});
+              }
             });
-      });
-  } else  {
-    res.json({message: 'error'});
-  }
+          });
+        })
+        .catch(err => {
+          res.json({message: err +''});
+        });
 };
+
+
+
+
+
+
+   
 
 
 exports.delClientHandler = (req, res) => {
@@ -202,7 +213,7 @@ exports.delClientHandler = (req, res) => {
   const ids = [...req.body];
   const promises = ids.map( id => {
     return new Promise((resolve, reject) => {
-        ClientDB.deleteOne({ _id: id }, (err) => {
+        InvoiceDB.deleteOne({ _id: id }, (err) => {
         if (err) reject(err);
       }).then(() => {
         ReceiptDB.remove({clientId: id}, (err) => {
@@ -253,8 +264,14 @@ exports.getClientsHandler = (req, res) => {
       });
       Promise.all(invPromises)
         .then(invs => {
+          const newIvoices = invs.reduce((p, c) => {
+            p[c._id] = {
+              ...c
+            };
+            return p;
+          }, {});
           res.json({ 
-            invoices: [...invs], 
+            invoices: { ...newIvoices }, 
             message: 'entfernt' 
           });
         })

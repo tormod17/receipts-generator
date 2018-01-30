@@ -10,7 +10,7 @@ import Corrections from '../../components/corrections/Corrections';
 import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
 
-import { calculateTotals } from '../../utils/apiUtils';
+import { calculateTotals, calculateTaxTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
 import { addClient, getClient, getClients, updateClient } from "../../actions/clients";
@@ -128,16 +128,16 @@ class Client extends Component {
   }
 
   handleSubmission(){
-    const { dispatch, auth } = this.props;
-    const clientId = this.props.match.params.id;
+    const { dispatch, auth, match } = this.props;
+    const invoiceId = match.params.id;
     const data  = {
       ...this.state
     };
-    let eventType  = clientId ? 'updateClient' : 'addClient';
+    let eventType  = invoiceId ? 'updateClient' : 'addClient';
     let message = 'Bist du sicher?';
     const missingFields = this.checkRequiredFields(data);
 
-    if (missingFields.length > 0 && !clientId){
+    if (missingFields.length > 0 && !invoiceId){
       eventType = 'requiredFields';
       message = 'Wir brauchen diese Felder :- ' + missingFields.join(', ');
     }
@@ -145,7 +145,7 @@ class Client extends Component {
     let event = new Event(eventType);
     event.message = message;
     event.value = missingFields;
-    event.id = clientId
+    event.id = invoiceId
     event.payload = { ...data };
     document.dispatchEvent(event);
   }
@@ -265,7 +265,7 @@ class Client extends Component {
         />
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            { Belegart !== 'Rechnung' &&
+            { Belegart === 'Auszahlung' &&
               <EditableField 
                 name="Gesamtumsatz Airgreets" 
                 placeholder="Gesamtauszahlungsbetrag"
@@ -286,7 +286,7 @@ class Client extends Component {
             <EditableField 
               name="Darin enthaltene Umsatzsteuer"
               placeholder="Darin Enthaltene Umsatzsteuer"
-              value={calculateTotals('Rechnungs', guests, corrections, 'tax')}
+              value={calculateTaxTotals(Belegart, guests, corrections)}
               disabled
             />
           </Col>
@@ -305,9 +305,9 @@ class Client extends Component {
 
 const mapStateToProps = (state, props) => { 
   const { clients } = state;
-  const { message, data } = clients;
+  const { message, invoices } = clients;
   const id = props.match.params.id;
-  const client = data && data.filter(inv => id === inv.clientId)[0];
+  const client = invoices && invoices[id];
   const guests =  client && client.listings.filter(listing => listing && listing['Name des Gastes']);
   const corrections = client && client.listings.filter(listing =>  listing && !listing['Name des Gastes']);
   const locked = guests && Object.values(guests)[0] && Object.values(guests)[0].locked;
@@ -316,7 +316,7 @@ const mapStateToProps = (state, props) => {
     guests: client  && { ...guests},
     corrections: client && { ...corrections},
     message,
-    locked
+    locked,
   };
 };
 

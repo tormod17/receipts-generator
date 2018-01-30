@@ -107,7 +107,6 @@ export function upload(data, userId) {
   );
 }
 
-
 /// Client CRUD
 
 function clientsRequest() {
@@ -178,7 +177,7 @@ export function updateClient(id, data) {
     body: JSON.stringify(data)
   };
   return callApi(
-    '/api/client?clientId='+ id,
+    '/api/invoice?invoiceId='+ id,
     config,
     updateClientRequest(data),
     updateClientSuccess,

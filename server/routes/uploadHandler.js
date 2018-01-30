@@ -131,8 +131,14 @@ exports.uploadHandler = (req, res, next) => {
           });
           Promise.all(invPromises)
             .then(invs => {
+              const newIvoices = invs.reduce((p, c) => {
+                p[c['Kunden-nummer']] = {
+                  ...c
+                };
+                return p;
+              }, {});
               res.json({ 
-                invoices: [...invs], 
+                invoices: { ...newIvoices }, 
                 message: 'entfernt' 
               });
             })

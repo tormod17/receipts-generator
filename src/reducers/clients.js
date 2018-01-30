@@ -70,7 +70,7 @@ export function clients(state = initialState, action = {}) {
         case SAVE_MONTH_SUCCESS:
             return {
                 ...state,
-                data: {
+                invoices: {
                     ...action.payload.clients
                 },
                 message: action.payload.message,
@@ -90,9 +90,9 @@ export function clients(state = initialState, action = {}) {
         case UPLOAD_SUCCESS:
             return {
                 ...state,
-                data:{
-                    ...state.data,
-                    ...action.payload.data
+                invoices:{
+                    ...state.invoices,
+                    ...action.payload.invoices
                 },
                 message: action.payload.message,
                 uploading: false,
@@ -112,9 +112,9 @@ export function clients(state = initialState, action = {}) {
         case CLIENTS_SUCCESS:
             return {
                 ...state,
-                data: [
+                invoices: {
                     ...action.payload.invoices
-                ],
+                },
                 message: action.payload.message,
                 retrieving: false,
                 retrieved: true
@@ -131,8 +131,8 @@ export function clients(state = initialState, action = {}) {
         case ADD_CLIENT_SUCCESS:
             return {
                 ...state,
-                data: {
-                    ...state.data,
+                invoices: {
+                    ...state.invoices,
                     ...action.payload.invoice
                 },
                 message: action.payload.message
@@ -149,9 +149,9 @@ export function clients(state = initialState, action = {}) {
         case UPDATE_CLIENT_SUCCESS:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    ...action.payload.client
+                invoices:{
+                    ...state.invoices,
+                    ...action.payload.invoice
                 },
                 message: action.payload.message
             };
@@ -167,8 +167,8 @@ export function clients(state = initialState, action = {}) {
         case DEL_CLIENT_SUCCESS:
             return {
                 ...state,
-                data: {
-                    ...removeProperties(action.payload.data, state.data)
+                invoices: {
+                    ...removeProperties(action.payload.data, state.invoices)
                 },
                 message: action.payload.message,
                 status: 'deleted'

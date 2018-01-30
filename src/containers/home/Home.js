@@ -153,7 +153,7 @@ class Home extends Component {
 
   getClient(invoice) {
     const { history } = this.props;
-    history.push('/client/'+invoice.clientId);
+    history.push('/client/'+invoice._id);
   }
 
   uploadFile(){
@@ -319,27 +319,26 @@ const calcTotalListings = (listings) => {
 };
 
 const mapStateToProps = state => {
-  console.log(state, state);
   const { clients } = state;
-  const { message, data } = clients;
+  const { message, invoices } = clients;
   let total = 0;
-  data && Object.keys(data || {}).map((key) => {
-    data[key].Rechnungsbetrag = data && calcTotalListings(data[key].listings); 
-    total += data[key].Rechnungsbetrag;
+  invoices && Object.keys(invoices || {}).map((key) => {
+    invoices[key].Rechnungsbetrag = invoices && calcTotalListings(invoices[key].listings); 
+    total += invoices[key].Rechnungsbetrag;
   });
   let locked =true;
   let currentDate;
-  if (data) {
-    locked =  Object.values(data)[0]
-      &&  Object.values(data)[0].listings[0]
-        && Object.values(data)[0].listings[0].locked;
-    currentDate = Object.values(data)[0]
-      &&  Object.values(data)[0].listings[0]
-        && Object.values(data)[0].listings[0]['Rechnungs-datum'];
+  if (invoices) {
+    locked =  Object.values(invoices)[0]
+      &&  Object.values(invoices)[0].listings[0]
+        && Object.values(invoices)[0].listings[0].locked;
+    currentDate = Object.values(invoices)[0]
+      &&  Object.values(invoices)[0].listings[0]
+        && Object.values(invoices)[0].listings[0]['Rechnungs-datum'];
   }
   return {
     message,
-    clients: {...data },
+    clients: {...invoices },
     total: total.toFixed(2),
     currentDate,
     locked

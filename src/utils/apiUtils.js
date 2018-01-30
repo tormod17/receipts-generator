@@ -32,26 +32,36 @@ export function formatDate(timeStamp) {
   return newDate;
 }
 
-export function calculateTotals(type, guests, corrections, tax) {
+
+const sumUpTotals = (transactions, fieldName) =>
+  Object.values(transactions || {}).reduce((a, b) => {
+    transactions = 
+      (b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, '')) || 0);
+    a +=   transactions;
+    return a;
+  }, 0);
+
+export function calculateTotals(type, guests, corrections) {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
 
-  const sumUpTotals = (transactions, fieldName) =>
-    Object.values(transactions || {}).reduce((a, b) => {
-      const transactions = 
-          (b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, '')) || 0);
-      a +=   transactions;
-      return a;
-    }, 0);
-
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, key2);
-
-  if (tax) {
-    return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2);
-  }
   return (sumGuests + sumCorr).toFixed(2) ;
 }
+
+
+export function calculateTaxTotals(type, guests, corrections) {
+  const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
+  const sumGuests = sumUpTotals(guests, key1);
+  // sum up all corrections  Rechnungskorrektur in € don't add Auszahlung Korrections. 
+  const sumCorr = sumUpTotals(corrections, 'tax');
+  console.log(sumCorr);
+  return (((((sumGuests) / 119 ) * 19)) + sumCorr).toFixed(2);
+
+}
+
+
 
 /**
  * A utility to call a restful service.

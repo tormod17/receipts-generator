@@ -6,7 +6,7 @@ const multer = require('multer'); // used for writing file before saving.
 const { 
     getClientsHandler,
     addClientHandler,
-    updateClientHandler,
+    updateInvoiceHandler,
     delClientHandler
 } = require('./clientsHandler');
 
@@ -36,7 +36,7 @@ router.post('/api/upload', upload.single('csvdata'), (req,res) => uploadHandler(
 // receipts 
 router.get('/api/clients', (req, res) => getClientsHandler(req,res));
 
-router.put('/api/client', (req, res) => updateClientHandler(req, res));
+router.put('/api/invoice', (req, res) => updateInvoiceHandler(req, res));
 
 router.post('/api/client', (req, res) => addClientHandler(req, res));
 

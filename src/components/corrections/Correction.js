@@ -22,10 +22,12 @@ export default class Correction extends React.Component {
     this.state = {
       correction, 
       reason: correction['Sonstige Leistungsbeschreibung'],
-      Belegart: selectedName,
-      total: correction[`${selectedName} in €`]
+      correctionsBelegart: selectedName,
+      total: correction[`${selectedName} in €`],
+      tax: true,
     }
     this.handleValueChange = this.handleValueChange.bind(this)
+    this.handleCorrectionTypeChange = this.handleCorrectionTypeChange.bind(this)
   }
 
   componentWillReceiveProps(nextProps){
@@ -35,28 +37,55 @@ export default class Correction extends React.Component {
       this.setState({
         correction, 
         reason: correction['Sonstige Leistungsbeschreibung'],
-        Belegart: selectedName,
-        total: correction[`${selectedName} in €`]
+        total: correction[`${selectedName} in €`],
       })
     }
   }
 
-  addTax(){
+  addTax(id, e){
+    const { total, correctionsBelegart, tax  } = this.state;
+    const { updateFieldValue } = this.props;
+    this.setState({
+      tax: !tax
+    })
 
+    if (e.target.checked) {
+      const taxTotal = ((total / 119 ) * 19).toFixed(2);
+      updateFieldValue('tax', taxTotal, 'corrections', id )
+    } else {
+      updateFieldValue('tax', 0, 'corrections', id )      
+    }
   }
 
   handleValueChange(name, value, id) {
-    if (name  === 'Belegart') {
-      this.setState({
-        Belegart: value
-      })
-    }
     this.props.updateFieldValue(name, value, 'corrections', id)
   }
 
+  handleCorrectionTypeChange(name, value, id){
+    this.setState({
+      correctionsBelegart: value
+    })
+  }
+
+  handleTotalChange(name, value, id) {
+    this.props.updateFieldValue(name, value, 'corrections', id)
+    if (this.state.tax) {
+      this.setState({
+        total: value
+      }, () => {
+        if (this.state.correctionsBelegart === 'Auszahlungskorrektur') {
+          console.log('add tax', this.state.correctionsBelegart);
+          return this.props.updateFieldValue('tax', 0, 'corrections', id )
+        }
+        const taxTotal = ((this.state.total / 119 ) * 19).toFixed(2);
+        this.props.updateFieldValue( 'tax', taxTotal, 'corrections', id)
+      })
+    }
+  }
+
   render() {
-    const { locked, correctionNumber } = this.props;
-    const { Belegart, correction, total, reason } = this.state; 
+    const { locked, correctionNumber, Belegart } = this.props;
+    const { correctionsBelegart, correction, total, reason, tax } = this.state; 
 
     return (
       <div
@@ -65,14 +94,23 @@ export default class Correction extends React.Component {
         <FormGroup row>
           <Col className="col-4">
             <hr/>
-            <Dropdown
-              disabled={locked}
-              name="Belegart"
-              data={correction}
-              updateFieldValue={(name, val) => this.handleValueChange(name, val, correctionNumber)} 
-              items={['Rechnungskorrektur', 'Auszahlungskorrektur']}
-              selected={Belegart}
-            />
+            { Belegart === 'Rechnung' &&
+              <Input                   
+                placeholder="Rechnungskorrektur" 
+                value="Rechnungskorrektur"
+                disabled
+              />
+            }
+            { Belegart !== 'Rechnung' &&
+              <Dropdown
+                disabled={locked}
+                name="correctionsBelegart"
+                data={correction}
+                updateFieldValue={(name, val) => this.handleCorrectionTypeChange(name, val, correctionNumber)} 
+                items={['Rechnungskorrektur', 'Auszahlungskorrektur']}
+                selected={correctionsBelegart}
+              />
+            }
           </Col>
           <Col className="col-4">
               <EditableField 
@@ -87,8 +125,8 @@ export default class Correction extends React.Component {
           <Col className="col-3">
              <EditableField
               disabled={locked}
-              name={`${Belegart} in €`}
-              updateFieldValue={(name, val) => this.handleValueChange(name, val, correctionNumber)} 
+              name={`${correctionsBelegart} in €`}
+              updateFieldValue={(name, val) => this.handleTotalChange(name, val, correctionNumber)} 
               placeholder="Betrag"
               value={total}
             />
@@ -107,20 +145,25 @@ export default class Correction extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
+            { correctionsBelegart === 'Rechnungskorrektur'&&
             <InputGroup>
               <InputGroupAddon>
                 <Input 
-                  addon 
+                  addon
+                  name="tax" 
                   type="checkbox"
                   aria-label="Umsatzsteuer" 
-                  onChange={() => this.addTax()}
-                  //checked
+                  onChange={(e) => this.addTax(correctionNumber, e)}
+                  checked={tax}
                 />
               </InputGroupAddon>
+            
               <Input                   
-                placeholder="Umsatzsteuer" 
+                placeholder="Steuer hinzufügen" 
+                value="Steuer hinzufügen"
               />
             </InputGroup>
+            }
           </Col>
         </FormGroup>
       </div>

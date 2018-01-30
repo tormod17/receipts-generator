@@ -22,7 +22,7 @@ export default class Corrections extends React.Component {
   }
 
   render() {
-    const { corrections, locked } = this.props;
+    const { corrections, locked, Belegart } = this.props;
     return (
       <div>
         <FormGroup row>
@@ -36,6 +36,7 @@ export default class Corrections extends React.Component {
             updateFieldValue={this.props.updateFieldValue}
             handleDel={this.props.handleDelCorrection}
             correctionNumber={key}
+            Belegart={Belegart}
           />
         )}
         { Object.keys(corrections).length === 0 &&
