@@ -308,8 +308,8 @@ const mapStateToProps = (state, props) => {
   const { message, invoices } = clients;
   const id = props.match.params.id;
   const client = invoices && invoices[id];
-  const guests =  client && client.listings.filter(listing => listing && listing['Name des Gastes']);
-  const corrections = client && client.listings.filter(listing =>  listing && !listing['Name des Gastes']);
+  const guests =  client && client.transactions.filter(listing => listing && listing['Name des Gastes']);
+  const corrections = client && client.transactions.filter(listing =>  listing && !listing['Name des Gastes']);
   const locked = guests && Object.values(guests)[0] && Object.values(guests)[0].locked;
   return {
     client: client && { ...client},

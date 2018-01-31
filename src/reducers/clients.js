@@ -27,7 +27,6 @@ import {
 } from '../actions/email.js';
 
 const initialState = {
-    data: {},
     message: '',
     status: ''
 };
@@ -71,7 +70,7 @@ export function clients(state = initialState, action = {}) {
             return {
                 ...state,
                 invoices: {
-                    ...action.payload.clients
+                    ...action.payload.invoices
                 },
                 message: action.payload.message,
                 saving: false,

@@ -3,6 +3,7 @@ import { Col, FormGroup, InputGroup, InputGroupAddon, Input } from 'reactstrap';
 import PropTypes from "prop-types";
 import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
+import { calculateTax } from '../../utils/apiUtils';
 
 export default class Correction extends React.Component {
   
@@ -30,14 +31,18 @@ export default class Correction extends React.Component {
     this.handleCorrectionTypeChange = this.handleCorrectionTypeChange.bind(this)
   }
 
+  componentDidMount(){
+    const { total } = this.state;
+    const { correctionNumber,  updateFieldValue } = this.props;
+    updateFieldValue('Ust-Korrektur', calculateTax(total), 'corrections', correctionNumber)
+  }
+
   componentWillReceiveProps(nextProps){
     const { correction } = nextProps;
-    if(this.props.correction !== correction){
+    if(this.props.Belegart !== nextProps.Belegart){
       const selectedName = correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
       this.setState({
-        correction, 
-        reason: correction['Sonstige Leistungsbeschreibung'],
-        total: correction[`${selectedName} in €`],
+        correctionsBelegart: selectedName,
       })
     }
   }
@@ -46,14 +51,12 @@ export default class Correction extends React.Component {
     const { total, correctionsBelegart, tax  } = this.state;
     const { updateFieldValue } = this.props;
     this.setState({
-      tax: !tax
+      tax: e.target.checked
     })
-
     if (e.target.checked) {
-      const taxTotal = ((total / 119 ) * 19).toFixed(2);
-      updateFieldValue('tax', taxTotal, 'corrections', id )
+      updateFieldValue('Ust-Korrektur', calculateTax(total), 'corrections', id )
     } else {
-      updateFieldValue('tax', 0, 'corrections', id )      
+      updateFieldValue('Ust-Korrektur', 0, 'corrections', id )      
     }
   }
 
@@ -64,7 +67,10 @@ export default class Correction extends React.Component {
   handleCorrectionTypeChange(name, value, id){
     this.setState({
       correctionsBelegart: value
-    })
+    }, () => {
+      const newTotal = (value === 'Rechnungskorrektur') ? calculateTax(this.state.total) : 0;
+      this.props.updateFieldValue('Ust-Korrektur', newTotal, 'corrections', id)
+    }) 
   }
 
   handleTotalChange(name, value, id) {
@@ -74,11 +80,10 @@ export default class Correction extends React.Component {
         total: value
       }, () => {
         if (this.state.correctionsBelegart === 'Auszahlungskorrektur') {
-          console.log('add tax', this.state.correctionsBelegart);
-          return this.props.updateFieldValue('tax', 0, 'corrections', id )
+          return this.props.updateFieldValue('Ust-Korrektur', 0, 'corrections', id )
         }
-        const taxTotal = ((this.state.total / 119 ) * 19).toFixed(2);
-        this.props.updateFieldValue( 'tax', taxTotal, 'corrections', id)
+        const taxTotal = calculateTax(this.state.total)
+        this.props.updateFieldValue( 'Ust-Korrektur', taxTotal, 'corrections', id)
       })
     }
   }
@@ -145,7 +150,7 @@ export default class Correction extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            { correctionsBelegart === 'Rechnungskorrektur'&&
+            { (correctionsBelegart === 'Rechnungskorrektur' || Belegart === 'Rechnung' ) &&
             <InputGroup>
               <InputGroupAddon>
                 <Input 

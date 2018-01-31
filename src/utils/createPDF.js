@@ -1,6 +1,6 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import vfsFonts from 'pdfmake/build/vfs_fonts';
-import { calculateTotals } from  './apiUtils';
+import { calculateTotals, calculateTaxTotals } from  './apiUtils';
 import { formatDate } from 'react-day-picker/moment';
 import 'moment/locale/de';
 
@@ -9,8 +9,9 @@ const logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVgAAACQCAYAAABNoHMt
 
 export function createPDF(clients, id) {
   const client = { ...clients[id] };  
-  const guests = client.listings.filter(listing => listing['Name des Gastes']);
-  const corrections = client.listings.filter(listing => !listing['Name des Gastes']);
+  const guests = client.transactions.filter(listing => listing['Name des Gastes']);
+  const corrections = client.transactions.filter(listing => !listing['Name des Gastes']);
+  
 
   const letter = {
     title: 'Airgreets Gmbh',
@@ -173,9 +174,6 @@ export function createPDF(clients, id) {
   ];
 
   const correctionRows = createRows(corrections, correctionFields, guestRows.length);
-
-  console.log(correctionRows);
-
   const newCorrectionRows = correctionRows.map(row => {
     const rowArr = [];
     const firstRow = [ 
@@ -252,7 +250,7 @@ export function createPDF(clients, id) {
     },
     {
       name: 'Darin enthaltene Ust. (19%)',
-      value: calculateTotals('Rechnungs', guests, corrections, 'tax') + '€'
+      value: calculateTaxTotals('Rechnungs', guests, corrections) + '€'
     }
   ]; 
 

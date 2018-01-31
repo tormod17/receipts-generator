@@ -321,20 +321,17 @@ const calcTotalListings = (listings) => {
 const mapStateToProps = state => {
   const { clients } = state;
   const { message, invoices } = clients;
+  console.log(invoices, 'invoices');
   let total = 0;
   invoices && Object.keys(invoices || {}).map((key) => {
-    invoices[key].Rechnungsbetrag = invoices && calcTotalListings(invoices[key].listings); 
+    invoices[key].Rechnungsbetrag = invoices && calcTotalListings(invoices[key].transactions); 
     total += invoices[key].Rechnungsbetrag;
   });
   let locked =true;
   let currentDate;
   if (invoices) {
-    locked =  Object.values(invoices)[0]
-      &&  Object.values(invoices)[0].listings[0]
-        && Object.values(invoices)[0].listings[0].locked;
-    currentDate = Object.values(invoices)[0]
-      &&  Object.values(invoices)[0].listings[0]
-        && Object.values(invoices)[0].listings[0]['Rechnungs-datum'];
+    locked =  Object.values(invoices)[0] && Object.values(invoices)[0].locked;
+    currentDate = Object.values(invoices)[0] && Number(Object.values(invoices)[0]['Rechnungs-datum']);
   }
   return {
     message,
