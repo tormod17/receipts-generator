@@ -114,8 +114,10 @@ ReceiptDB.insertMany(listings, err => {
                   res.json({
                     message: 'entfernt',
                     invoice: {
-                      ...client,
-                      ...newInvoice
+                      [newInvoice._id]: {
+                        ...client,
+                        ...newInvoice
+                      }
                     }
                   });
                 });
@@ -200,14 +202,6 @@ exports.updateInvoiceHandler = (req, res) => {
         });
 };
 
-
-
-
-
-
-   
-
-
 exports.delClientHandler = (req, res) => {
   if (!req.body) return console.error('no body to request');
   const ids = [...req.body];
@@ -248,11 +242,11 @@ exports.getClientsHandler = (req, res) => {
               ReceiptDB.find({ clientId: invoice.clientId})
                 .exec((err, trans) => {
                   if (err) return reject(err);
-                  console.log(client._doc);
+              
                   const newInvoice = {
                     ...client._doc,
                     ...invoice._doc,
-                    listings: [ ...trans]
+                    transactions: [ ...trans]
                   };
                    resolve(newInvoice);
                 });

@@ -2,7 +2,7 @@ const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
 const InvoiceDB = require('../models/invoice');
 
-const { formatDate, getDateQuery } = require('../helpers/helpers');
+const { formatDate, getDateQuery, findTransactionsByIds } = require('../helpers/helpers');
 const xlsx = require('xlsx');
 const uuidv1 = require('uuid/v1');
 const DATETIMESTAMP = Date.now();
@@ -50,7 +50,7 @@ exports.uploadHandler = (req, res, next) => {
       p[c['Kunden-nummer']] = {
         ...c,
         _id: c['Kunden-nummer'],
-        listings: listings.filter(bill => bill['Kunden-nummer'] === c['Kunden-nummer']).map(bill => bill._id),
+        transactions: listings.filter(bill => bill['Kunden-nummer'] === c['Kunden-nummer']).map(bill => bill._id),
         created: DATETIMESTAMP,
         Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
         'Rechnungs-datum': formatDate(c['Rechnungs-datum']) || DATETIMESTAMP
@@ -58,7 +58,7 @@ exports.uploadHandler = (req, res, next) => {
       return p;
     }, {});
 
-    ReceiptDB.insertMany(listings, err => {
+    ReceiptDB.insertMany(listings, (err, newListings) => {
         if (err) {
           return res.json({ message: err });
         } else {      
@@ -72,15 +72,34 @@ exports.uploadHandler = (req, res, next) => {
                   .where('clientId').equals(client['Kunden-nummer'])
                   .exec((err, invoice) => {
                       if(invoice.length) {
-                       // update invoice with more transactions. 
-                        console.log('invoice update >>>>');
-                        const currentInvoice = { ...invoice[0] };
-                        currentInvoice.transactions =  [...invoice[0].transactions, ...client.listings];
-                        InvoiceDB.update({_id: currentInvoice._id }, currentInvoice, err => {
-                          if (err) return resolve(err);
-                            resolve({...currentInvoice });
+                        // update invoice with more transactions also need to return existing 
+                        // transactions for each invoice. 
+                        const currentInvoice = { ...invoice[0]._doc };
+                        const allTrans = [currentInvoice.transactions, ...client.transactions].map(trans => {
+                          return new Promise((resolve, reject) => {
+                            ReceiptDB.findById(trans)
+                              .then( newtrans => {
+                                resolve(newtrans);
+                              })
+                              .catch(err => {
+                                reject(err);
+                              });
+                          });
                         });
-                              
+                        Promise.all(allTrans)
+                          .then(trans => {
+                            InvoiceDB.findByIdAndUpdate( currentInvoice._id, currentInvoice, { new: true},  err => {
+                                if (err) return resolve(err);
+                                resolve({
+                                  ...client,
+                                  ...currentInvoice,
+                                  transactions: [...trans]
+                                });
+                            });  
+                          })
+                          .catch(err => {
+                            reject(err);
+                          });
                      } else {
                       // Create a new Invoice 
                       InvoiceDB.find({ clientId: invoice.clientId}).exec((err, invoices) => {
@@ -88,34 +107,24 @@ exports.uploadHandler = (req, res, next) => {
                           _id: uuidv1(),
                           clientId: client['Kunden-nummer'],
                           'Rechnungs-datum': client['Rechnungs-datum'],
-                          transactions: client.listings,
+                          transactions: client.transactions,
                           'Rechnungs-nummer': (invoices.length + 1),
                           Belegart: client.Belegart
                         };
                         if (invoices.length) {  
-                          console.log('New invoice only');
                             // Only Invoice and add increment
                           InvoiceDB.create(newInvoice, err => {
                             if (err) return resolve(err);
-                            newInvoice['transactions'] = listings.map(listing => {
-                              if (newInvoice.transactions.includes(listing._id)){
-                                return listing;
-                              }
-                            });
+                            newInvoice['transactions'] = findTransactionsByIds(newListings, newInvoice);
                             resolve({...newInvoice });
                           });   
                         } else {
-                          // new invoice and client
+                          // new invoice and client already exists as invoice with client Id exists.
                           InvoiceDB.create(newInvoice, err => {
                             if (err) return reject(err);
-                            ClientDB.create(client, err => {
+                            ClientDB.findByIdAndUpdate(client._id, client, err => {
                               if (err) return reject(err);
-                              console.log('New invoice and Client', newInvoice.transactions, listings);
-                              newInvoice['transactions'] = listings.map(listing => {
-                                if (newInvoice.transactions.includes(listing._id)){
-                                  return listing;
-                                }
-                              });
+                              newInvoice['transactions'] = findTransactionsByIds(newListings, newInvoice);
                               resolve({
                                 ...client,
                                 ...newInvoice
@@ -132,7 +141,7 @@ exports.uploadHandler = (req, res, next) => {
           Promise.all(invPromises)
             .then(invs => {
               const newIvoices = invs.reduce((p, c) => {
-                p[c['Kunden-nummer']] = {
+                p[c._id] = {
                   ...c
                 };
                 return p;

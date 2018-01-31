@@ -36,12 +36,18 @@ exports.calculateTotals = (type, guests, corrections, tax) => {
       a +=   corrections;
       return a;
   }, 0);
-
-  
   if (tax) {
     return (((sumGuests + sumCorr) / 119 ) * 19).toFixed(2);
   }
   return (sumGuests + sumCorr).toFixed(2) ;
+};
+
+exports.findTransactionsByIds = (transactions, currentInvoice) => {
+  return transactions.map(listing => {
+    if (currentInvoice.transactions.includes(listing._id)) {
+      return listing;
+    }
+  }).filter(listing => { if(listing) return listing });
 };
 
 exports.getDateQuery = (month, year) => {
