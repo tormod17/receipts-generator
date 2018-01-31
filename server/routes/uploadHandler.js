@@ -142,7 +142,8 @@ exports.uploadHandler = (req, res, next) => {
             .then(invs => {
               const newIvoices = invs.reduce((p, c) => {
                 p[c._id] = {
-                  ...c
+                  ...c,
+                  'Rechnungs-datum': Number(c['Rechnungs-datum'])
                 };
                 return p;
               }, {});
