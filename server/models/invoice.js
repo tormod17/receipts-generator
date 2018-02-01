@@ -10,10 +10,10 @@ const InvoiceSchema = new mongoose.Schema({
     clientId: {
         type: String
     },
-    'Rechnungs-nummer': {
+    'Rechnungsnummer': {
         type: Number
     },
-    'Rechnungs-datum': {
+    'Rechnungsdatum': {
         type: String
     },
     transactions: {

@@ -22,7 +22,7 @@ exports.saveMonthHandler = (req, res) => {
         p[c._id] = {
           ...c._doc,
           ...invoices[c._id],
-          'Rechnungs-datum': Number(c['Rechnungs-datum']),
+          'Rechnungsdatum': Number(c['Rechnungsdatum']),
           transactions: [ ...invoices[c._id].transactions ].filter(trans => trans !== null)
         };
         return p;

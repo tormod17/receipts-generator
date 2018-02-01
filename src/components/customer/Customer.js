@@ -123,28 +123,28 @@ export default class Customer extends React.Component {
           <Col>            
             <EditableField 
               updateFieldValue={this.handleValueChange}
-              name="Kunden-nummer" 
-              placeholder="Kunden-nummer" 
-              value={client['Kunden-nummer']}
+              name="Kundennummer" 
+              placeholder="Kundennummer" 
+              value={client['Kundennummer']}
               required
               />
           </Col>
           <Col>
-          <Label for="Rechnungs-datum">Rechnungs-datum</Label>
+          <Label for="Rechnungsdatum">Rechnungsdatum</Label>
             <InputGroupAddon>
               <DayPickerInput 
-                value={`${formatDate(new Date(Number(client['Rechnungs-datum'])|| TIMESTAMP), 'LL', 'de')}`}
+                value={`${formatDate(new Date(Number(client['Rechnungsdatum'])|| TIMESTAMP), 'LL', 'de')}`}
                 formatDate={formatDate}
                 parseDate={parseDate}
                 format="LL"
-                placeholder={`${formatDate(new Date(Number(client['Rechnungs-datum']) || TIMESTAMP), 'LL', 'de')}`}
+                placeholder={`${formatDate(new Date(Number(client['Rechnungsdatum']) || TIMESTAMP), 'LL', 'de')}`}
                 dayPickerProps={{
                   locale: 'de',
                   localeUtils: MomentLocaleUtils
                 }}
-                name="Rechnungs-datum"
+                name="Rechnungsdatum"
                 onDayChange={(val) =>
-                  this.handleValueChange('Rechnungs-datum', val, 'client')
+                  this.handleValueChange('Rechnungsdatum', val, 'client')
                 }
                 required
               />

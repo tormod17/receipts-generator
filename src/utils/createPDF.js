@@ -24,9 +24,9 @@ export function createPDF(clients, id) {
     customer: {
       Kunde: client['Kunde'],
       Stadt: client['Stadt'],
-      'Straße': client['Straße'], 
+      Straße: client['Straße'], 
       PLZ: client['PLZ'],
-      'Kunden-nummer': 'Kundennummer  '+ client['Kunden-nummer']
+      Kundennummer: 'Kundennummer  '+ client['Kundennummer']
     },
     heading: client['Belegart'] === 'Rechnung' ? 'Rechnungsübersicht' : 'Auszahlungsübersicht',
     subHeading: 'Bitte bei Zahlung und Schriftverkehr angeben',
@@ -298,7 +298,7 @@ export function createPDF(clients, id) {
       {
         columns: [
           {
-            text: letter.customer.Kunde + '\n'+ letter.customer['Straße'] + '\n'+ letter.customer.PLZ + ' '+ letter.customer.Stadt + '\n'+letter.customer['Kunden-nummer'],
+            text: letter.customer.Kunde + '\n'+ letter.customer['Straße'] + '\n'+ letter.customer.PLZ + ' '+ letter.customer.Stadt + '\n'+letter.customer['Kundennummer'],
             alignment: 'left',
             style: 'address'
           },
@@ -314,7 +314,7 @@ export function createPDF(clients, id) {
         style: 'heading'
       },
       {
-        text: 'München, den  ' + formatDate(new Date(Number(client['Rechnungs-datum'])),  'LL', 'de'),
+        text: 'München, den  ' + formatDate(new Date(Number(client['Rechnungsdatum'])),  'LL', 'de'),
         alignment: 'right'
       },
       {

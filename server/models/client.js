@@ -10,7 +10,7 @@ const ClientSchema = new mongoose.Schema({
     Kunde: {
         type: String
     },
-    'Kunden-nummer': {
+    'Kundennummer': {
         type: String
     },
     'Straße':{
@@ -25,7 +25,7 @@ const ClientSchema = new mongoose.Schema({
     Belegart: {
         type: String
     },
-    'Rechnungs-datum': {
+    'Rechnungsdatum': {
         type: String
     },
     'Rechnungsnummer':{

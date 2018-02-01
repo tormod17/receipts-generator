@@ -25,8 +25,8 @@ const requiredFields = [
   'Straße',
   'Stadt',
   'PLZ',
-  'Kunden-nummer',
-  'Rechnungs-datum'
+  'Kundennummer',
+  'Rechnungsdatum'
 ];
 
 const requiredFieldsGuest = [
@@ -184,8 +184,8 @@ class Client extends Component {
   }
 
   updateFieldValue(field, value, type, id){
-    if (!this.state.client['Rechnungs-datum']) {
-      this.state.client['Rechnungs-datum'] = new Date().getTime();
+    if (!this.state.client['Rechnungsdatum']) {
+      this.state.client['Rechnungsdatum'] = new Date().getTime();
     }
     if ((/datum/).test(field)) {
       value = new Date(value).getTime();

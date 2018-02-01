@@ -26,7 +26,7 @@ exports.uploadHandler = (req, res, next) => {
     const listings = jsonResults.map(record => {
       const uuid = uuidv1();
       const dates = {
-        'Rechnungs-datum': formatDate(record['Rechnungs-datum']) || DATETIMESTAMP
+        'Rechnungsdatum': formatDate(record['Rechnungsdatum']) || DATETIMESTAMP
       };
       if (record['Anreisedatum']) {
         dates['Anreisedatum'] = formatDate(record['Anreisedatum']);
@@ -39,7 +39,7 @@ exports.uploadHandler = (req, res, next) => {
         filename,
         userId,
         created: DATETIMESTAMP,
-        clientId: record['Kunden-nummer'],
+        clientId: record['Kundennummer'],
         ...dates,
         _id: uuid
       };
@@ -47,13 +47,13 @@ exports.uploadHandler = (req, res, next) => {
     });
   
     const customers = listings.reduce((p, c) => {
-      p[c['Kunden-nummer']] = {
+      p[c['Kundennummer']] = {
         ...c,
-        _id: c['Kunden-nummer'],
-        transactions: listings.filter(bill => bill['Kunden-nummer'] === c['Kunden-nummer']).map(bill => bill._id),
+        _id: c['Kundennummer'],
+        transactions: listings.filter(bill => bill['Kundennummer'] === c['Kundennummer']).map(bill => bill._id),
         created: DATETIMESTAMP,
         Belegart: (c['Auszahlung'] && 'Auszahlung' || c['Rechnung'] && 'Rechnung'),
-        'Rechnungs-datum': formatDate(c['Rechnungs-datum']) || DATETIMESTAMP
+        'Rechnungsdatum': formatDate(c['Rechnungsdatum']) || DATETIMESTAMP
       };
       return p;
     }, {});
@@ -64,12 +64,12 @@ exports.uploadHandler = (req, res, next) => {
         } else {      
           const invPromises = Object.values(customers).map(client => {
               return new Promise((resolve, reject) => {
-                const month =  new Date(Number(client['Rechnungs-datum'])).getMonth();
-                const year = new Date(Number(client['Rechnungs-datum'])).getFullYear();
+                const month =  new Date(Number(client['Rechnungsdatum'])).getMonth();
+                const year = new Date(Number(client['Rechnungsdatum'])).getFullYear();
                 const dateQuery = getDateQuery(month, year);
 
                 InvoiceDB.find(dateQuery)
-                  .where('clientId').equals(client['Kunden-nummer'])
+                  .where('clientId').equals(client['Kundennummer'])
                   .exec((err, invoice) => {
                       if(invoice.length) {
                         // update invoice with more transactions also need to return existing 
@@ -105,10 +105,10 @@ exports.uploadHandler = (req, res, next) => {
                       InvoiceDB.find({ clientId: invoice.clientId}).exec((err, invoices) => {
                         const newInvoice = {
                           _id: uuidv1(),
-                          clientId: client['Kunden-nummer'],
-                          'Rechnungs-datum': client['Rechnungs-datum'],
+                          clientId: client['Kundennummer'],
+                          'Rechnungsdatum': client['Rechnungsdatum'],
                           transactions: client.transactions,
-                          'Rechnungs-nummer': (invoices.length + 1),
+                          'Rechnungsnummer': (invoices.length + 1),
                           Belegart: client.Belegart
                         };
                         if (invoices.length) {  
@@ -143,7 +143,7 @@ exports.uploadHandler = (req, res, next) => {
               const newIvoices = invs.reduce((p, c) => {
                 p[c._id] = {
                   ...c,
-                  'Rechnungs-datum': Number(c['Rechnungs-datum'])
+                  'Rechnungsdatum': Number(c['Rechnungsdatum'])
                 };
                 return p;
               }, {});

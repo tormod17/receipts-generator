@@ -4,19 +4,19 @@ const InvoiceDB = require('../models/invoice');
 
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
-const { formatDate, getDateQuery } = require('../helpers/helpers');
+const { formatDate, getDateQuery, findTransactionsByIds } = require('../helpers/helpers');
 
 exports.addClientHandler = (req, res) => {
   // Check if customer already exists 
   if (!req.query.userId && !client) return console.error('no userId'); 
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
-  client._id = client['Kunden-nummer'];
+  client._id = client['Kundennummer'];
 
   console.log('ADDING A USER MANUALLY'); 
 
-  const month =  new Date(Number(client['Rechnungs-datum'])).getMonth();
-  const year = new Date(Number(client['Rechnungs-datum'])).getFullYear();
+  const month =  new Date(Number(client['Rechnungsdatum'])).getMonth();
+  const year = new Date(Number(client['Rechnungsdatum'])).getFullYear();
 
   const transactions = [ 
     ...Object.values(guests || {}),
@@ -25,8 +25,8 @@ exports.addClientHandler = (req, res) => {
 
   const listings = transactions.map(record =>{
     const dates = {};
-    if (record['Rechnungs-datum']) {
-        dates['Rechnungs-datum'] = formatDate(record['Rechnungs-datum'])|| DATETIMESTAMP;
+    if (record['Rechnungsdatum']) {
+        dates['Rechnungsdatum'] = formatDate(record['Rechnungsdatum'])|| DATETIMESTAMP;
     }
     if (record['Anreisedatum']) {
         dates['Anreisedatum'] = formatDate(record['Anreisedatum'])|| DATETIMESTAMP;
@@ -34,13 +34,14 @@ exports.addClientHandler = (req, res) => {
     if (record['Abreisedatum (Leistungsdatum)']) {
         dates['Abreisedatum (Leistungsdatum)'] = formatDate(record['Abreisedatum (Leistungsdatum)']);
     }
+
     return {
         ...client,
         ...record,
         filename: 'manual entry',
         userId,
         created: DATETIMESTAMP,
-        clientId: client['Kunden-nummer'],
+        clientId: client['Kundennummer'],
         ...dates,
         Belegart
     };
@@ -48,38 +49,45 @@ exports.addClientHandler = (req, res) => {
 
 const transactionsKeys = transactions.map(trans => trans._id);
 const dateQuery = getDateQuery(month, year);
-
+// new invoice, client and transaction , new invoice and new transaction , new transaction
 ReceiptDB.insertMany(listings, err => {
   if(err) { 
       return res.json( { message: err });
   } else {   
     InvoiceDB.find(dateQuery)
-      .where('clientId').equals(client['Kunden-nummer'])
+      .where('clientId').equals(client['Kundennummer'])
       .exec((err, invoice) => {
           if(invoice.length) {
-           // update invoice with more transactions. 
-            console.log('invoice update >>>>');
-            const currentInvoice = { ...invoice[0] };
-            currentInvoice.transactions =  [...invoice[0].transactions, ...transactionsKeys];
-            InvoiceDB.update({_id: currentInvoice._id }, currentInvoice, err => {
-            if (err) return res.json({ message: err });
-            res.json({
-              message: 'entfernt',
-              client: {
-                ...currentInvoice
-              }
-            });
+            // If invoice exists update invoice with more transactions. 
+            const currentInvoice = { ...invoice[0]._doc };
+            currentInvoice.transactions = [...currentInvoice.transactions, ...transactionsKeys]
+            console.log('New transaction on existing invoice');
+            // list of ids need to return the transactions associated with the invoice. 
+            ReceiptDB.find({
+              '_id': [...currentInvoice.transactions]
+            })
+            .exec((err, transactions) => {
+              InvoiceDB.findByIdAndUpdate(currentInvoice._id, currentInvoice, err => {
+                if (err) return res.json({ message: err });
+                currentInvoice.transactions = [...transactions]
+                res.json({
+                  message: 'entfernt',
+                  client: {
+                    ...currentInvoice
+                  }
+                });
+            })
           });
                   
          } else {
-          // Create a new Invoice 
-          InvoiceDB.find({ clientId: invoice.clientId}).exec((err, invoices) => {
+          // Create a new Invoice first find all of the other invoices for that client
+          InvoiceDB.find({ clientId: client._id}).exec((err, invoices) => {
             const newInvoice = {
               _id: uuidv1(),
-              clientId: client['Kunden-nummer'],
-              'Rechnungs-datum': client['Rechnungs-datum'],
+              clientId: client['Kundennummer'],
+              'Rechnungsdatum': client['Rechnungsdatum'],
               transactions: transactionsKeys,
-              'Rechnungs-nummer': (invoices.length + 1),
+              Rechnungsnummer: (invoices.length + 1),
               Belegart
             };
             if (invoices.length) {  
@@ -101,11 +109,11 @@ ReceiptDB.insertMany(listings, err => {
               });   
             } else {
               // new invoice and client
+              console.log('New invoice and Client');
               InvoiceDB.create(newInvoice, err => {
                 if (err) return res.json({ message: err });
                 ClientDB.create(client, err => {
                   if (err) return res.json({ message: err });
-                  console.log('New invoice and Client', newInvoice.transactions, listings);
                   newInvoice['transactions'] = listings.map(listing => {
                     if (newInvoice.transactions.includes(listing._id)){
                       return listing;
@@ -145,8 +153,8 @@ exports.updateInvoiceHandler = (req, res) => {
         _id: invoiceId,
         Belegart,
         clientId: client.clientId,
-        'Rechnungs-nummer': client['Rechnungs-nummer'],
-        'Rechnungs-datum': client['Rechnungs-datum'],
+        'Rechnungsnummer': client['Rechnungsnummer'],
+        'Rechnungsdatum': client['Rechnungsdatum'],
         transactions: [...client.listings]
       };
       const updatedClient = {
@@ -166,7 +174,7 @@ exports.updateInvoiceHandler = (req, res) => {
                 if (!model) {
                   listing.created = DATETIMESTAMP;
                   listing.Belegart = Belegart;
-                  listing['Rechnungs-datum'] = Number(client['Rechnungs-datum']);
+                  listing['Rechnungsdatum'] = Number(client['Rechnungsdatum']);
                   ReceiptDB.create(listing, err => {
                     if (err) {
                       reject(err);

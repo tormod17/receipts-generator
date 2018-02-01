@@ -110,7 +110,7 @@ class Home extends Component {
       ...this.state.clients
     };
     Object.keys(newClients).forEach((key) => {
-      newClients[key]['Rechnungs-datum'] = new Date(selectedDay).getTime();
+      newClients[key]['Rechnungsdatum'] = new Date(selectedDay).getTime();
      
     });
     this.setState({
@@ -331,7 +331,7 @@ const mapStateToProps = state => {
   let currentDate;
   if (invoices) {
     locked =  Object.values(invoices)[0] && Object.values(invoices)[0].locked;
-    currentDate = Object.values(invoices)[0] && Number(Object.values(invoices)[0]['Rechnungs-datum']);
+    currentDate = Object.values(invoices)[0] && Number(Object.values(invoices)[0]['Rechnungsdatum']);
   }
   return {
     message,

@@ -58,9 +58,9 @@ exports.emailHandler = (req, res) => {
 
       const html = htmlTemplate({ 
           name: client['Kunde'],
-          customerNumber: client['Kunden-nummer'],
+          customerNumber: client['Kundennummer'],
           Rechnungsnummer: client['Rechnungsnummer'],
-          Rechnungsdatum: `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`,
+          Rechnungsdatum: `${formatDate(new Date(Number(client['Rechnungsdatum'])), 'LL', 'de')}`,
           headings: ['Name des Gastes',  'Anreisedatum', 'Abreisedatum', 'Leistungsbeschreinung', '', 'Betrag'],
           listings: [...client.listings],
           guests: [...guests],

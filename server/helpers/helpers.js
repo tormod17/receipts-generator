@@ -63,7 +63,7 @@ exports.getDateQuery = (month, year) => {
     const toDate = new Date(toYear, Number(toMonth), 1).getTime();  
 
     let query = {
-      'Rechnungs-datum': {
+      'Rechnungsdatum': {
        '$gte': fromDate,
        '$lt': toDate
       }

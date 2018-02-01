@@ -98,11 +98,11 @@ class Tableclients extends Component {
           <Table striped>
             <thead>
               <tr>
-                <th>Kunden-nummer</th>
+                <th>Kundennummer</th>
                 <th>Kunde</th>
                 <th>Belegart</th>
                 <th>Rechnungsnummer</th>     
-                <th>Rechnungs-datum</th> 
+                <th>Rechnungsdatum</th> 
                 <th>Rechnungsbetrag</th>
                 <th>
                   <CheckBox {...hoptions} />
@@ -121,11 +121,11 @@ class Tableclients extends Component {
                   <tr
                     key={client._id}
                   >
-                    <td  onClick={() => this.handleClick(client)} >{ `${client['Kunden-nummer']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Kundennummer']}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Kunde']}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Belegart']}`}</td>
-                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungs-nummer']}`}</td>
-                    <td  onClick={() => this.handleClick(client)} >{ `${formatDate(new Date(Number(client['Rechnungs-datum'])), 'LL', 'de')}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsnummer']}`}</td>
+                    <td  onClick={() => this.handleClick(client)} >{ `${formatDate(new Date(Number(client['Rechnungsdatum'])), 'LL', 'de')}`}</td>
                     <td  onClick={() => this.handleClick(client)} >{ `${client['Rechnungsbetrag'].toFixed(2)}€`}</td>
                     <td> 
                       <CheckBox {...options} />
