@@ -98,6 +98,8 @@ class Client extends Component {
     const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
     const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
 
+    console.log(isCorrections);
+
     const currentFields = [...clientKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
     if (Belegart === 'Belegart') {
       return ['Belegart'];

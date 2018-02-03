@@ -7,7 +7,6 @@ const uuidv1 = require('uuid/v1');
 const { formatDate, getDateQuery, findTransactionsByIds } = require('../helpers/helpers');
 
 exports.addClientHandler = (req, res) => {
-  // Check if customer already exists 
   if (!req.query.userId && !client) return console.error('no userId'); 
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
@@ -25,6 +24,7 @@ exports.addClientHandler = (req, res) => {
 
   const listings = transactions.map(record =>{
     const dates = {};
+
     if (record['Rechnungsdatum']) {
         dates['Rechnungsdatum'] = formatDate(record['Rechnungsdatum'])|| DATETIMESTAMP;
     }
@@ -49,94 +49,91 @@ exports.addClientHandler = (req, res) => {
 
 const transactionsKeys = transactions.map(trans => trans._id);
 const dateQuery = getDateQuery(month, year);
-// new invoice, client and transaction , new invoice and new transaction , new transaction
-ReceiptDB.insertMany(listings, err => {
-  if(err) { 
-      return res.json( { message: err });
-  } else {   
-    InvoiceDB.find(dateQuery)
-      .where('clientId').equals(client['Kundennummer'])
-      .exec((err, invoice) => {
-          if(invoice.length) {
-            // If invoice exists update invoice with more transactions. 
-            const currentInvoice = { ...invoice[0]._doc };
-            currentInvoice.transactions = [...currentInvoice.transactions, ...transactionsKeys]
-            console.log('New transaction on existing invoice');
-            // list of ids need to return the transactions associated with the invoice. 
-            ReceiptDB.find({
-              '_id': [...currentInvoice.transactions]
-            })
-            .exec((err, transactions) => {
-              InvoiceDB.findByIdAndUpdate(currentInvoice._id, currentInvoice, err => {
-                if (err) return res.json({ message: err });
-                currentInvoice.transactions = [...transactions]
-                res.json({
-                  message: 'entfernt',
-                  client: {
-                    ...currentInvoice
-                  }
-                });
-            })
+
+// Check invoice for given month. 
+  InvoiceDB
+    .find({clientId: client['Kundennummer']})
+    .exec()
+    .then(invoices => {
+      const newInvoice = {
+        _id: uuidv1(),
+        clientId: client['Kundennummer'],
+        Rechnungsdatum: client['Rechnungsdatum'],
+        transactions: transactionsKeys,
+        Rechnungsnummer: (invoices.length + 1),
+        Belegart
+      };
+      console.log(invoices.length, 'Are there Invoices with that client Id');
+      if(invoices.length) {
+         
+        const { $lt, $gte }  = dateQuery.Rechnungsdatum;
+        const invoicesInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt).length
+        if (invoicesInDateRange) {
+          return res.json({
+            message: 'Diese Kundennummer existiert bereits',
+            invoice: {} 
           });
-                  
-         } else {
-          // Create a new Invoice first find all of the other invoices for that client
-          InvoiceDB.find({ clientId: client._id}).exec((err, invoices) => {
-            const newInvoice = {
-              _id: uuidv1(),
-              clientId: client['Kundennummer'],
-              'Rechnungsdatum': client['Rechnungsdatum'],
-              transactions: transactionsKeys,
-              Rechnungsnummer: (invoices.length + 1),
-              Belegart
-            };
-            if (invoices.length) {  
-                console.log('New invoice only');
-                // Only Invoice and add increment
-                InvoiceDB.create(newInvoice, err => {
-                newInvoice['transactions'] = listings.map(listing => {
-                  if (newInvoice.transactions.includes(listing._id)){
-                    return listing;
-                  }
-                });
-                res.json({
-                  message: 'entfernt',
-                  invoice: {
-                    ...client,
-                    ...newInvoice
-                  }
-                });
-              });   
-            } else {
-              // new invoice and client
-              console.log('New invoice and Client');
-              InvoiceDB.create(newInvoice, err => {
-                if (err) return res.json({ message: err });
-                ClientDB.create(client, err => {
-                  if (err) return res.json({ message: err });
-                  newInvoice['transactions'] = listings.map(listing => {
-                    if (newInvoice.transactions.includes(listing._id)){
-                      return listing;
-                    }
-                  });
-                  res.json({
-                    message: 'entfernt',
-                    invoice: {
-                      [newInvoice._id]: {
-                        ...client,
+        } else  {
+          // Create new invoice for this month
+          console.log('Create new invoice for existing client for new month.');
+          InvoiceDB.create(newInvoice)
+            .then(() => {
+              ReceiptDB.insertMany(listings)
+                .then(()=> {
+                  // Return new invoice, with new transaction return client details
+                  ClientDB.findById(client._id)
+                    .then((savedClient) =>{
+                      newInvoice['transactions'] = listings.map(listing => {
+                        if (newInvoice.transactions.includes(listing._id)){
+                          return listing;
+                        }
+                      });
+                      console.log({
+                        ...savedClient,
                         ...newInvoice
-                      }
-                    }
+                      });
+                      res.json({
+                        message: 'entfernt',
+                        invoice: {
+                          ...savedClient,
+                          ...newInvoice
+                        }
+                      })
+                    })
+                })
+            })
+        }
+      } else {
+        console.log('Create new invoice and client');
+        InvoiceDB.create(newInvoice)
+          .then(() => {
+              ReceiptDB.insertMany(listings)
+              .then(() => {
+                  ClientDB.create(client)
+                    .then(() => {
+                      newInvoice['transactions'] = listings.map(listing => {
+                        if (newInvoice.transactions.includes(listing._id)){
+                          return listing;
+                        }
+                      });
+                      res.json({
+                        message: 'entfernt',
+                        invoice: {
+                          [newInvoice._id]: {
+                            ...client,
+                            ...newInvoice
+                          }
+                        }
+                      });
+                    })                   
                   });
-                });
-              });  
-            }
-          });
-         }
-      });
-    }
-  });
-};
+            })
+      }
+    })
+    .catch(err => {
+      res.json({message: err +''});
+    })
+}
 
 exports.updateInvoiceHandler = (req, res) => {
   // needs to only update the receipt details not client
@@ -250,6 +247,7 @@ exports.getClientsHandler = (req, res) => {
               ReceiptDB.find({ clientId: invoice.clientId})
                 .exec((err, trans) => {
                   if (err) return reject(err);
+                  //if(!invoice) return reject()
               
                   const newInvoice = {
                     ...client._doc,

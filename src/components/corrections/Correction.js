@@ -5,6 +5,14 @@ import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
 import { calculateTax } from '../../utils/apiUtils';
 
+const selectedName = (correction) => {
+  if (!correction['Rechnungskorrektur'] && !correction['Auszahlungskorrektur']) {
+    return 'Rechnungskorrektur'
+  }else {
+    return correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
+  }
+}
+
 export default class Correction extends React.Component {
   
   static defaultProps = {
@@ -19,12 +27,11 @@ export default class Correction extends React.Component {
   constructor(props) {
     super(props);
     const { correction } = props;
-    const selectedName = correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
     this.state = {
       correction, 
       reason: correction['Sonstige Leistungsbeschreibung'],
-      correctionsBelegart: selectedName,
-      total: correction[`${selectedName} in €`],
+      correctionsBelegart: selectedName(correction),
+      total: correction[`${selectedName(correction)} in €`],
       tax: true,
     }
     this.handleValueChange = this.handleValueChange.bind(this)
@@ -40,9 +47,8 @@ export default class Correction extends React.Component {
   componentWillReceiveProps(nextProps){
     const { correction } = nextProps;
     if(this.props.Belegart !== nextProps.Belegart){
-      const selectedName = correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
       this.setState({
-        correctionsBelegart: selectedName,
+        correctionsBelegart: selectedName(correction),
       })
     }
   }

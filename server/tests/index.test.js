@@ -56,6 +56,7 @@ describe('Returns index.html file from serve in dev mode', () => {
 
 describe.only('clients entry form will respond with the correct payloads', () => {
   let userId = '5a327139dd4b790d7d17e0e5';
+
   let data = {
     Belegart: "Rechnung",
     client: {
@@ -68,28 +69,37 @@ describe.only('clients entry form will respond with the correct payloads', () =>
       "Kundennummer": "333"
     },
     corrections: {},
-    guests: {
-      "0": {
-        "_id": "eec8f8ab-201b-4d9a-b372-89fd11de11f7",
-        "Anreisedatum": 1515153600000,
-        "Abreisedatum (Leistungsdatum)": 1517431009394,
-        "Name des Gastes": "Mini Mouse",
-        "Airgreets Service Fee (€)": "200",
-        "Gesamtumsatz Airgreets": "300",
-        "Auszahlung an Kunde": "100",
-        "Reinigungs-gebühr": "100",
-        "Airbnb Einkommen": "400"
-      }
-    }
+    guests: {}
   };
+
+  let guest ={
+    "0": {
+      "_id": "eec8f8ab-201b-4d9a-b372-89fd11de11f7",
+      "Anreisedatum": 1515153600000,
+      "Abreisedatum (Leistungsdatum)": 1517431009394,
+      "Name des Gastes": "Mini Mouse",
+      "Airgreets Service Fee (€)": "200",
+      "Gesamtumsatz Airgreets": "300",
+      "Auszahlung an Kunde": "100",
+      "Reinigungs-gebühr": "100",
+      "Airbnb Einkommen": "400"
+    }
+  }
+
+  let correction = {
+    "0": {
+      "_id": "fa643c76-37d1-4e18-bf99-b2cd9e1a9a44",
+      "Ust-Korrektur": "15.97",
+      "Sonstige Leistungsbeschreibung": "dirty",
+      "Rechnungskorrektur in €": "100"
+    }
+  }
 
   function removeAllCollections() {
     InvoiceDB.remove({}, (err, res) => {
-
       console.log('cleared Invoice Collection', res, err);
     });
     ReceiptDB.remove({}, (err, res) => {
-
       console.log('cleared Receipt Collection', res, err);
     });
     ClientDB.remove({ "Kundennummer": "333" }, (err, res) => {
@@ -112,25 +122,11 @@ describe.only('clients entry form will respond with the correct payloads', () =>
   });
 
 
-  it('Add a new customer and invoice with a single guest transation', () => {
-    const testData = {
-      ...data,
-    };
-    const testUrl = base_url + 'api/client?userId=' + userId;
-    request(testUrl, createConfig("post", testData), (json) => {
-      console.log(json)
-    });
-  });
-
-  it.only('Add an existing client and add new single guest transaction in the same month', () => {
+  it('Add an invoice with a new customer and invoice with a single guest transation in Jan', () => {
     const testData = {
       ...data,
       guests: {
-        "0": {
-          ...data.guests["0"],
-          "_id": "eec8f8ab-201b-4d9a-b372-89fd11de226",
-          "Name des Gastes": "second guest first month",
-        }
+        ...guest
       }
     };
     const testUrl = base_url + 'api/client?userId=' + userId;
@@ -139,16 +135,30 @@ describe.only('clients entry form will respond with the correct payloads', () =>
     });
   });
 
-  it('Add an existing client with a new single guest transaction in another month', () => {
+  it('Add a new invoice with a new client and add new single guest transaction in Jan', () => {
+    const testData = {
+      ...data,
+      guests: {
+        ...guest
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      // should create a new invocie and a new client in Jan.
+      console.log(json)
+    });
+  });
+
+  it('Add an existing client with a new single guest transaction in Feb', () => {
     const testData = {
       ...data,
       client: {
         ...data.client,
         "Rechnungsdatum": 1518609600000,
       },
-      guests: {
+      guests: {      
         "0": {
-          ...data.guests["0"],
+          ...guest["0"],
           "_id": "eec8f8ab-201b-4d9a-b372-89fd11de337", // always a unique key
           "Name des Gastes": "only guest second month",
         }
@@ -160,10 +170,82 @@ describe.only('clients entry form will respond with the correct payloads', () =>
     });
   });
 
+  it('Add an existing client with an additional single guest transaction in Feb', () => {
+    const testData = {
+      ...data,
+      client: {
+        ...data.client,
+        "Rechnungsdatum": 1518609600000,
+      },
+      guests: {
+        "0": {
+          ...guest["0"],
+          "_id": "eec8f8ab-201b-4d9a-b372-89fd11de338", // always a unique key
+          "Name des Gastes": "only guest second month",
+        }
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      console.log(json) // existing invoice for that month need to edit it.
+    });
+  });
 
+  it('Add an new client with a guest and a correction in Feb', () => {
+    const testData = {
+      ...data,
+      client: {
+        ...data.client,
+        "Rechnungsdatum": 1518609600000,
+        "Kundennummer": "448"
+      },
+      guests: {
+        "0": {
+          ...guest["0"],
+          "_id": "eec8f8ab-201b-4d9a-b372-89fd11de888", // always a unique key
+        }
+      },
+      corrections: {
+        ...correction
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      console.log(json) // existing invoice for that month need to edit it.
+    });
+  });
 
-  it('Update an existing invoice', () => {
-
+  it.only('Add an new client with a guest and a new correction in Feb', () => {
+    newCorrection = {
+      "0": {
+        ...correction["0"],
+        "_id": "fa643c76-37d1-4e18-bf99-b2cd9e1a9a3332",
+      }
+    }
+    newGuest = {
+      "0":{
+        ...guest["0"],
+        "_id": "fa643c76-37d1-4e18-bf99-b2cd9e1a9a555"
+      }
+    }
+    const testData = {
+      ...data,
+      client: {
+        ...data.client,
+        "Rechnungsdatum": 1518609600000,
+        "Kundennummer": "888"
+      },
+      guests: {
+        ...newGuest
+      },
+      corrections: {
+        ...newCorrection
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      console.log(json) // existing invoice for that month need to edit it.
+    });
   });
 
 
