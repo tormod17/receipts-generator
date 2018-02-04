@@ -1,3 +1,5 @@
+const uuidv4= require('uuid/v4');
+const DATETIMESTAMP = Date.now();
 
 exports.formatTimeStamp = (timeStamp) => {
   if (!timeStamp) return false;
@@ -16,10 +18,33 @@ exports.formatTimeStamp = (timeStamp) => {
   return newDate;
 };
 
+const formatDate = date => {
+  const timestamp = (/\D+/).test(date) ? new Date(date).getTime() : date;
+  return timestamp;
+};
+
 exports.formatDate = date => {
   const timestamp = (/\D+/).test(date) ? new Date(date).getTime() : date;
   return timestamp;
 };
+
+exports.createTransactionList = (list, filename) => {
+    return list.map(record => {
+    Object.keys(record).forEach(key => {
+      if (key.includes('datum')){
+        record[key] = formatDate(record[key]) || DATETIMESTAMP;
+      }
+    })
+    return {
+        ...record,
+        filename,
+        created: DATETIMESTAMP,
+        clientId: record['Kundennummer'],
+        Belegart: record['Auszahlung'] === 'X' ? 'Auszahlung' : 'Rechnung',
+        _id: uuidv4()
+    };      
+  })
+}
 
 exports.calculateTotals = (type, guests, corrections, tax) => {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';

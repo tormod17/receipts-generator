@@ -49,7 +49,7 @@ export default class Customer extends React.Component {
   }
 
   render() {
-    const { updateFieldValue, currentDate } = this.props;
+    const { updateFieldValue, currentDate, locked } = this.props;
     const { client } = this.state;
 
     return (
@@ -59,7 +59,8 @@ export default class Customer extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col>
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="Kunde" 
               placeholder="Name des Kunden" 
@@ -68,7 +69,8 @@ export default class Customer extends React.Component {
             />
           </Col>
           <Col>
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
                name="Emailadresse" 
                placeholder="Emailadresse" 
@@ -77,7 +79,8 @@ export default class Customer extends React.Component {
             />
           </Col>
           <Col>
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="Rechnungsnummer" 
               placeholder="Fortlaufende Rechnungsnummer" 
@@ -89,7 +92,8 @@ export default class Customer extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col >
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="Straße" 
               placeholder="Straße" 
@@ -99,7 +103,8 @@ export default class Customer extends React.Component {
               />
           </Col>
           <Col>
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="Stadt" 
               placeholder="Stadt" 
@@ -109,7 +114,8 @@ export default class Customer extends React.Component {
               />
           </Col>
           <Col>
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="PLZ" 
               placeholder="PLZ" 
@@ -121,7 +127,8 @@ export default class Customer extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col>            
-            <EditableField 
+            <EditableField
+              disabled={locked} 
               updateFieldValue={this.handleValueChange}
               name="Kundennummer" 
               placeholder="Kundennummer" 

@@ -98,8 +98,6 @@ class Client extends Component {
     const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
     const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
 
-    console.log(isCorrections);
-
     const currentFields = [...clientKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
     if (Belegart === 'Belegart') {
       return ['Belegart'];
@@ -219,18 +217,25 @@ class Client extends Component {
   render() {
     const { client, guests, corrections, Belegart } = this.state;
     const { locked } = this.props;
+    console.log(locked);
     return (
     <Form className="bill">
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>
-            <Dropdown
-              data={client}
-              name="Belegart"
-              items={['Rechnung', 'Auszahlung']}
-              updateFieldValue={this.updateFieldValue} 
-              selected={client['Belegart']|| 'Belegart'}
-            />
+            { locked &&
+              <h4> {client.Belegart}</h4>
+            }
+            { !locked && 
+              <Dropdown
+                data={client}
+                name="Belegart"
+                items={['Rechnung', 'Auszahlung']}
+                updateFieldValue={this.updateFieldValue} 
+                selected={client['Belegart']|| 'Belegart'}
+                disabled={locked}
+              />
+            }
           </Col>
           <Col sm={{ size:1, offset: 6}}>
             <i 
@@ -312,7 +317,7 @@ const mapStateToProps = (state, props) => {
   const client = invoices && invoices[id];
   const guests =  client && client.transactions.filter(listing => listing && listing['Name des Gastes']);
   const corrections = client && client.transactions.filter(listing =>  listing && !listing['Name des Gastes']);
-  const locked = guests && Object.values(guests)[0] && Object.values(guests)[0].locked;
+  const locked = invoices && invoices[id].locked;
   return {
     client: client && { ...client},
     guests: client  && { ...guests},

@@ -97,7 +97,7 @@ export default class Correction extends React.Component {
   render() {
     const { locked, correctionNumber, Belegart } = this.props;
     const { correctionsBelegart, correction, total, reason, tax } = this.state; 
-
+    console.log(locked);
     return (
       <div
         key={correctionNumber}
@@ -105,14 +105,21 @@ export default class Correction extends React.Component {
         <FormGroup row>
           <Col className="col-4">
             <hr/>
-            { Belegart === 'Rechnung' &&
+            { locked && 
+              <Input                   
+                placeholder={correctionsBelegart} 
+                value={correctionsBelegart}
+                disabled
+              />
+            }
+            { Belegart === 'Rechnung' && !locked &&
               <Input                   
                 placeholder="Rechnungskorrektur" 
                 value="Rechnungskorrektur"
                 disabled
               />
             }
-            { Belegart !== 'Rechnung' &&
+            { Belegart !== 'Rechnung' && !locked &&
               <Dropdown
                 disabled={locked}
                 name="correctionsBelegart"
@@ -156,7 +163,7 @@ export default class Correction extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            { (correctionsBelegart === 'Rechnungskorrektur' || Belegart === 'Rechnung' ) &&
+            { (correctionsBelegart === 'Rechnungskorrektur' || Belegart === 'Rechnung' ) && !locked &&
             <InputGroup>
               <InputGroupAddon>
                 <Input 

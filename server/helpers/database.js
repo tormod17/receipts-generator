@@ -2,28 +2,34 @@ const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
 const InvoiceDB = require('../models/invoice');
 
-exports.createInvoiceExistingClient = (newInvoice, trans, client, cb) => {
-  InvoiceDB.create(newInvoice)
+exports.updateInvoiceTrans = (invoice, newTrans, cb) => {
+  // get all transactions
+  invoice.transactions = [ ...invoice.transactions, ...newTrans];
+  InvoiceDB.findByIdAndUpdate(invoice._id, invoice, { new: true })
+    .then(updatedInvoice => {
+        ReceiptDB.insertMany(newTrans)      
+      })
+      .then(updatedInvoice => {
+        cb(null, invoice)
+      })
+      .catch(err =>{
+        cb(err)
+      })
+}
+
+exports.createInvoiceExistingClient = (invoice, trans, cb) => {
+  InvoiceDB.create(invoice)
     .then(() => {
       ReceiptDB.insertMany(listings)
         .then(() => {
           // Return new invoice, with new transaction return client details
-          ClientDB.findById(client._id)
-            .then((savedClient) => {
-              newInvoice['transactions'] = listings.map(listing => {
-                if (newInvoice.transactions.includes(listing._id)) {
-                  return listing;
-                }
-              });
-              cb(newInvoice)
-            })
+          cb(newInvoice)
         })
     })
     .catch(err => {
       cb(null, err);
     })
 }
-
 
 exports.createNewInvoiceAndClient = (newInvoice, trans, client, cb) => {
   InvoiceDB.create(newInvoice)
@@ -32,11 +38,6 @@ exports.createNewInvoiceAndClient = (newInvoice, trans, client, cb) => {
         .then(() => {
           ClientDB.create(client)
             .then(() => {
-              newInvoice['transactions'] = trans.map(listing => {
-                if (newInvoice.transactions.includes(listing._id)) {
-                  return listing;
-                }
-              });
               cb(null, newInvoice)
             })
         });

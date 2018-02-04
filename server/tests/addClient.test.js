@@ -10,7 +10,6 @@ const mongoTestURL = 'mongodb://localhost/airgreets-test';
 const base_url = 'http://localhost:3001/';
 const userId = '5a327139dd4b790d7d17e0e5';
 
-
 function createConfig(method, data) {
   return {
     method: method,
@@ -35,7 +34,7 @@ function parseJSON(response) {
   return response.json();
 }
 
-const request = (url, config, cb) => {
+function request(url, config, cb) {
   fetch(url, config)
     .then(checkStatus)
     .then(parseJSON)
@@ -47,6 +46,59 @@ const request = (url, config, cb) => {
     });
 };
 
+//let userId = '5a327139dd4b790d7d17e0e5';
+
+let data = {
+  Belegart: "Rechnung",
+  client: {
+    "Rechnungsdatum": 1517430999991,
+    "Kunde": "Micky Mouse",
+    "Emailadresse": "mouse@magic.com",
+    "Straße": "Goofy Street",
+    "Stadt": "Goof Town",
+    "PLZ": "SW11",
+    "Kundennummer": "333"
+  },
+  corrections: {},
+  guests: {}
+};
+
+let guest ={
+  "0": {
+    "_id": "eec8f8ab-201b-4d9a-b372-89fd11de11f7",
+    "Anreisedatum": 1515153600000,
+    "Abreisedatum (Leistungsdatum)": 1517431009394,
+    "Name des Gastes": "Mini Mouse",
+    "Airgreets Service Fee (€)": "200",
+    "Gesamtumsatz Airgreets": "300",
+    "Auszahlung an Kunde": "100",
+    "Reinigungs-gebühr": "100",
+    "Airbnb Einkommen": "400"
+  }
+}
+
+let correction = {
+  "0": {
+    "_id": "fa643c76-37d1-4e18-bf99-b2cd9e1a9a44",
+    "Ust-Korrektur": "15.97",
+    "Sonstige Leistungsbeschreibung": "dirty",
+    "Rechnungskorrektur in €": "100"
+  }
+}
+
+function removeAllCollections() {
+  InvoiceDB.remove({}, (err, res) => {
+    console.log('cleared Invoice Collection', res, err);
+  });
+  ReceiptDB.remove({}, (err, res) => {
+    console.log('cleared Receipt Collection', res, err);
+  });
+  ClientDB.remove({ "Kundennummer": "333" }, (err, res) => {
+    console.log('cleared Client Collection', res, err);
+  });
+}
+
+
 describe('Returns index.html file from serve in dev mode', () => {
   it('returns status code 200', () => {
     request(base_url);
@@ -54,59 +106,10 @@ describe('Returns index.html file from serve in dev mode', () => {
 });
 
 
-describe.only('clients entry form will respond with the correct payloads', () => {
-  let userId = '5a327139dd4b790d7d17e0e5';
+describe('clients entry form will respond with the correct payloads', () => {
 
-  let data = {
-    Belegart: "Rechnung",
-    client: {
-      "Rechnungsdatum": 1517430999991,
-      "Kunde": "Micky Mouse",
-      "Emailadresse": "mouse@magic.com",
-      "Straße": "Goofy Street",
-      "Stadt": "Goof Town",
-      "PLZ": "SW11",
-      "Kundennummer": "333"
-    },
-    corrections: {},
-    guests: {}
-  };
 
-  let guest ={
-    "0": {
-      "_id": "eec8f8ab-201b-4d9a-b372-89fd11de11f7",
-      "Anreisedatum": 1515153600000,
-      "Abreisedatum (Leistungsdatum)": 1517431009394,
-      "Name des Gastes": "Mini Mouse",
-      "Airgreets Service Fee (€)": "200",
-      "Gesamtumsatz Airgreets": "300",
-      "Auszahlung an Kunde": "100",
-      "Reinigungs-gebühr": "100",
-      "Airbnb Einkommen": "400"
-    }
-  }
-
-  let correction = {
-    "0": {
-      "_id": "fa643c76-37d1-4e18-bf99-b2cd9e1a9a44",
-      "Ust-Korrektur": "15.97",
-      "Sonstige Leistungsbeschreibung": "dirty",
-      "Rechnungskorrektur in €": "100"
-    }
-  }
-
-  function removeAllCollections() {
-    InvoiceDB.remove({}, (err, res) => {
-      console.log('cleared Invoice Collection', res, err);
-    });
-    ReceiptDB.remove({}, (err, res) => {
-      console.log('cleared Receipt Collection', res, err);
-    });
-    ClientDB.remove({ "Kundennummer": "333" }, (err, res) => {
-      console.log('cleared Client Collection', res, err);
-    });
-  }
-
+ 
   beforeAll(() => {
     removeAllCollections()
   });
@@ -215,7 +218,7 @@ describe.only('clients entry form will respond with the correct payloads', () =>
     });
   });
 
-  it.only('Add an new client with a guest and a new correction in Feb', () => {
+  it('Add an new client with a guest and a new correction in Feb', () => {
     newCorrection = {
       "0": {
         ...correction["0"],
@@ -247,6 +250,99 @@ describe.only('clients entry form will respond with the correct payloads', () =>
       console.log(json) // existing invoice for that month need to edit it.
     });
   });
+});
+
+describe.only('client can update invoice if not locked',  () => {
+
+  beforeAll(() => {
+    //removeAllCollections()
+    const testData = {
+      ...data,
+      guests: { ...guest }  ,
+      corrections: { ...correction }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("put", testData), (json) => {
+      console.log('success') // existing invoice for that month need to edit it.
+    });
+  });
+  beforeEach(() => {
+
+  });
+  afterEach(() => {
+
+
+  });
+  afterAll((done) => {
+    //removeAllCollections()
+  });
+
+  it.only('User can update a clients personal details', () => {
+    const testData = {
+      ...data,
+      client:{
+        ...data.client,
+        Kunde: "Ultimatte Warrior"
+      },
+      guests: { ...guest },
+      corrections: { ...correction}
+    };
+    const testUrl = base_url + 'api/invoice';
+    request(testUrl, createConfig("put", testData), (json) => {
+      console.log(json)
+    });
+  });
+  it('User can update existing guest details', () => {
+    const testData = {
+      ...data,
+      guests: {
+        ...guest
+      }
+    };
+    const testUrl = base_url + 'api/invoice' + userId;
+    request(testUrl, createConfig("put", testData), (json) => {
+      console.log(json)
+    });
+  });
+  it('User can add a guest to an invoice', () => {
+    const testData = {
+      ...data,
+      guests: {
+        ...guest
+      }
+    };
+    const testUrl = base_url + 'api/invoice' + userId;
+    request(testUrl, createConfig("put", testData), (json) => {
+      console.log(json)
+    });
+  });
+  it('User can update existing correction details', () => {
+    const testData = {
+      ...data,
+      guests: {
+        ...guest
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      console.log(json)
+    });
+  });
+  it('User can add a correction to an invoice', () => {
+    const testData = {
+      ...data,
+      guests: {
+        ...guest
+      }
+    };
+    const testUrl = base_url + 'api/client?userId=' + userId;
+    request(testUrl, createConfig("post", testData), (json) => {
+      console.log(json)
+    });
+  });
+});
+
+
 
 
   // it('Update a client with different guest details', () => {
@@ -475,4 +571,3 @@ describe.only('clients entry form will respond with the correct payloads', () =>
   //   const testUrl = base_url + 'api/clients?receiptId=' + receiptId;    request(testUrl, config, (json) => console.log(json));
 
   // });
-});

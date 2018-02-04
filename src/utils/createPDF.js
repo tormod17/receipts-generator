@@ -11,7 +11,7 @@ export function createPDF(clients, id) {
   const client = { ...clients[id] };  
   const guests = client.transactions.filter(listing => listing['Name des Gastes']);
   const corrections = client.transactions.filter(listing => !listing['Name des Gastes']);
-  
+  const isInvoice = client['Belegart'] === 'Rechnung';
 
   const letter = {
     title: 'Airgreets Gmbh',
@@ -28,10 +28,11 @@ export function createPDF(clients, id) {
       PLZ: client['PLZ'],
       Kundennummer: 'Kundennummer  '+ client['Kundennummer']
     },
-    heading: client['Belegart'] === 'Rechnung' ? 'Rechnungsübersicht' : 'Auszahlungsübersicht',
+    heading: isInvoice ? 'Rechnungsübersicht' : 'Auszahlungsübersicht',
     subHeading: 'Bitte bei Zahlung und Schriftverkehr angeben',
     invoiceNumber: 'Rechnungsnummer    '+ client['Rechnungsnummer'],
-    userText: 'Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto',
+    userText: isInvoice ? 'Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto' : 
+      'Der obige Betrag wird Dir die nächsten Tage auf Dein Konto überwiesen.',
     salu: 'Beste Grüße',
     userName: 'Florian',
     finfo: 'IBAN: DE22700700240017773301, SWIFT-BIC: DEUTDEDBMUC',

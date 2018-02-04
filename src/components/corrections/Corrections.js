@@ -37,6 +37,7 @@ export default class Corrections extends React.Component {
             handleDel={this.props.handleDelCorrection}
             correctionNumber={key}
             Belegart={Belegart}
+            locked={locked}
           />
         )}
         { Object.keys(corrections).length === 0 &&

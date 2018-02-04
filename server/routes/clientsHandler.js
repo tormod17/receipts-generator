@@ -4,7 +4,7 @@ const InvoiceDB = require('../models/invoice');
 
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
-const { formatDate, getDateQuery, findTransactionsByIds } = require('../helpers/helpers');
+const { formatDate, getDateQuery, findTransactionsByIds, createTransactionList } = require('../helpers/helpers');
 const { createInvoiceExistingClient, createNewInvoiceAndClient } = require('../helpers/database');
 
 exports.addClientHandler = (req, res) => {
@@ -23,48 +23,24 @@ exports.addClientHandler = (req, res) => {
     ...Object.values(corrections || {}) 
     ];
 
-  const listings = transactions.map(record =>{
-    const dates = {};
+  const listings = createTransactionList(transactions, 'manual entry');
 
-    if (record['Rechnungsdatum']) {
-        dates['Rechnungsdatum'] = formatDate(record['Rechnungsdatum'])|| DATETIMESTAMP;
-    }
-    if (record['Anreisedatum']) {
-        dates['Anreisedatum'] = formatDate(record['Anreisedatum'])|| DATETIMESTAMP;
-    } 
-    if (record['Abreisedatum (Leistungsdatum)']) {
-        dates['Abreisedatum (Leistungsdatum)'] = formatDate(record['Abreisedatum (Leistungsdatum)']);
-    }
+  const transactionsKeys = transactions.map(trans => trans._id);
+  const dateQuery = getDateQuery(month, year);
 
-    return {
-        ...client,
-        ...record,
-        filename: 'manual entry',
-        userId,
-        created: DATETIMESTAMP,
-        clientId: client['Kundennummer'],
-        ...dates,
-        Belegart
-    };
-  });
-
-const transactionsKeys = transactions.map(trans => trans._id);
-const dateQuery = getDateQuery(month, year);
-
-// Check invoice for given month. 
+  // Get all invoices by client Number
   InvoiceDB
     .find({clientId: client['Kundennummer']})
     .exec()
     .then(invoices => {
       const newInvoice = {
+        ...client,
         _id: uuidv1(),
         clientId: client['Kundennummer'],
-        Rechnungsdatum: client['Rechnungsdatum'],
-        transactions: transactionsKeys,
+        transactions: transactions,
         Rechnungsnummer: (invoices.length + 1),
         Belegart
       };
-      console.log(invoices.length, 'Are there Invoices with that client Id');
       if(invoices.length) {
          
         const { $lt, $gte }  = dateQuery.Rechnungsdatum;
@@ -77,7 +53,7 @@ const dateQuery = getDateQuery(month, year);
         } else  {
           // Create new invoice for this month
           console.log('Create new invoice for existing client for new month.');
-          createInvoiceExistingClient(newInvoice, listings, client, (err, updatedInvoice) => {
+          createInvoiceExistingClient(newInvoice, listings, (err, updatedInvoice) => {
             if (err) return res.json({message: err +''});
             res.json({
               message: 'entfernt',
@@ -91,19 +67,40 @@ const dateQuery = getDateQuery(month, year);
           })
         }
       } else {
-        console.log('Create new invoice and client');
-        createNewInvoiceAndClient(newInvoice, listings, client, (err, updatedInvoice) => {
-          if (err) return res.json({message: err +''});
-          res.json({
-            message: 'entfernt',
-            invoice: {
-              [updatedInvoice._id]: {
-               ...client,
-               ...updatedInvoice
-              }
+        ClientDB
+          .findById(client._id)
+          .then(savedClient => {
+            console.log(savedClient);
+            if (savedClient) {
+              console.log('Create new invoice for existing client no previous invoice');
+              createInvoiceExistingClient(newInvoice, listings, client, (err, updatedInvoice) => {
+                if (err) return res.json({message: err +''});
+                res.json({
+                  message: 'entfernt',
+                  invoice: {
+                    [newInvoice._id]: {
+                     ...client,
+                     ...newInvoice
+                    }
+                  }
+                });
+              })
+            } else {
+              console.log('Create new invoice and client'); 
+              createNewInvoiceAndClient(newInvoice, listings, client, (err, updatedInvoice) => {
+                if (err) return res.json({message: err +''});
+                res.json({
+                  message: 'entfernt',
+                  invoice: {
+                    [updatedInvoice._id]: {
+                     ...client,
+                     ...updatedInvoice
+                    }
+                  }
+                });
+              })
             }
-          });
-        })
+          })  
       }
     })
     .catch(err => {
@@ -116,143 +113,87 @@ exports.updateInvoiceHandler = (req, res) => {
   const { Belegart, guests, client, corrections } = req.body;
   const { invoiceId } = req.query;
 
-  const listings = [ ...Object.values(guests), ...Object.values(corrections) ];  
+  const transactions = [ ...Object.values(guests), ...Object.values(corrections) ];  
     if(!client && invoiceId ) return  res.json({ message: 'fail no invoice Id or client details' });
       client.Belegart = Belegart;
-      // we only store array of Ids not objects (better for parsing)
-      client.listings = listings.map(listing => listing._id); 
-
-      const updatedInvoice = {
-        _id: invoiceId,
-        Belegart,
-        clientId: client.clientId,
-        'Rechnungsnummer': client['Rechnungsnummer'],
-        'Rechnungsdatum': client['Rechnungsdatum'],
-        transactions: [...client.listings]
-      };
-      const updatedClient = {
+      const newInvoice = {
         PLZ: client.PLZ,
         Stadt: client.Stadt,
         Straße: client.Straße,
-        Emailadresse: client.Emailadresse
+        Emailadresse: client.Emailadresse,
+        Belegart,
+        clientId: client.clientId,
+        Rechnungsdatum: client['Rechnungsdatum'],
+        transactions: [...transactions],
+        _id: invoiceId,
       };
-      // update invoice
-      InvoiceDB.findByIdAndUpdate(invoiceId, updatedInvoice)
-        .then(() => {
-          //update listings
-          const updatedTransactions = listings.map(listing => {
-            return new Promise((resolve, reject) => {
-              ReceiptDB.findByIdAndUpdate(listing._id, listing, { new: true }, (err, model) => {
-                if (err) return reject(err);
-                if (!model) {
-                  listing.created = DATETIMESTAMP;
-                  listing.Belegart = Belegart;
-                  listing['Rechnungsdatum'] = Number(client['Rechnungsdatum']);
-                  ReceiptDB.create(listing, err => {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      resolve(listing);
-                    }                 
-                  });
-                } else {
-                  resolve(model);
+      // update invoice, new transactions need to be added as entities
+      InvoiceDB.findById(invoiceId)
+        .then(savedInv => {
+          // compare transactions
+          const savedTransIds = savedInv.transactions.map(trans => trans._id)
+          const newTransactions = [...transactions].filter(trans => !savedTransIds.includes(trans._id))
+          // check for any new transactions 
+          if (newTransactions.length) {
+            ReceiptDB.insertMany(newTransactions)
+              .catch(err => {
+                res.json({message: err +''});
+              })
+          }
+          InvoiceDB.findByIdAndUpdate(invoiceId, newInvoice, { new: true})
+            .then((updatedInvoice) =>{
+              res.json({
+                message: 'entfernt',
+                invoice: {
+                  [updatedInvoice._doc._id]: {
+                    ...updatedInvoice._doc
+                  }
                 }
-              });
-            });     
-          });
-          return Promise.all(updatedTransactions);
-        })
-        .then(() => {
-          // update client
-          ClientDB.findByIdAndUpdate(client._id, updatedClient, { new: true}, err => {
-            if (err) return res.json({message: err +''});
-            client.listings = [...listings];
-            res.json({ 
-              message: 'entfernt',
-              invoice: { 
-                [invoiceId]: {
-                  ...client
-                }
-              }
-            });
-          });
+              })
+            })    
         })
         .catch(err => {
           res.json({message: err +''});
-        });
-};
+        })
+
+}
 
 exports.delClientHandler = (req, res) => {
   if (!req.body) return console.error('no body to request');
   const ids = [...req.body];
-  const promises = ids.map( id => {
-    return new Promise((resolve, reject) => {
-        InvoiceDB.deleteOne({ _id: id }, (err) => {
-        if (err) reject(err);
-      }).then(() => {
-        ReceiptDB.remove({clientId: id}, (err) => {
-          if (err) reject(err);
-          resolve();          
-        });
-      });
-    });
-  });
-  Promise.all(promises)
-    .then(res.json({ 
-        data: ids, 
-        message: 'entfernt' 
-    }))
-    .catch((err)=>{
-      res.json({ message: '' + err});
-  });
-};
+
+  InvoiceDB.remove({_id: { $in: ids}}, (err, response) => {
+    if (err) return res.json({ message: '' + err});
+    res.json({
+      data: ids, 
+      message: 'entfernt' 
+    })
+  })
+}
 
 exports.getClientsHandler = (req, res) => {
   /// needs to accept time parameters
   if (!req.query) return console.error('no userId');
   const { month, year } = req.query;
   // get invoices in a date range
-  InvoiceDB.find(getDateQuery(month, year)) 
-    .exec((err, invoices) => {
-      // for each invoice get all their invoices. 
-      const invPromises = invoices.map( invoice => {
-        return new Promise((resolve, reject) => {
-          ClientDB.findById(invoice.clientId)
-            .then(client => {
-              ReceiptDB.find({ clientId: invoice.clientId})
-                .exec((err, trans) => {
-                  if (err) return reject(err);
-                  //if(!invoice) return reject()
-              
-                  const newInvoice = {
-                    ...client._doc,
-                    ...invoice._doc,
-                    transactions: [ ...trans]
-                  };
-                   resolve(newInvoice);
-                });
-            })
-            .catch(err => {
-              reject(err);
-            });
+  InvoiceDB.find(getDateQuery(month, year))
+    .exec()
+    .then(invs => {
+      // for each invoice must get client details
+      const newIvoices = invs.reduce((p, c) => {
+          p[c._id] = {
+            ...c._doc
+          };
+          return p;
+        }, {});
+        res.json({ 
+          invoices: { ...newIvoices }, 
+          message: 'entfernt' 
         });
-      });
-      Promise.all(invPromises)
-        .then(invs => {
-          const newIvoices = invs.reduce((p, c) => {
-            p[c._id] = {
-              ...c
-            };
-            return p;
-          }, {});
-          res.json({ 
-            invoices: { ...newIvoices }, 
-            message: 'entfernt' 
-          });
-        })
-        .catch((err)=>{
-          res.json({ message: '' + err});
-        });
-    });
-};
+    })
+    .catch(err => {
+      res.json({ message: '' + err});
+    })
+}
+
+
