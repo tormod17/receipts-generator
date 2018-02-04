@@ -1,46 +1,46 @@
 const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
-const InvoiceDB = require('../models/invoice');
+const InvoiceDB = require('../models/invoice')
 
-exports.updateInvoiceTrans = (invoice, newTrans, cb) => {
-  // get all transactions
+exports.updateInvoice = (invoice, newTrans, cb) => {
   invoice.transactions = [ ...invoice.transactions, ...newTrans];
   InvoiceDB.findByIdAndUpdate(invoice._id, invoice, { new: true })
-    .then(updatedInvoice => {
+    .then(updatedInv => {
         ReceiptDB.insertMany(newTrans)      
-      })
-      .then(updatedInvoice => {
-        cb(null, invoice)
-      })
-      .catch(err =>{
-        cb(err)
-      })
-}
-
-exports.createInvoiceExistingClient = (invoice, trans, cb) => {
-  InvoiceDB.create(invoice)
-    .then(() => {
-      ReceiptDB.insertMany(listings)
         .then(() => {
-          // Return new invoice, with new transaction return client details
-          cb(newInvoice)
+          cb(null, updatedInv)
         })
     })
-    .catch(err => {
-      cb(null, err);
+    .catch(err =>{
+      cb(err)
     })
 }
 
-exports.createNewInvoiceAndClient = (newInvoice, trans, client, cb) => {
+
+exports.createNewInvoiceAndClient = (newInvoice, client, cb) => {
   InvoiceDB.create(newInvoice)
     .then(() => {
-      ReceiptDB.insertMany(trans)
+      ReceiptDB.insertMany(newInvoice.trans)
         .then(() => {
           ClientDB.create(client)
             .then(() => {
               cb(null, newInvoice)
             })
         });
+    })
+    .catch(err => {
+      cb(err);
+    })
+}
+
+
+exports.createNewInvoice = (newInvoice, cb ) => {
+  InvoiceDB.create(newInvoice)
+    .then(() => {
+      ReceiptDB.insertMany(newInvoice.trans)
+        .then(() => {
+          cb(null, newInvoice)
+        })
     })
     .catch(err => {
       cb(err);

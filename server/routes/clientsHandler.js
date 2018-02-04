@@ -5,7 +5,7 @@ const InvoiceDB = require('../models/invoice');
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 const { formatDate, getDateQuery, findTransactionsByIds, createTransactionList } = require('../helpers/helpers');
-const { createInvoiceExistingClient, createNewInvoiceAndClient } = require('../helpers/database');
+const { createNewInvoice, createNewInvoiceAndClient } = require('../helpers/database');
 
 exports.addClientHandler = (req, res) => {
   if (!req.query.userId && !client) return console.error('no userId'); 
@@ -53,7 +53,7 @@ exports.addClientHandler = (req, res) => {
         } else  {
           // Create new invoice for this month
           console.log('Create new invoice for existing client for new month.');
-          createInvoiceExistingClient(newInvoice, listings, (err, updatedInvoice) => {
+          createNewInvoice(newInvoice, listings, (err, updatedInvoice) => {
             if (err) return res.json({message: err +''});
             res.json({
               message: 'entfernt',
@@ -70,10 +70,9 @@ exports.addClientHandler = (req, res) => {
         ClientDB
           .findById(client._id)
           .then(savedClient => {
-            console.log(savedClient);
             if (savedClient) {
               console.log('Create new invoice for existing client no previous invoice');
-              createInvoiceExistingClient(newInvoice, listings, client, (err, updatedInvoice) => {
+              createNewInvoice(newInvoice, listings, client, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 res.json({
                   message: 'entfernt',
@@ -134,7 +133,7 @@ exports.updateInvoiceHandler = (req, res) => {
           const savedTransIds = savedInv.transactions.map(trans => trans._id)
           const newTransactions = [...transactions].filter(trans => !savedTransIds.includes(trans._id))
           // check for any new transactions 
-          if (newTransactions.length) {
+          if (newTransactions.length > 0) {
             ReceiptDB.insertMany(newTransactions)
               .catch(err => {
                 res.json({message: err +''});
@@ -176,7 +175,8 @@ exports.getClientsHandler = (req, res) => {
   if (!req.query) return console.error('no userId');
   const { month, year } = req.query;
   // get invoices in a date range
-  InvoiceDB.find(getDateQuery(month, year))
+  InvoiceDB
+    .find(getDateQuery(month, year))
     .exec()
     .then(invs => {
       // for each invoice must get client details

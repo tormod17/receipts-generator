@@ -3,7 +3,7 @@ const ClientDB = require('../models/client');
 const InvoiceDB = require('../models/invoice');
 
 const { formatDate, getDateQuery, findTransactionsByIds, createTransactionList } = require('../helpers/helpers');
-const { createInvoiceExistingClient, createNewInvoiceAndClient, updateInvoiceTrans } = require('../helpers/database');
+const { createInvoiceExistingClient, createNewInvoiceAndClient, updateInvoice, createNewInvoice } = require('../helpers/database');
 
 const xlsx = require('xlsx');
 const uuidv4 = require('uuid/v4');
@@ -28,110 +28,91 @@ exports.uploadHandler = (req, res, next) => {
     .sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
   const transactions = createTransactionList(jsonResults, filename)
-  // Add transactions to each customer.
-  const customers = transactions.reduce((p, c) => {
-    p[c['Kundennummer']] = {
-      ...c,
-      _id: c['Kundennummer'],
-      transactions: transactions.filter(bill => bill['Kundennummer'] === c['Kundennummer']),
-      created: DATETIMESTAMP,
-      Belegart: c['Auszahlung'] === 'x' ? 'Auszahlung': 'Rechnung',
-      Rechnungsdatum: formatDate(c['Rechnungsdatum']) || DATETIMESTAMP
-    };
-    return p;
-  }, {});
+  // Add transactions to each invocice.
+  let invoices = []
+  transactions.forEach(t => {
+    if (!invoices.find(inv => inv.Kundennummer === t.Kundennummer)) {
+      invoices.push({
+        PLZ: t.PLZ,
+        Stadt: t.Stadt,
+        Straße: t.Straße,
+        Emailadresse: t.Emailadresse,
+        Kundennummer: t.Kundennummer,
+        Kunde: t.Kunde,
+        transactions: transactions.filter(trans => trans['Kundennummer'] === t['Kundennummer']),
+        clientId: t.Kundennummer,
+        created: DATETIMESTAMP,
+        Belegart: t['Auszahlung'] === 'x' ? 'Auszahlung': 'Rechnung',
+        Rechnungsdatum: formatDate(t['Rechnungsdatum']) || DATETIMESTAMP
+      })
+    }
+  })
 
-  const invPromises = Object.values(customers).map(client => {
+  const invPromises = invoices.map(invoice => {
     return new Promise((resolve, reject) => {
-      const month =  new Date(Number(client['Rechnungsdatum'])).getMonth();
-      const year = new Date(Number(client['Rechnungsdatum'])).getFullYear();
-      const dateQuery = getDateQuery(month, year);
-      //find invoices by month and client id. 
+      //check if invoice for client exists, either update invoice for client or create new invoice
       InvoiceDB
-        .find({clientId: client['Kundennummer']})
+        .find({clientId: invoice.clientId })
         .exec()
         .then(invoices => {
-          //console.log(invoices, 'This should be a list of invoices');
-          const newInvoice = {
-            ...client,
-            clientId: client['Kundennummer'],
-            Rechnungsdatum: client['Rechnungsdatum'],
-            transactions: [ ...client.transactions ],
-            Rechnungsnummer: (invoices.length + 1),
-            _id: uuidv4()
-          };
+          // Any invoice exist for said client 
           if(invoices.length) {
+            const newInvoice = {
+              _id: uuidv4(),
+              Rechnungsnummer: invoices.length  + 1,
+              ...invoice,
+            }
+            const month =  new Date(Number(invoice['Rechnungsdatum'])).getMonth();
+            const year = new Date(Number(invoice['Rechnungsdatum'])).getFullYear();
+            const dateQuery = getDateQuery(month, year);
             const { $lt, $gte }  = dateQuery.Rechnungsdatum;
-            const invoiceInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt);
-            if (invoiceInDateRange.length > 0) {  
-              // update invoice with new transactions.
-              updateInvoiceTrans(invoiceInDateRange[0], newInvoice.transactions, (err, updatedInvoice) =>{
+            const currentInv = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt)[0];
+            if (currentInv) {
+              updateInvoice( currentInv, newInvoice.transactions, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 resolve({
-                   ...client,
-                   ...updatedInvoice
+                  ...updatedInvoice
                 })
               })
             } else {
-              // create new invoice for existing client
-              console.log('Create newInvoice for existing client');
-              createInvoiceExistingClient(newInvoice, newInvoice.transactions, (err, updatedInvoice) => {
+              createNewInvoice(newInvoice, (err, updatedInvoice) => { 
                 if (err) return res.json({message: err +''});
                 resolve({
-                   ...client,
-                   ...updatedInvoice
+                  ...updatedInvoice
                 })
-              });
+              })
             }
           } else {
-            // Check if client exist without invoice
-            ClientDB
-              .find({_id: client._id})
-              .then(existingClient => {
-                if (existingClient) {
-                  /// Only new Invoice.
-                  createInvoiceExistingClient(newInvoice, newInvoice.transactions, (err, updatedInvoice) => {
-                    if (err) return res.json({message: err +''});
-                    resolve({
-                       ...existingClient,
-                       ...updatedInvoice
-                    })
-                  });
-                } else {
-                  //create new client and new invoice.
-                  console.log('Create new Invoice and client');
-                  createNewInvoiceAndClient(newInvoice, newInvoice.transactions, client, (err, updatedInvoice) => {
-                    if (err) return res.json({message: err +''});
-                    resolve({
-                       ...client,
-                       ...updatedInvoice
-                    });
-                  })
-                }
+            const newInvoice = {
+              _id: uuidv4(),
+              Rechnungsnummer: 1,
+              ...invoice,
+            }
+            createNewInvoice(newInvoice, (err, updatedInvoice) => {
+              if (err) return res.json({message: err +''}); 
+              resolve({
+                ...updatedInvoice
               })
-              .catch(err => {
-                reject(err);
-              })          
+            })
           }
-        })
-        .catch(err => {
-          reject(err);
         })
     });
   });
   Promise.all(invPromises)
-    .then(invs => { // an array of objects
-      const newIvoices = invs.reduce((p, c) => {
+    .then(invs => {
+      const newInvoices = invs.reduce((p,c) => {
         p[c._id] = { ...c };
         return p;
-      }, {});
+      }, {})
       res.json({ 
-        invoices: { ...newIvoices }, 
+        invoices: { ...newInvoices }, 
         message: 'entfernt' 
-      });
+      })
     })
     .catch(err =>{
       res.json({ message: '' + err});
     });
-};
+}
+
+
 
