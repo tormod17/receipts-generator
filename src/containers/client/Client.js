@@ -317,7 +317,7 @@ const mapStateToProps = (state, props) => {
   const client = invoices && invoices[id];
   const guests =  client && client.transactions.filter(listing => listing && listing['Name des Gastes']);
   const corrections = client && client.transactions.filter(listing =>  listing && !listing['Name des Gastes']);
-  const locked = invoices && invoices[id].locked;
+  const locked = invoices && invoices[id] && invoices[id].locked;
   return {
     client: client && { ...client},
     guests: client  && { ...guests},
