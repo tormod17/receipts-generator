@@ -6,11 +6,7 @@ import EditableField from './../editableField/EditableField';
 import { calculateTax } from '../../utils/apiUtils';
 
 const selectedName = (correction) => {
-  if (!correction['Rechnungskorrektur'] && !correction['Auszahlungskorrektur']) {
-    return 'Rechnungskorrektur'
-  }else {
-    return correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
-  }
+  return correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
 }
 
 export default class Correction extends React.Component {
@@ -97,7 +93,7 @@ export default class Correction extends React.Component {
   render() {
     const { locked, correctionNumber, Belegart } = this.props;
     const { correctionsBelegart, correction, total, reason, tax } = this.state; 
-    console.log(locked);
+
     return (
       <div
         key={correctionNumber}

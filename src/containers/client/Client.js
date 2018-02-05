@@ -217,7 +217,6 @@ class Client extends Component {
   render() {
     const { client, guests, corrections, Belegart } = this.state;
     const { locked } = this.props;
-    console.log(locked);
     return (
     <Form className="bill">
         <FormGroup row>

@@ -42,7 +42,6 @@ exports.addClientHandler = (req, res) => {
         Belegart
       };
       if(invoices.length) {
-         
         const { $lt, $gte }  = dateQuery.Rechnungsdatum;
         const invoicesInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt).length
         if (invoicesInDateRange) {
@@ -53,8 +52,8 @@ exports.addClientHandler = (req, res) => {
         } else  {
           // Create new invoice for this month
           console.log('Create new invoice for existing client for new month.');
-          createNewInvoice(newInvoice, listings, (err, updatedInvoice) => {
-            if (err) return res.json({message: err +''});
+          createNewInvoice(newInvoice, (err, updatedInvoice) => {
+            if (err) return res.json({ message: err +'' });
             res.json({
               message: 'entfernt',
               invoice: {
@@ -72,7 +71,7 @@ exports.addClientHandler = (req, res) => {
           .then(savedClient => {
             if (savedClient) {
               console.log('Create new invoice for existing client no previous invoice');
-              createNewInvoice(newInvoice, listings, client, (err, updatedInvoice) => {
+              createNewInvoice(newInvoice, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 res.json({
                   message: 'entfernt',
@@ -86,7 +85,7 @@ exports.addClientHandler = (req, res) => {
               })
             } else {
               console.log('Create new invoice and client'); 
-              createNewInvoiceAndClient(newInvoice, listings, client, (err, updatedInvoice) => {
+              createNewInvoiceAndClient(newInvoice, client, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 res.json({
                   message: 'entfernt',

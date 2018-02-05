@@ -37,7 +37,7 @@ exports.createNewInvoiceAndClient = (newInvoice, client, cb) => {
 exports.createNewInvoice = (newInvoice, cb ) => {
   InvoiceDB.create(newInvoice)
     .then(() => {
-      ReceiptDB.insertMany(newInvoice.trans)
+      ReceiptDB.insertMany(newInvoice.transactions)
         .then(() => {
           cb(null, newInvoice)
         })

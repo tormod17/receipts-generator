@@ -56,7 +56,6 @@ export function calculateTaxTotals(type, guests, corrections) {
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, 'Ust-Korrektur');
-  console.log(((((sumGuests) / 119 ) * 19) + sumCorr).toFixed(2));
   return ((((sumGuests) / 119 ) * 19) + sumCorr).toFixed(2);
 }
 
