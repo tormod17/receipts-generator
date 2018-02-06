@@ -86,8 +86,7 @@ exports.createPDF = (client) => {
     return rowData.map((guest, index) => 
       fields.map( field  => {
         if ((/datum/).test(field)) {
-         // const foramattedDate = formatDate(new Date(Number(guest[field])),  'LL', 'de');
-          return  guest[field] //(/date/).test(foramattedDate) ? '-': foramattedDate;
+          return  guest[field] || '-' ;
         } else if ( field === '#') {
           return (Number(index) + 1) + numberOfRows;
         } else {
