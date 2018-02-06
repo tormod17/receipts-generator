@@ -1,5 +1,5 @@
 const pdfMake = require('pdfmake/build/pdfmake');
-const vfsFonts = require('pdfmake/build/vfs_fonts');
+const vfsFonts = require('./vfs_fonts');
 const { calculateTotals, calculateTaxTotals } = require('./helpers');
 const { formatDate } = require('react-day-picker/moment');
 //const 'moment/locale/de';
