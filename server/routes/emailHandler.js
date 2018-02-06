@@ -38,6 +38,7 @@ exports.emailHandler = (req, res) => {
             trans[key] = `${formatDate(new Date(Number(trans[key])), 'LL', 'de')}`
             console.log(trans[key]);
           }
+          trans[key] = trans[key] + ''
           trans[key].replace('€','')
         } 
         return trans; 
