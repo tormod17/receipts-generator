@@ -6,6 +6,8 @@ const path = require('path');
 
 const { formatDate } = require('react-day-picker/moment');
 
+const { createPDF } = require('../helpers/createPDF')
+
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
 
@@ -29,8 +31,20 @@ exports.emailHandler = (req, res) => {
   const promises = Object.values(clients).map(client=> {
     return new Promise ((resolve, reject) => {       
       const htmlTemplate = pug.compileFile(createEmailFilePath('html.pug'));
-      const guests = client.listings.filter(listing => listing['Name des Gastes']);
-      const corrections = client.listings.filter(listing => !listing['Name des Gastes']);
+
+      client.transactions = client.transactions.map(trans => {     
+        for (let key in trans){
+          if (key.includes('datum')){
+            trans[key] = `${formatDate(new Date(Number(trans[key])), 'LL', 'de')}`
+            console.log(trans[key]);
+          }
+          trans[key].replace('€','')
+        } 
+        return trans; 
+      })
+
+      const guests = client.transactions.filter(listing => listing['Name des Gastes']);
+      const corrections = client.transactions.filter(listing => !listing['Name des Gastes']);
 
       const totalFields = [ 
         {
@@ -62,7 +76,7 @@ exports.emailHandler = (req, res) => {
           Rechnungsnummer: client['Rechnungsnummer'],
           Rechnungsdatum: `${formatDate(new Date(Number(client['Rechnungsdatum'])), 'LL', 'de')}`,
           headings: ['Name des Gastes',  'Anreisedatum', 'Abreisedatum', 'Leistungsbeschreinung', '', 'Betrag'],
-          listings: [...client.listings],
+          transactions: [...client.transactions],
           guests: [...guests],
           corrections: [...corrections],
           totals: [...totalFields],
@@ -73,19 +87,26 @@ exports.emailHandler = (req, res) => {
       const subjectTemplate = pug.compileFile(createEmailFilePath('subject.pug'));
       const subject = subjectTemplate({ name: client['Kunde']});
 
-      const mailOptions = {
-        from: emailAddress,
-        to: emailAddress, //client['Emailadresse'], // emailAddress
-        subject,
-        html
-      };
-      transporter.sendMail(mailOptions)
-      .then((result) => {
-        resolve(result);
+      const pdf = createPDF(client).getBuffer((buffer) => {
+        const mailOptions = {
+          from: emailAddress,
+          to: emailAddress, //client['Emailadresse'], // emailAddress
+          attachments: [{
+              filename: `inv${client['Rechnungsnummer']}.pdf`,
+              content: buffer
+          }], 
+          subject,
+          html
+        };
+        transporter.sendMail(mailOptions)
+        .then((result) => {
+          resolve(result);
+        })
+        .catch(err => {
+          reject(err);
+        });
       })
-      .catch(err => {
-        reject(err);
-      });
+
     });
   });
 

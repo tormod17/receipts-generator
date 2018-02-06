@@ -32,7 +32,7 @@ html
           td(rowspan="3")= item[guestFields[1]]
           td(rowspan="3")= item[guestFields[2]]
           td(colspan="2")= 'Auszahlung'
-          td= item[guestFields[3]]
+          td(class="betrag")= item[guestFields[3]]
         tr
           td(colspan="2")= 'davon: Reinigungs-gebühr'
           td(class="betrag")= item[guestFields[4]]

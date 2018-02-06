@@ -138,7 +138,7 @@ class Home extends Component {
   handlePDF(){
     const { clients } = this.state;
     this.getSelectedIds().forEach(id => {
-      createPDF(clients, id);      
+      createPDF(clients[id]);      
     });
   }
   

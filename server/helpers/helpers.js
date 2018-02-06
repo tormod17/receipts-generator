@@ -1,6 +1,30 @@
 const uuidv4= require('uuid/v4');
 const DATETIMESTAMP = Date.now();
 
+
+const sumUpTotals = (transactions, fieldName) =>
+  Object.values(transactions || {}).reduce((a, b) => {
+    transactions = 
+      (b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, '')) || 0);
+    a +=   transactions;
+    return a;
+  }, 0);
+
+exports.calculateTotals = (type, guests, corrections) => {
+  const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
+  const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
+  const sumGuests = sumUpTotals(guests, key1);
+  const sumCorr = sumUpTotals(corrections, key2);
+  return (sumGuests + sumCorr).toFixed(2) ;
+}
+
+exports.calculateTaxTotals = (type, guests, corrections) => {
+  const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
+  const sumGuests = sumUpTotals(guests, key1);
+  const sumCorr = sumUpTotals(corrections, 'Ust-Korrektur');
+  return ((((sumGuests) / 119 ) * 19) + sumCorr).toFixed(2);
+}
+
 exports.formatTimeStamp = (timeStamp) => {
   if (!timeStamp) return false;
   let newDate = new Date(timeStamp);
@@ -18,12 +42,14 @@ exports.formatTimeStamp = (timeStamp) => {
   return newDate;
 };
 
-const formatDate = date => {
+
+exports.formatDate = date => {
   const timestamp = (/\D+/).test(date) ? new Date(date).getTime() : date;
   return timestamp;
 };
 
-exports.formatDate = date => {
+
+const formatDate = date => {
   const timestamp = (/\D+/).test(date) ? new Date(date).getTime() : date;
   return timestamp;
 };
