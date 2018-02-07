@@ -2,6 +2,7 @@ const { calculateTotals } = require('../helpers/helpers');
 const pug = require('pug');
 
 const nodemailer = require('nodemailer');
+const mg = require('nodemailer-mailgun-transport');
 const path = require('path');
 
 const { formatDate } = require('react-day-picker/moment');
@@ -11,13 +12,17 @@ const { createPDF } = require('../helpers/createPDF')
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
+const mgAPIKey = process.env.MAILGUN_API_KEY;
+const mgDomain = process.env.MAILGUN_DOMAIN;
+
+const auth = {
   auth: {
-    user: emailAddress,
-    pass: emailPassword
+    api_key: mgAPIKey,
+    domain: mgDomain
   }
-});
+}
+
+const transporter = nodemailer.createTransport(mg(auth));
 
 function createEmailFilePath(filename) {
   const newpath = process.env.NODE_ENV === 'production' ? 
@@ -94,7 +99,7 @@ exports.emailHandler = (req, res) => {
           to: emailAddress, //client['Emailadresse'], // emailAddress
           attachments: [{
               filename: `inv${client['Rechnungsnummer']}.pdf`,
-              content: buffer
+              content: new Buffer(buffer)
           }], 
           subject,
           html
