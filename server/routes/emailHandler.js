@@ -21,6 +21,7 @@ const auth = {
     domain: mgDomain
   }
 }
+console.log(auth);
 
 const transporter = nodemailer.createTransport(mg(auth));
 
@@ -41,7 +42,6 @@ exports.emailHandler = (req, res) => {
         for (let key in trans){
           if (key.includes('datum')){
             trans[key] = `${formatDate(new Date(Number(trans[key])), 'LL', 'de')}`
-            console.log(trans[key]);
           }
           trans[key] = trans[key] + ''
           trans[key].replace('€','')
@@ -106,6 +106,7 @@ exports.emailHandler = (req, res) => {
         };
         transporter.sendMail(mailOptions)
         .then((result) => {
+          console.log(result);
           resolve(result);
         })
         .catch(err => {
@@ -118,7 +119,6 @@ exports.emailHandler = (req, res) => {
 
   Promise.all(promises)
     .then((output) => { 
-      console.log(output);
       res.json({ 
         message: 'email sent' 
       });

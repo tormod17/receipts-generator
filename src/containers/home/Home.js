@@ -14,10 +14,10 @@ import 'moment/locale/de';
 
 //import { formatDate } from "../../utils/apiUtils";
 
-
 import 'react-day-picker/lib/style.css';
 
-import { createPDF } from '../../utils/createPDF';
+import { createPDF }  from '../../utils/createPDF';
+import { getText } from '../../language/';
 
 import TableData from '../../components/table/Table';
 import Dropdown from '../../components/dropdown/Dropdown';
@@ -32,19 +32,21 @@ import './home.css';
 
 const TIMESTAMP = new Date();
 
+console.log(getText);
+
 const MONTH = [
-  'Januar',
-  'Februar',
-  'Marz', 
-  'April',
-  'Mai', 
-  'Juni',
-  'Juli', 
-  'August', 
-  'September',
-  'Oktober',
-  'November',
-  'Dezember'
+  getText('MONTH.1'),
+  getText('MONTH.2'),
+  getText('MONTH.3'),
+  getText('MONTH.4'),
+  getText('MONTH.5'),
+  getText('MONTH.6'),
+  getText('MONTH.7'),
+  getText('MONTH.8'),
+  getText('MONTH.9'),
+  getText('MONTH.10'),
+  getText('MONTH.11'),
+  getText('MONTH.12')
 ];
 
 const YEAR = [
@@ -179,7 +181,7 @@ class Home extends Component {
   lockMonthEditing(){
     const { id } = this.props.auth;
     let event = new Event('lockMonth');
-    event.message = 'Bist du sicher?',
+    event.message = getText('CONFIRM.MESSAGE'),
     event.value = MONTH.indexOf(this.state.selectedMonth) + '-' +this.state.selectedYear;
     event.payload = { ...this.state.clients };
     event.id = id;
@@ -320,7 +322,6 @@ const calcTotalListings = (listings) => {
 const mapStateToProps = state => {
   const { clients } = state;
   const { message, invoices } = clients;
-  console.log(invoices, 'invoices');
   let total = 0;
   invoices && Object.keys(invoices || {}).map((key) => {
     invoices[key].Rechnungsbetrag = invoices && calcTotalListings(invoices[key].transactions); 

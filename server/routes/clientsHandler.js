@@ -2,6 +2,8 @@ const ReceiptDB = require('../models/receipts');
 const ClientDB = require('../models/client');
 const InvoiceDB = require('../models/invoice');
 
+const { getText } = require('../language/');
+
 const DATETIMESTAMP = Date.now();
 const uuidv1 = require('uuid/v1');
 const { formatDate, getDateQuery, findTransactionsByIds, createTransactionList } = require('../helpers/helpers');
@@ -46,7 +48,7 @@ exports.addClientHandler = (req, res) => {
         const invoicesInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt).length
         if (invoicesInDateRange) {
           return res.json({
-            message: 'Diese Kundennummer existiert bereits',
+            message: getText('CUSTOMER.EXISTS'),
             invoice: {} 
           });
         } else  {
@@ -55,7 +57,7 @@ exports.addClientHandler = (req, res) => {
           createNewInvoice(newInvoice, (err, updatedInvoice) => {
             if (err) return res.json({ message: err +'' });
             res.json({
-              message: 'entfernt',
+              message: getText('SUCCESS'),
               invoice: {
                 [newInvoice._id]: {
                  ...client,
@@ -74,7 +76,7 @@ exports.addClientHandler = (req, res) => {
               createNewInvoice(newInvoice, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 res.json({
-                  message: 'entfernt',
+                  message: getText('SUCCESS'),
                   invoice: {
                     [newInvoice._id]: {
                      ...client,
@@ -88,7 +90,7 @@ exports.addClientHandler = (req, res) => {
               createNewInvoiceAndClient(newInvoice, client, (err, updatedInvoice) => {
                 if (err) return res.json({message: err +''});
                 res.json({
-                  message: 'entfernt',
+                  message: getText('SUCCESS'),
                   invoice: {
                     [updatedInvoice._id]: {
                      ...client,

@@ -1,0 +1,87 @@
+{
+  "CONFIRM.MESSAGE":"Bist du sicher?",
+
+  "CUSTOMER.EXISTS": "Diese Kundennummer existiert bereits",
+  "SUCCESS": "entfernt",
+
+  "PAYOUT": "Auszahlung",
+  "INV":"Rechnung",
+  "INVS":"Rechnungs",
+  "REASON": "Leistungsbeschreinung",
+  "TYPE": "Belegart",
+  "AMOUNT": "Betrag",
+  "CORRECTION":"Korrektur",
+  "DATE": "datum",
+
+  "MONTH.1":"Januar",
+  "MONTH.2":"Februar",
+  "MONTH.3":"Marz",
+  "MONTH.4":"April",
+  "MONTH.5":"Mai",
+  "MONTH.6":"Juni",
+  "MONTH.7":"Juli",
+  "MONTH.8":"August",
+  "MONTH.9":"September",
+  "MONTH.10":"Oktober",
+  "MONTH.11":"November",
+  "MONTH.12":"Dezember",
+
+
+  "CUSTOMER.NAME":"",
+  "CUSTOMER.STREET":"",
+  "CUSTOMER.CITY":"",
+  "CUSTOMER.PLZ":"",
+  "CUSTOMER.NUMBER":"",
+
+
+  "INV.NUMBER": "Rechnungsnummer",
+  "INV.DATE": "Rechnungsdatum",
+
+  "LETTER.TITLE": "Airgreets Gmbh",
+  "LETTER.EMAIL": "hello@Airgreets.com",
+  "LETTER.DATE": "München, den   31.10.2017",
+  "LETTER.ADDRESS.STREET": "Waltherstraße 23",
+  "LETTER.ADDRESS.CITY": "80337 München",
+  "LETTER.HEADING1": "Rechnungsübersicht",
+  "LETTER.HEADING2": "Auszahlungsübersicht",
+  "LETTER.SUBHEADING":"Bitte bei Zahlung und Schriftverkehr angeben",
+  "LETTER.SALU": "Beste Grüße",
+  "LETTER.TEXT": "Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto",
+  "LETTER.TEXT1": "Der obige Betrag wird Dir die nächsten Tage auf Dein Konto überwiesen.",
+  "LETTER.TEXT2": "IBAN: DE22700700240017773301, SWIFT-BIC: DEUTDEDBMUC",
+  "LETTER.TEXT3": "Geschäftsführung: Julian Ritter, Sebastian Drescher",
+  "LETTER.TEXT4": "Florian Bogenschütz Handelsregister: Amtsgericht München, HRB-Nr. 227243",
+  "LETTER.TEXT5": "Sitz der Gesellschaft: München Steuernr: 143/112/10719",
+  "LETTER.TEXT6": "München, den  ",
+  "LETTER.NAME": "letter",
+
+  "USERNAME":"Florian",
+
+  "ARR.DATE": "Anreisedatum",
+  "DPRT.DATE": "Abreisedatum (Leistungsdatum)",
+
+  "TRANS.TYPE": "Belegart",
+  "TRANS.CUSTOMER": "Kunde",
+  "TRANS.EMAIL": "Emailadresse",
+  "TRANS.STREET": "Straße",
+  "TRANS.TOWN": "Stadt",
+  "TRANS.POSTCODE": "PLZ",
+  "TRANS.CUSTOMER.NO": "Kundennummer",
+
+  "TRANS.GUEST.NAME": "Name des Gastes",
+  "TRANS.ARR.DATE": "Abreisedatum",
+  "TRANS.DPRT.DATE": "Anreisedatum",
+  "TRANS.CLEANING": "Reinigungs-gebühr",
+  "TRANS.LETTER.CLEANING": " davon: Reinigungs-gebühr",
+
+  "TRANS.SRV.FEE":"davon: Airgreets Service Fee (€) (25%)",
+  "TRANS.GUEST.SRV.FEE":"Airgreets Service Fee (€)",
+  "TRANS.INCOME": "Airbnb Einkommen",
+  "TRANS.CORR.REASON":"Sonstige Leistungsbeschreibung",
+  "TRANS.CORR.INV":"Rechnungskorrektur in €",
+  "TRANS.CORR.PAYOUT":"Auszahlungskorrektur in €",
+  "TOTAL.INV":"Gesamtrechnungsbetrag",
+  "TOTAL.PAYOUT":"Gesamtauszahlungsbetrag",
+  "TOTAL.TAX": "Darin enthaltene Ust. (19%)"
+
+}

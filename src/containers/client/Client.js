@@ -9,6 +9,8 @@ import EditableField from '../../components/editableField/EditableField';
 import Corrections from '../../components/corrections/Corrections';
 import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
+import { getText } from '../../language/';
+
 
 import { calculateTotals, calculateTaxTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
@@ -19,14 +21,14 @@ import 'react-day-picker/lib/style.css';
 import "./client.css";
 
 const requiredFields = [ 
-  'Belegart',
-  'Kunde',
-  'Emailadresse',
-  'Straße',
-  'Stadt',
-  'PLZ',
-  'Kundennummer',
-  'Rechnungsdatum'
+  getText('TYPE'),
+  getText('CUSTOMER'),
+  getText('EMAIL'),
+  getText('STREET'),
+  getText('TOWN'),
+  getText('POSTCODE'),
+  getText('CUSTOMER.NUMBER'),
+  getText('INVOICE.DATE')
 ];
 
 const requiredFieldsGuest = [
@@ -34,23 +36,16 @@ const requiredFieldsGuest = [
   'Abreisedatum (Leistungsdatum)',
   'Anreisedatum',
   'Reinigungs-gebühr',
-//  'Gesamtumsatz Airgreets',
   'Airgreets Service Fee (€)'
 ];
 
 const requiredFieldsRechnungsCorrection = [
-  //'Rechnungskorrektur', 
   'Rechnungskorrektur in €',
-  //'Ust-Korrektur',
-  //'total',
   'Sonstige Leistungsbeschreibung'
 ];
 
 const requiredFieldsAuszhalungsCorrection = [
-  //'Auszhalungskorrektur', 
   'Auszahlungskorrektur in €',
-  // 'Ust-Korrektur',
-  //'total',
   'Sonstige Leistungsbeschreibung'
 ];
 
@@ -60,14 +55,14 @@ class Client extends Component {
     client: {},
     guests: {},
     correction: {},
-    Belegart: 'Belegart'
+    Belegart: getText('TYPE')
   }
 
   constructor(props) {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: client['Belegart'] || 'Belegart',
+      Belegart: client[getText('TYPE')] || getText('TYPE'),
       client: { ...client },
       guests: { ...guests},
       corrections: {...corrections},
@@ -81,7 +76,7 @@ class Client extends Component {
   componentWillReceiveProps(nextProps){
     if(this.props !== nextProps){
       this.setState({
-        Belegart: nextProps['Belegart'],
+        Belegart: nextProps[getText('TYPE')],
         client: { ...nextProps.client },
         guests: { ...nextProps.guests},
         corrections: {...nextProps.corrections},
@@ -98,11 +93,11 @@ class Client extends Component {
     const guestsKeys = isGuests && Object.keys(Object.values(guests)[0]);
     const correctionsKeys = isCorrections && Object.keys(Object.values(corrections)[0]);
 
-    const currentFields = [...clientKeys, ...guestsKeys, ...correctionsKeys, 'Belegart'];
-    if (Belegart === 'Belegart') {
-      return ['Belegart'];
+    const currentFields = [...clientKeys, ...guestsKeys, ...correctionsKeys, getText('TYPE')];
+    if (Belegart === getText('TYPE')) {
+      return [getText('TYPE')];
     }
-    if( Belegart !== 'Belegart' && !isGuests && !isCorrections) {
+    if( Belegart !== getText('TYPE') && !isGuests && !isCorrections) {
       fields = [ ...requiredFields ];
     }
     if( Belegart === 'Auszahlung' && isGuests && !isCorrections) {
@@ -134,7 +129,7 @@ class Client extends Component {
       ...this.state
     };
     let eventType  = invoiceId ? 'updateClient' : 'addClient';
-    let message = 'Bist du sicher?';
+    let message = getText('CONFIRM.MESSAGE');
     const missingFields = this.checkRequiredFields(data);
 
     if (missingFields.length > 0 && !invoiceId){

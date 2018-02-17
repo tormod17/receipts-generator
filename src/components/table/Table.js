@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Table, Input, Label } from 'reactstrap';
 import PropTypes from "prop-types";
 import { formatDate } from 'react-day-picker/moment';
-
+import { getText } from '../../language/';
 
 const CheckBox = (props) => {
   return (

@@ -62,7 +62,7 @@ class EditableField extends Component {
           name={name}
           type={type} 
           placeholder={placeholder}
-          onChange={(e) => this.handleOnChange(e,name)}
+          onChange={(e) => this.handleOnChange(e, name)}
           disabled={disabled}
           value={value}
           required
