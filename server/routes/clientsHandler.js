@@ -166,7 +166,7 @@ exports.delClientHandler = (req, res) => {
     if (err) return res.json({ message: '' + err});
     res.json({
       data: ids, 
-      message: 'entfernt' 
+      message: getText("DEL")
     })
   })
 }
@@ -189,7 +189,7 @@ exports.getClientsHandler = (req, res) => {
         }, {});
         res.json({ 
           invoices: { ...newIvoices }, 
-          message: 'entfernt' 
+          message: '' 
         });
     })
     .catch(err => {
