@@ -5,3 +5,13 @@
 .home-fa-twitter{
   margin-left: 2em;
 }
+
+
+.topbanner button {
+  border-radius: 0 !important;
+}
+
+.topbanner .input-group div:last-child.btn-group button {
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}

@@ -23,8 +23,8 @@ class Header extends Component {
     const isSignupPage = pathname.indexOf("signup") > -1;
 
     return (
-      <div>
-       <Nav pills>
+      <div className="header">
+       <Nav pills className="container">
          <NavItem>
          { isAuthenticated && 
            <NavLink 

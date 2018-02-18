@@ -26,7 +26,6 @@
   "MONTH.11":"November",
   "MONTH.12":"Dezember",
 
-
   "CUSTOMER.NAME":"",
   "CUSTOMER.STREET":"",
   "CUSTOMER.CITY":"",
@@ -80,8 +79,14 @@
   "TRANS.CORR.REASON":"Sonstige Leistungsbeschreibung",
   "TRANS.CORR.INV":"Rechnungskorrektur in €",
   "TRANS.CORR.PAYOUT":"Auszahlungskorrektur in €",
+  "TRANS.NO.CLIENT": "Keine Kunden",
+
   "TOTAL.INV":"Gesamtrechnungsbetrag",
   "TOTAL.PAYOUT":"Gesamtauszahlungsbetrag",
-  "TOTAL.TAX": "Darin enthaltene Ust. (19%)"
+  "TOTAL.TAX": "Darin enthaltene Ust. (19%)",
+
+  "EMAIL.NONE": "Keine email",
+  "EMAIL.SENDING": "E-Mail senden",
+  "EMAIL.SENT": "E-Mail gesendet"
 
 }

@@ -11,9 +11,6 @@ import MomentLocaleUtils, {
 } from 'react-day-picker/moment';
 
 import 'moment/locale/de';
-
-//import { formatDate } from "../../utils/apiUtils";
-
 import 'react-day-picker/lib/style.css';
 
 import { createPDF }  from '../../utils/createPDF';
@@ -196,13 +193,15 @@ class Home extends Component {
     const currentYear = currentDate ? new Date(currentDate).getFullYear() : selectedYear;
     return (
       <Container>
+        <div className="topbanner">
           <FormGroup row>
-            <Col sm={{ size:8 }}>
+            <Col sm={{ size: 9 }}>
               <h3>Willkommen {auth.username} {auth.email}</h3>
             </Col>
-            <Col sm={{ size:4 }}>
+            <Col sm={{ size: 3 }}>
             <InputGroup>
-               <InputGroupAddon>
+               <InputGroupAddon
+               >
                   <i 
                     className={`fa ${locked ? 'fa-lock' : 'fa-unlock'} fa-2x`} 
                     aria-hidden="true"
@@ -225,44 +224,41 @@ class Home extends Component {
             </InputGroup>
             </Col>
           </FormGroup>
-        <FormGroup row>
-          <Col sm={{ size:4 }}>
-            <InputGroupAddon>
-              <input 
-                type="file"
-                name="csvdata"
-                accept="text/cvs"
-                onChange={this.uploadFile}
-                ref={(input) => { this.newFile = input;}}
-                disabled={locked}
-               />        
-            </InputGroupAddon>
-          </Col>
-          <Col sm={{ size:4 }}>
-            <p>{message}</p>
-          </Col>
-          <Col sm={{ size:4  }}>
-            <InputGroupAddon>
-              <DayPickerInput
-                value={germanDate}
-                onDayChange={this.handleDayChange}
-                formatDate={formatDate}
-                parseDate={parseDate}
-                format="LL"
-                placeholder={germanDate}
-                dayPickerProps={{
-                  locale: 'de',
-                  localeUtils: MomentLocaleUtils
-                }}
-                disabled={locked} 
-              />
-            </InputGroupAddon>
+          <FormGroup row>
+            <Col sm={{ size:3 }}>
+              <InputGroupAddon>
+                <input 
+                  type="file"
+                  name="csvdata"
+                  accept="text/cvs"
+                  onChange={this.uploadFile}
+                  ref={(input) => { this.newFile = input;}}
+                  disabled={locked}
+                 />        
+              </InputGroupAddon>
             </Col>
-          </FormGroup>
-          <Row>
-        
-        </Row>
-        <br/>
+            <Col sm={{ size:6 }}>
+              <p className="message">{message}</p>
+            </Col>
+            <Col sm={{ size:3 }}>
+              <InputGroupAddon>
+                <DayPickerInput
+                  value={germanDate}
+                  onDayChange={this.handleDayChange}
+                  formatDate={formatDate}
+                  parseDate={parseDate}
+                  format="LL"
+                  placeholder={germanDate}
+                  dayPickerProps={{
+                    locale: 'de',
+                    localeUtils: MomentLocaleUtils
+                  }}
+                  disabled={locked} 
+                />
+              </InputGroupAddon>
+              </Col>
+            </FormGroup>
+        </div>
         <Row>
           {clients && 
             <TableData

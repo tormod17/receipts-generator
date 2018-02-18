@@ -24,20 +24,20 @@ html
 
     table
       tr
-        for heading in headings
-           th= heading
+      for heading in headings
+        th= heading
       for item in guests
         tr
           td(rowspan="3")= item[guestFields[0]]
           td(rowspan="3")= item[guestFields[1]]
           td(rowspan="3")= item[guestFields[2]]
-          td(colspan="2")= 'Auszahlung'
+          td(colspan="2") #{payout}
           td(class="betrag")= item[guestFields[3]]
         tr
-          td(colspan="2")= 'davon: Reinigungs-gebühr'
+          td(colspan="2") #{cleaning}
           td(class="betrag")= item[guestFields[4]]
         tr
-          td(colspan="2")= 'davon: Airgreets Service Fee (25%)'
+          td(colspan="2") #{service}
           td(class="betrag")= item[guestFields[5]] 
       for item in corrections
         tr
@@ -45,13 +45,13 @@ html
           td(rowspan="3")= item[correctionFields[1]]
           td(rowspan="3")= item[correctionFields[2]]
           td(rowspan="3")= item[correctionFields[3]]   
-          td= 'Korrektur'
+          td #{correction}
           td
         tr
-          td= 'Auszahlung'
+          td #{payout}
           td(class="betrag")= item[correctionFields[4]]   
         tr
-          td= 'Rechnung'
+          td #{inv}
           td(class="betrag")= item[correctionFields[5]]   
       for item in totals 
         tr

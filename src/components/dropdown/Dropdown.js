@@ -47,28 +47,28 @@ export default class Example extends React.Component {
   }
 
   render() {
-    const { items } = this.props;
+    const { items, className } = this.props;
     const { selected } =this.state
 
     return (
-      <ButtonDropdown 
-        isOpen={this.state.dropdownOpen} 
-        toggle={this.toggle}
-      >
-        <DropdownToggle caret>
-          {selected}
-        </DropdownToggle>
-        <DropdownMenu>
-          { items.map(item => 
-            <DropdownItem 
-              key={item}
-              onClick={() => this.handleSelectItem(item)}
-            >
-              {item}
-            </DropdownItem>
-          )}
-        </DropdownMenu>
-      </ButtonDropdown>
+        <ButtonDropdown 
+          isOpen={this.state.dropdownOpen} 
+          toggle={this.toggle}
+        >
+          <DropdownToggle caret>
+            {selected}
+          </DropdownToggle>
+          <DropdownMenu>
+            { items.map(item => 
+              <DropdownItem 
+                key={item}
+                onClick={() => this.handleSelectItem(item)}
+              >
+                {item}
+              </DropdownItem>
+            )}
+          </DropdownMenu>
+        </ButtonDropdown>
     );
   }
 }

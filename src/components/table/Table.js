@@ -91,9 +91,7 @@ class Tableclients extends Component {
 
       return  (
         <div
-          style={{
-            width: '100%'
-          }}
+         className="container"
         >
           <Table striped>
             <thead>

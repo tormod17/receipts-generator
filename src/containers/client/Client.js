@@ -213,7 +213,7 @@ class Client extends Component {
     const { client, guests, corrections, Belegart } = this.state;
     const { locked } = this.props;
     return (
-    <Form className="bill">
+    <Form className="bill container">
         <FormGroup row>
           <Col sm={{ size:5 }}>
             <br/>
@@ -292,8 +292,8 @@ class Client extends Component {
             />
           </Col>
         </FormGroup>
-        <Row className="">
-          <Col sm={{ size: 2, order: 2, offset: 10 }}>
+        <Row className="row__button">
+          <Col sm={{ size: 2, order: 1, offset: 10 }}>
             <Button onClick={this.handleSubmission} type="button" color="primary">
             Speichern
             </Button>

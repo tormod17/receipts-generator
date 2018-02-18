@@ -49,8 +49,7 @@ class App extends Component {
     return (
       <Router>
         <div>
-          <div className="container">
-            <Header auth={auth}  handleLogout={() => this.handleLogout()} />
+          <Header auth={auth}  handleLogout={() => this.handleLogout()} />
             <div className="appContent">
               <Switch>
                 <Route exact path="/" render={() => <Home {...this.props}/>} />
@@ -61,8 +60,7 @@ class App extends Component {
                 <Route path="/client" component={() => <Client  {...this.props}/>} />
                 <Route component={NotFound} />
               </Switch>
-            </div>
-          </div>
+            </div>       
           <ModalComp {...this.props}/>
           <Footer />
         </div>

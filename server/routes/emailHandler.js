@@ -4,10 +4,9 @@ const pug = require('pug');
 const nodemailer = require('nodemailer');
 const mg = require('nodemailer-mailgun-transport');
 const path = require('path');
-
 const { formatDate } = require('react-day-picker/moment');
-
-const { createPDF } = require('../helpers/createPDF')
+const { createPDF } = require('../helpers/createPDF');
+const { getText } = require('../language/');
 
 const emailAddress = process.env.EMAIL_ADDRESS;
 const emailPassword = process.env.EMAIL_PASSWORD;
@@ -21,7 +20,6 @@ const auth = {
     domain: mgDomain
   }
 }
-console.log(auth);
 
 const transporter = nodemailer.createTransport(mg(auth));
 
@@ -33,14 +31,15 @@ function createEmailFilePath(filename) {
 
 exports.emailHandler = (req, res) => {
   const  { clients } = req.body;    
-  if (!clients) return res.json({ message: 'no clients' });
+  if (!clients) return res.json({ message: getText("TRANS.NO.CLIENTS")});
   const promises = Object.values(clients).map(client=> {
+    const isInvoice = client[getText('TYPE')] === getText('INV');
     return new Promise ((resolve, reject) => {       
       const htmlTemplate = pug.compileFile(createEmailFilePath('html.pug'));
 
       client.transactions = client.transactions.map(trans => {     
         for (let key in trans){
-          if (key.includes('datum')){
+          if (key.includes(getText("DATE"))){
             trans[key] = `${formatDate(new Date(Number(trans[key])), 'LL', 'de')}`
           }
           trans[key] = trans[key] + ''
@@ -49,41 +48,46 @@ exports.emailHandler = (req, res) => {
         return trans; 
       })
 
-      const guests = client.transactions.filter(listing => listing['Name des Gastes']);
-      const corrections = client.transactions.filter(listing => !listing['Name des Gastes']);
+      const guests = client.transactions.filter(listing => listing[getText('TRANS.GUEST.NAME')])
+      const corrections = client.transactions.filter(listing => !listing[getText('TRANS.GUEST.NAME')]);
 
       const totalFields = [ 
         {
-          name: 'Gesamtauszahlungsbetrag',
-          value: calculateTotals('Auszahlung', guests, corrections) + '€'
+          name: getText('TOTAL.PAYOUT'),
+          value: calculateTotals(getText('PAYOUT'), guests, corrections) + '€'
         },
         {
-          name: 'Gesamtrechnungsbetrag',
-          value: calculateTotals('Rechnungs', guests, corrections) + '€'
+          name: getText('TOTAL.INV'),
+          value: calculateTotals(getText("INVS"), guests, corrections) + '€'
         },
         {
-          name: 'Darin enthaltene Ust. (19%)',
-          value: calculateTotals('Rechnungs', guests, corrections, 'tax') + '€'
+          name: getText('TOTAL.TAX'),
+          value: calculateTotals(getText("INVS"), guests, corrections, 'tax') + '€'
         }
       ]; 
 
       const emailDetails = { 
-        title: 'Airgreets Gmbh',
-        email: 'hello@Airgreets.com',
-        info: 'München, den   31.10.2017',
-        userText: 'Bitte überweise obigen Betrag bis zum 15.11.17 auf das untenstehende Konto',
-        salu: 'Beste Grüße',
-        userName: 'Florian'
+        title: getText('LETTER.TITLE'),
+        email: getText('LETTER.EMAIL'),
+        info: getText('LETTER.DATE'),
+        userText: isInvoice ? getText('LETTER.TEXT') : getText('LETTER.TEXT1'),
+        salu: getText('LETTER.SALU'),
+        userName: getText('USERNAME')
       };
 
       const html = htmlTemplate({ 
-          name: client['Kunde'],
-          customerNumber: client['Kundennummer'],
-          Rechnungsnummer: client['Rechnungsnummer'],
-          Rechnungsdatum: `${formatDate(new Date(Number(client['Rechnungsdatum'])), 'LL', 'de')}`,
-          headings: ['Name des Gastes',  'Anreisedatum', 'Abreisedatum', 'Leistungsbeschreinung', '', 'Betrag'],
+          name: client[getText("TRANS.CUSTOMER")],
+          customerNumber: client[getText("TRANS.CUSTOMER.NO")],
+          Rechnungsnummer: client[getText("INV.NUMBER")],
+          Rechnungsdatum: `${formatDate(new Date(Number(client[getText("INV.DATE")])), 'LL', 'de')}`,
+          headings: [   ,  getText("TRANS.DPRT.DATE"), getText('TRANS.ARR.DATE'), getText("REASON"), '', getText("AMOUNT")],
           transactions: [...client.transactions],
           guests: [...guests],
+          payout: getText("PAYOUT"),
+          cleaning: getText("TRANS.LETTER.CLEANING"),
+          service: getText("TRANS.SRV.FEE"),
+          inv: getText("INV"),
+          correction: getText("CORRECTION"),
           corrections: [...corrections],
           totals: [...totalFields],
           emailDetails: { ...emailDetails}
@@ -98,7 +102,7 @@ exports.emailHandler = (req, res) => {
           from: emailAddress,
           to: emailAddress, //client['Emailadresse'], // emailAddress
           attachments: [{
-              filename: `inv${client['Rechnungsnummer']}.pdf`,
+              filename: `inv${client[getText("INV.NUMBER")]}.pdf`,
               content: new Buffer(buffer)
           }], 
           subject,
@@ -120,7 +124,7 @@ exports.emailHandler = (req, res) => {
   Promise.all(promises)
     .then((output) => { 
       res.json({ 
-        message: 'email sent' 
+        message: getText("EMAIL.SENT")
       });
     })
     .catch((err)=>{

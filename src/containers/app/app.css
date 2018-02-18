@@ -1,0 +1,17 @@
+.active {
+  background-color: white !important;
+  color: #189da7 !important;
+  border-radius: 
+}
+
+a {
+  color: white;
+}
+
+.btn-primary {
+  background-color: #189da7 !important;
+}
+
+.appContent {
+  padding-bottom: 5px;
+}
