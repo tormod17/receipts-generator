@@ -52,7 +52,7 @@ exports.uploadHandler = (req, res, next) => {
     return new Promise((resolve, reject) => {
       //check if invoice for client exists, either update invoice for client or create new invoice
       var invoiceCount
-      InvoiceDB.count({}).exec().then(count =>{
+      InvoiceDB.count({}).then(count => {
         invoiceCount = count
       }).find({clientId: invoice.clientId })
         .exec()
