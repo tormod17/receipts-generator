@@ -6,7 +6,7 @@ import EditableField from './../editableField/EditableField';
 import { calculateTax } from '../../utils/apiUtils';
 
 const selectedName = (correction) => {
-  return correction['Rechnungskorrektur'] === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
+  return correction['Rechnungskorrektur'].toUpperCase() === 'X' ? 'Rechnungskorrektur' : 'Auszahlungskorrektur'
 }
 
 export default class Correction extends React.Component {

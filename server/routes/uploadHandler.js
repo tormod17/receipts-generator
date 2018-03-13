@@ -42,7 +42,7 @@ exports.uploadHandler = (req, res, next) => {
         transactions: transactions.filter(trans => trans['Kundennummer'] === t['Kundennummer']),
         clientId: t.Kundennummer,
         created: DATETIMESTAMP,
-        Belegart: t['Auszahlung'] === 'x' ? 'Auszahlung': 'Rechnung',
+        Belegart: t['Auszahlung'].toUpperCase() === 'X' ? 'Auszahlung': 'Rechnung',
         Rechnungsdatum: formatDate(t['Rechnungsdatum']) || DATETIMESTAMP
       })
     }
