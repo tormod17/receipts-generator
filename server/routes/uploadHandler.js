@@ -51,10 +51,8 @@ exports.uploadHandler = (req, res, next) => {
   const invPromises = invoices.map(invoice => {
     return new Promise((resolve, reject) => {
       //check if invoice for client exists, either update invoice for client or create new invoice
-      var invoiceCount
-      InvoiceDB.count({}).then(count => {
-        invoiceCount = count
-      }).find({clientId: invoice.clientId })
+      InvoiceDB.count({}).then(invoiceCount => {
+        InvoiceDB.find({clientId: invoice.clientId })
         .exec()
         .then(invoices => {
           // Any invoice exist for said client 
@@ -71,7 +69,7 @@ exports.uploadHandler = (req, res, next) => {
             const currentInv = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt)[0];
             if (currentInv) {
               updateInvoice( currentInv, newInvoice.transactions, (err, updatedInvoice) => {
-                if (err) return res.json({message: err +''});
+                if (err) return res.json({message: err + ''});
                 resolve({
                   ...updatedInvoice
                 })
@@ -98,6 +96,7 @@ exports.uploadHandler = (req, res, next) => {
             })
           }
         })
+      });
     });
   });
   Promise.all(invPromises)
