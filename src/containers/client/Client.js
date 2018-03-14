@@ -11,7 +11,6 @@ import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
 import { getText } from '../../language/';
 
-
 import { calculateTotals, calculateTaxTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
@@ -22,13 +21,13 @@ import "./client.css";
 
 const requiredFields = [ 
   getText('TYPE'),
-  getText('CUSTOMER'),
-  getText('EMAIL'),
-  getText('STREET'),
-  getText('TOWN'),
-  getText('POSTCODE'),
+  getText('CUSTOMER.NAME'),
+  getText('CUSTOMER.EMAIL'),
+  getText('CUSTOMER.STREET'),
+  getText('CUSTOMER.TOWN'),
+  getText('CUSTOMER.POSTCODE'),
   getText('CUSTOMER.NUMBER'),
-  getText('INVOICE.DATE')
+  getText('INV.DATE')
 ];
 
 const requiredFieldsGuest = [
@@ -97,6 +96,7 @@ class Client extends Component {
     if (Belegart === getText('TYPE')) {
       return [getText('TYPE')];
     }
+    console.log(requiredFields);
     if( Belegart !== getText('TYPE') && !isGuests && !isCorrections) {
       fields = [ ...requiredFields ];
     }

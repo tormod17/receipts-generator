@@ -31,14 +31,14 @@ export function createPDF(client) {
   const { vfs } = vfsFonts.pdfMake;
 
   pdfMake.vfs = vfs;
-
+  console.log(pdfMake.vfs, vfsFonts);
   pdfMake.fonts = {
     'aileron-regular-webfont': {
       normal: 'aileron-regular-webfont.ttf'
     },
     'SourceSansPro': {
       normal: 'SourceSansPro-Regular.ttf',
-      bold: 'SourceSansPro-SemiBold.ttf'      
+      bold: 'SourceSansPro-Bold.ttf'      
     }
   };
 

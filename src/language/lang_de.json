@@ -26,13 +26,12 @@
   "MONTH.11":"November",
   "MONTH.12":"Dezember",
 
-
-  "CUSTOMER.NAME":"",
-  "CUSTOMER.STREET":"",
-  "CUSTOMER.CITY":"",
-  "CUSTOMER.PLZ":"",
-  "CUSTOMER.NUMBER":"",
-
+  "CUSTOMER.NAME": "Kunde",
+  "CUSTOMER.EMAIL": "Emailadresse",
+  "CUSTOMER.STREET": "Straße",
+  "CUSTOMER.TOWN": "Stadt",
+  "CUSTOMER.POSTCODE": "PLZ",
+  "CUSTOMER.NUMBER": "Kundennummer",
 
   "INV.NUMBER": "Rechnungsnummer",
   "INV.DATE": "Rechnungsdatum",
