@@ -321,6 +321,4 @@ const mapStateToProps = (state, props) => {
   };
 };
 
-
 export default withRouter(connect(mapStateToProps)(Client));
-

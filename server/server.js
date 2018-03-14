@@ -38,7 +38,7 @@ app.use(session({
     mongooseConnection: db
   })
 }));
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 app.set('emails', __dirname + '/emails');
 app.set('emails engine', 'pug');
 // Configure app to use bodyParser to parse json data

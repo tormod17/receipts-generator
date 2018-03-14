@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/ryce/airgreets-tool/issues"
   },
-  "proxy": "http://localhost:3001",
+  "proxy": "http://localhost:3000",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.26.0",
