@@ -51,7 +51,9 @@ exports.uploadHandler = (req, res, next) => {
   const invPromises = invoices.map(invoice => {
     return new Promise((resolve, reject) => {
       //check if invoice for client exists, either update invoice for client or create new invoice
+      var totalCount
       InvoiceDB.count({}).then(invoiceCount => {
+        totalCount = invoiceCount
         InvoiceDB.find({clientId: invoice.clientId })
         .exec()
         .then(invoices => {
@@ -59,7 +61,7 @@ exports.uploadHandler = (req, res, next) => {
           if(invoices.length) {
             const newInvoice = {
               _id: uuidv4(),
-              Rechnungsnummer: invoiceCount + 1,
+              Rechnungsnummer: totalCount++,
               ...invoice,
             }
             const month =  new Date(Number(invoice['Rechnungsdatum'])).getMonth();
@@ -85,7 +87,7 @@ exports.uploadHandler = (req, res, next) => {
           } else {
             const newInvoice = {
               _id: uuidv4(),
-              Rechnungsnummer: invoiceCount + 1,
+              Rechnungsnummer: totalCount++,
               ...invoice,
             }
             createNewInvoice(newInvoice, (err, updatedInvoice) => {
