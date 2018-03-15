@@ -42,7 +42,7 @@ exports.uploadHandler = (req, res, next) => {
         transactions: transactions.filter(trans => trans['Kundennummer'] === t['Kundennummer']),
         clientId: t.Kundennummer,
         created: DATETIMESTAMP,
-        Belegart: t['Auszahlung'] === 'x' ? 'Auszahlung': 'Rechnung',
+        Belegart: t['Auszahlung'].toUpperCase() === 'X' ? 'Auszahlung': 'Rechnung',
         Rechnungsdatum: formatDate(t['Rechnungsdatum']) || DATETIMESTAMP
       })
     }
@@ -51,15 +51,15 @@ exports.uploadHandler = (req, res, next) => {
   const invPromises = invoices.map(invoice => {
     return new Promise((resolve, reject) => {
       //check if invoice for client exists, either update invoice for client or create new invoice
-      InvoiceDB
-        .find({clientId: invoice.clientId })
-        .exec()
-        .then(invoices => {
+      InvoiceDB.find({clientId: invoice.clientId })
+      .exec()
+      .then(invoices => {
+        InvoiceDB.count({}).then(invoiceCount => {
           // Any invoice exist for said client 
           if(invoices.length) {
             const newInvoice = {
               _id: uuidv4(),
-              Rechnungsnummer: invoices.length  + 1,
+              Rechnungsnummer: invoiceCount + 1,
               ...invoice,
             }
             const month =  new Date(Number(invoice['Rechnungsdatum'])).getMonth();
@@ -69,7 +69,7 @@ exports.uploadHandler = (req, res, next) => {
             const currentInv = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt)[0];
             if (currentInv) {
               updateInvoice( currentInv, newInvoice.transactions, (err, updatedInvoice) => {
-                if (err) return res.json({message: err +''});
+                if (err) return res.json({message: err + ''});
                 resolve({
                   ...updatedInvoice
                 })
@@ -85,7 +85,7 @@ exports.uploadHandler = (req, res, next) => {
           } else {
             const newInvoice = {
               _id: uuidv4(),
-              Rechnungsnummer: 1,
+              Rechnungsnummer: invoiceCount + 1,
               ...invoice,
             }
             createNewInvoice(newInvoice, (err, updatedInvoice) => {
@@ -96,6 +96,7 @@ exports.uploadHandler = (req, res, next) => {
             })
           }
         })
+      });
     });
   });
   Promise.all(invPromises)

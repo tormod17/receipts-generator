@@ -66,7 +66,7 @@ exports.createTransactionList = (list, filename) => {
         filename,
         created: DATETIMESTAMP,
         clientId: record['Kundennummer'],
-        Belegart: record['Auszahlung'] === 'X' ? 'Auszahlung' : 'Rechnung',
+        Belegart: record['Auszahlung'].toUpperCase() === 'X' ? 'Auszahlung' : 'Rechnung',
         _id: uuidv4()
     };      
   })
