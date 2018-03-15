@@ -39,7 +39,7 @@ const requiredFieldsGuest = [
 ];
 
 const requiredFieldsRechnungsCorrection = [
-  'Rechnungskorrektur in €',
+   getText("TRANS.CORR.INV"),
   'Sonstige Leistungsbeschreibung'
 ];
 
