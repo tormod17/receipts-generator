@@ -88,6 +88,8 @@
 
   "EMAIL.NONE": "Keine email",
   "EMAIL.SENDING": "E-Mail senden",
-  "EMAIL.SENT": "E-Mail gesendet"
+  "EMAIL.SENT": "E-Mail gesendet",
+
+  "FILE.EXIST": "Sie haben diese Datei bereits hochgeladen"
 
 }

@@ -54,15 +54,44 @@ const formatDate = date => {
   return timestamp;
 };
 
+const sortObject = (o) => Object.keys(o).sort().reduce((r, k) => (r[k] = o[k], r), {});
+
+exports.splitDuplicatesUniques = (newarr, oldarr) => {
+  let duplicates = [];
+  let unique = [];
+
+  var matchExcId = (obj1, obj2) => {
+    delete obj1._id;
+    delete obj2._id;
+    const a  = sortObject(obj1);
+    const b =  sortObject(obj2);
+    const { stringify }  = JSON;
+    return stringify(a) === stringify(b);
+  }
+  newarr.forEach((nt) => {
+    // check an exisitng transaction exists.
+    const dup = oldarr.find((t) => {
+      return matchExcId(t, nt);
+    })
+    if(dup) {
+      duplicates.push(dup)
+    } else  {
+      unique.push(nt)
+    }
+  })
+  return [duplicates, unique];
+}
+
+
 exports.createTransactionList = (list, filename) => {
-    return list.map(record => {
+  return list.map(record => {
     Object.keys(record).forEach(key => {
       if (key.includes('datum')){
         record[key] = formatDate(record[key]) || DATETIMESTAMP;
       }
     })
     return {
-        ...record,
+        ...sortObject(record),
         filename,
         created: DATETIMESTAMP,
         clientId: record['Kundennummer'],
