@@ -12,7 +12,6 @@
   "AMOUNT": "Betrag",
   "CORRECTION":"Korrektur",
   "DATE": "datum",
-  "DEL": "gelöscht",
 
   "MONTH.1":"Januar",
   "MONTH.2":"Februar",
@@ -27,12 +26,12 @@
   "MONTH.11":"November",
   "MONTH.12":"Dezember",
 
-  "CUSTOMER.NAME":"",
-  "CUSTOMER.STREET":"",
-  "CUSTOMER.CITY":"",
-  "CUSTOMER.PLZ":"",
-  "CUSTOMER.NUMBER":"",
-
+  "CUSTOMER.NAME": "Kunde",
+  "CUSTOMER.EMAIL": "Emailadresse",
+  "CUSTOMER.STREET": "Straße",
+  "CUSTOMER.TOWN": "Stadt",
+  "CUSTOMER.POSTCODE": "PLZ",
+  "CUSTOMER.NUMBER": "Kundennummer",
 
   "INV.NUMBER": "Rechnungsnummer",
   "INV.DATE": "Rechnungsdatum",
@@ -60,6 +59,7 @@
   "ARR.DATE": "Anreisedatum",
   "DPRT.DATE": "Abreisedatum (Leistungsdatum)",
 
+
   "TRANS.TYPE": "Belegart",
   "TRANS.CUSTOMER": "Kunde",
   "TRANS.EMAIL": "Emailadresse",
@@ -69,27 +69,33 @@
   "TRANS.CUSTOMER.NO": "Kundennummer",
 
   "TRANS.GUEST.NAME": "Name des Gastes",
-  "TRANS.ARR.DATE": "Abreisedatum",
-  "TRANS.DPRT.DATE": "Anreisedatum",
-  "TRANS.CLEANING": "Reinigungs-gebühr",
+  "TRANS.GUEST.SRV.FEE":"Airgreets Service Fee (€)",
+  
+
+  "TRANS.GUEST.ARR.DATE": "Anreisedatum",
+  "TRANS.GUEST.DPRT.DATE": "Abreisedatum (Leistungsdatum)",
+
+  "TRANS.ARR.DATE": "Anreisedatum",
+  "TRANS.DPRT.DATE": "Abreisedatum",
+  
+  "TRANS.CLEANING": "Reinigungsgebühr",
   "TRANS.LETTER.CLEANING": " davon: Reinigungs-gebühr",
 
   "TRANS.SRV.FEE":"davon: Airgreets Service Fee (€) (25%)",
-  "TRANS.GUEST.SRV.FEE":"Airgreets Service Fee (€)",
   "TRANS.INCOME": "Airbnb Einkommen",
   "TRANS.CORR.REASON":"Sonstige Leistungsbeschreibung",
   "TRANS.CORR.INV":"Rechnungskorrektur in €",
   "TRANS.CORR.PAYOUT":"Auszahlungskorrektur in €",
-  "TRANS.NO.CLIENT": "Keine Kunden",
 
   "TOTAL.INV":"Gesamtrechnungsbetrag",
   "TOTAL.PAYOUT":"Gesamtauszahlungsbetrag",
   "TOTAL.TAX": "Darin enthaltene Ust. (19%)",
+  "TOTAL.AIRGREETS": "Gesamtumsatz Airgreets",
 
-  "EMAIL.NONE": "Keine email",
-  "EMAIL.SENDING": "E-Mail senden",
+  "TRANS.GUEST.A.KUNDE": "Auszahlung an Kunde",
   "EMAIL.SENT": "E-Mail gesendet",
-
-  "FILE.EXIST": "Sie haben diese Datei bereits hochgeladen"
+  "FILE.EXIST": "Die Datei wurde bereits hochgeladen",
+  "FILE.INCORRECT": "falscher Dateityp",
+  "FILE.EMPTY": "err_desc: Keine Datei wurde übergeben"
 
 }

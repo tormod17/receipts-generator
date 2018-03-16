@@ -10,12 +10,15 @@ const { formatDate, getDateQuery, findTransactionsByIds, createTransactionList }
 const { createNewInvoice, createNewInvoiceAndClient } = require('../helpers/database');
 
 exports.addClientHandler = (req, res) => {
-  if (!req.query.userId && !client) return console.error('no userId'); 
+  if (!req.query.userId && !req.body.client) {
+    console.error('no userId', req.body); 
+    return res.json({ message: 'no client details'});
+  }
   const { userId } = req.query;
   const { guests, corrections, client, Belegart } = req.body;
   client._id = client['Kundennummer'];
 
-  console.log('ADDING A USER MANUALLY'); 
+  console.log('ADDING A USER MANUALLY', client); 
 
   const month =  new Date(Number(client['Rechnungsdatum'])).getMonth();
   const year = new Date(Number(client['Rechnungsdatum'])).getFullYear();
@@ -32,49 +35,33 @@ exports.addClientHandler = (req, res) => {
 
   // Get all invoices by client Number
   InvoiceDB
-    .find({clientId: client['Kundennummer']})
-    .exec()
-    .then(invoices => {
-      const newInvoice = {
-        ...client,
-        _id: uuidv1(),
-        clientId: client['Kundennummer'],
-        transactions: transactions,
-        Rechnungsnummer: (invoices.length + 1),
-        Belegart
-      };
-      if(invoices.length) {
-        const { $lt, $gte }  = dateQuery.Rechnungsdatum;
-        const invoicesInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt).length
-        if (invoicesInDateRange) {
-          return res.json({
-            message: getText('CUSTOMER.EXISTS'),
-            invoice: {} 
-          });
-        } else  {
-          // Create new invoice for this month
-          console.log('Create new invoice for existing client for new month.');
-          createNewInvoice(newInvoice, (err, updatedInvoice) => {
-            if (err) return res.json({ message: err +'' });
-            res.json({
-              message: getText('SUCCESS'),
-              invoice: {
-                [newInvoice._id]: {
-                 ...client,
-                 ...newInvoice
-                }
-              }
-            });
-          })
-        }
-      } else {
-        ClientDB
-          .findById(client._id)
-          .then(savedClient => {
-            if (savedClient) {
-              console.log('Create new invoice for existing client no previous invoice');
+    .count({}).exec()
+    .then(count => {
+      return InvoiceDB
+        .find({clientId: client['Kundennummer']})
+        .exec()
+        .then(invoices => {
+          const newInvoice = {
+            ...client,
+            _id: uuidv1(),
+            clientId: client['Kundennummer'],
+            transactions: transactions,
+            Rechnungsnummer: (count + 1),
+            Belegart
+          };
+          if(invoices.length) {
+            const { $lt, $gte }  = dateQuery.Rechnungsdatum;
+            const invoicesInDateRange = invoices.filter(inv => inv.Rechnungsdatum > $gte && inv.Rechnungsdatum  < $lt).length
+            if (invoicesInDateRange) {
+              return res.json({
+                message: getText('CUSTOMER.EXISTS'),
+                invoice: {} 
+              });
+            } else  {
+              // Create new invoice for this month
+              console.log('Create new invoice for existing client for new month.');
               createNewInvoice(newInvoice, (err, updatedInvoice) => {
-                if (err) return res.json({message: err +''});
+                if (err) return res.json({ message: err +'' });
                 res.json({
                   message: getText('SUCCESS'),
                   invoice: {
@@ -85,27 +72,48 @@ exports.addClientHandler = (req, res) => {
                   }
                 });
               })
-            } else {
-              console.log('Create new invoice and client'); 
-              createNewInvoiceAndClient(newInvoice, client, (err, updatedInvoice) => {
-                if (err) return res.json({message: err +''});
-                res.json({
-                  message: getText('SUCCESS'),
-                  invoice: {
-                    [updatedInvoice._id]: {
-                     ...client,
-                     ...updatedInvoice
-                    }
-                  }
-                });
-              })
             }
-          })  
-      }
+          } else {
+            ClientDB
+              .findById(client._id)
+              .then(savedClient => {
+                if (savedClient) {
+                  console.log('Create new invoice for existing client no previous invoice');
+                  createNewInvoice(newInvoice, (err, updatedInvoice) => {
+                    if (err) return res.json({message: err +''});
+                    res.json({
+                      message: getText('SUCCESS'),
+                      invoice: {
+                        [newInvoice._id]: {
+                         ...client,
+                         ...newInvoice
+                        }
+                      }
+                    });
+                  })
+                } else {
+                  console.log('Create new invoice and client'); 
+                  createNewInvoiceAndClient(newInvoice, client, (err, updatedInvoice) => {
+                    if (err) return res.json({message: err +''});
+                    res.json({
+                      message: getText('SUCCESS'),
+                      invoice: {
+                        [updatedInvoice._id]: {
+                         ...client,
+                         ...updatedInvoice
+                        }
+                      }
+                    });
+                  })
+                }
+              })  
+          }
+        })
     })
     .catch(err => {
       res.json({message: err +''});
     })
+
 }
 
 exports.updateInvoiceHandler = (req, res) => {

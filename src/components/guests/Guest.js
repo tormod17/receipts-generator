@@ -9,8 +9,9 @@ import MomentLocaleUtils, {
   parseDate
 } from 'react-day-picker/moment';
 import 'moment/locale/de';
-//import { formatDate } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
+import { getText } from '../../language/';
+
 
 const TIMESTAMP = new Date().getTime();
 
@@ -42,7 +43,7 @@ export default class Guest extends React.Component {
     if(this.props !== nextProps){
       this.setState({
         ...nextProps.guest,
-        Belegart: nextProps.Belegart
+        [getText("TRANS.TYPE")]: nextProps.Belegart
       })
     }
   }
@@ -52,26 +53,26 @@ export default class Guest extends React.Component {
   }
 
   handleIncomeChange(name, value, id) {
-    const newTotal = Number(value || 0) - Number(this.state['Gesamtumsatz Airgreets'] || 0) +'';
+    const newTotal = Number(value || 0) - Number(this.state[getText("TOTAL.AIRGREETS")] || 0) +'';
     this.setState({
-      ['Auszahlung an Kunde']: newTotal,
+      [getText("GUEST.A.KUNDE")]: newTotal,
       [name]: value
-    }, this.props.updateFieldValue("Auszahlung an Kunde", newTotal, 'guests', id))
+    }, this.props.updateFieldValue(getText("GUEST.A.KUNDE"), newTotal, 'guests', id))
     this.props.updateFieldValue(name, value, 'guests', id)
   }
 
   handleServiceChange(name, value, id) {
     /// updates its self and updates the total.
-    const oppKey = (name === "Airgreets Service Fee (€)" ) ? "Reinigungs-gebühr" : "Airgreets Service Fee (€)";
+    const oppKey = (name === getText("TRANS.GUEST.SRV.FEE")) ? getText("TRANS.CLEANING") : getText("TRANS.GUEST.SRV.FEE");;
     const newTotal = Number(value || 0)  + Number(this.state[oppKey] || 0) + '';
-    const newCustomerTotal = (Number(this.state["Airbnb Einkommen"] || 0) - Number(newTotal || 0) )+ '';
+    const newCustomerTotal = (Number(this.state[getText("TRANS.INCOME")] || 0) - Number(newTotal || 0) )+ '';
     this.setState({
-      ['Gesamtumsatz Airgreets']: newTotal,
-      ["Auszahlung an Kunde"]: newCustomerTotal,
+      [getText('TRANS.AIRGREETS')]: newTotal,
+      [getText('GUEST.A.KUNDE')]: newCustomerTotal,
       [name]: value
     },() => {
-      this.props.updateFieldValue("Gesamtumsatz Airgreets", newTotal, 'guests', id)
-      this.props.updateFieldValue("Auszahlung an Kunde", newCustomerTotal, 'guests', id)
+      this.props.updateFieldValue(getText('TRANS.AIRGREETS'), newTotal, 'guests', id)
+      this.props.updateFieldValue(getText('GUEST.A.KUNDE'), newCustomerTotal, 'guests', id)
     })
     this.props.updateFieldValue(name, value, 'guests', id)
   }
@@ -88,28 +89,28 @@ export default class Guest extends React.Component {
               <EditableField
                 disabled={locked} 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, guestNumber)} 
-                name="Name des Gastes"
-                placeholder="Name des Gastes"
-                value={this.state["Name des Gastes"]}
+                name={getText('TRANS.GUEST.NAME')}
+                placeholder={getText('TRANS.GUEST.NAME')}
+                value={this.state[getText('TRANS.GUEST.NAME')]}
                 required
               />
             </Col>
             <Col>
-              <Label for="Anreisedatum">Anreise-datum</Label>
+              <Label for={getText('TRANS.GUEST.ARR.DATE')}>{getText('TRANS.GUEST.ARR.DATE')}</Label>
               <InputGroupAddon>
                 <DayPickerInput 
-                  value={`${formatDate(new Date(this.state.Anreisedatum || TIMESTAMP), 'LL', 'de')}` }
+                  value={`${formatDate(new Date(this.state[getText('TRANS.GUEST.ARR.DATE')] || TIMESTAMP), 'LL', 'de')}` }
                   formatDate={formatDate}
                   parseDate={parseDate}
                   format="LL"
-                  placeholder={`${formatDate(new Date(this.state.Anreisedatum || TIMESTAMP), 'LL', 'de')}`}
+                  placeholder={`${formatDate(new Date(this.state[getText('TRANS.GUEST.ARR.DATE')] || TIMESTAMP), 'LL', 'de')}`}
                   dayPickerProps={{
                     locale: 'de',
                     localeUtils: MomentLocaleUtils
                   }}
-                  name="Anreisedatum"
+                  name={getText('TRANS.GUEST.ARR.DATE')}
                   onDayChange={(val) =>
-                    this.handleValueChange('Anreisedatum', val, guestNumber)
+                    this.handleValueChange(getText('TRANS.GUEST.ARR.DATE'), val, guestNumber)
                   }
                   disabled={locked}
                   required
@@ -117,21 +118,21 @@ export default class Guest extends React.Component {
               </InputGroupAddon>
             </Col>
             <Col >
-              <Label for="Abreisedatum">Abreise-datum</Label>
+              <Label for={getText('TRANS.GUEST.DPRT.DATE')}>{getText('TRANS.GUEST.DPRT.DATE')} </Label>
               <InputGroupAddon>
                 <DayPickerInput 
-                  name="Abreisedatum (Leistungsdatum)"
-                  value={`${formatDate(new Date(this.state['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
+                  name={getText('TRANS.GUEST.DPRT.DATE')}
+                  value={`${formatDate(new Date(this.state[getText('TRANS.GUEST.DPRT.DATE')] || TIMESTAMP), 'LL', 'de')}`}
                   formatDate={formatDate}
                   parseDate={parseDate}
                   format="LL"
-                  placeholder={`${formatDate(new Date(this.state['Abreisedatum (Leistungsdatum)'] || TIMESTAMP), 'LL', 'de')}`}
+                  placeholder={`${formatDate(new Date(this.state[getText('TRANS.GUEST.DPRT.DATE')] || TIMESTAMP), 'LL', 'de')}`}
                   dayPickerProps={{
                     locale: 'de',
                     localeUtils: MomentLocaleUtils
                   }}
                   onDayChange={val => 
-                    this.handleValueChange('Abreisedatum (Leistungsdatum)', val, guestNumber )
+                    this.handleValueChange(getText('TRANS.GUEST.DPRT.DATE'), val, guestNumber )
                   }
                   disabled={locked}
                   required
@@ -146,22 +147,22 @@ export default class Guest extends React.Component {
                 updateFieldValue={(name, val) => 
                   this.handleServiceChange(name, val, guestNumber)
                 } 
-                name="Airgreets Service Fee (€)"
-                placeholder="Airgreets Service Fee (€)"
-                value={this.state['Airgreets Service Fee (€)']}
+                name={getText('TRANS.GUEST.SRV.FEE')}
+                placeholder={getText('TRANS.GUEST.SRV.FEE')}
+                value={this.state[getText('TRANS.GUEST.SRV.FEE')]}
                 required
               />
             </Col>
             <Col>
               <EditableField
                 disabled={locked}
-                name="Reinigungs-gebühr"
+                name={getText('TRANS.CLEANING')}
                 updateFieldValue={(name, val) => 
                   this.handleServiceChange(name, val, guestNumber)
                 } 
                 required
-                placeholder="Reinigungs-gebühr"
-                value={this.state["Reinigungs-gebühr"]} 
+                placeholder={getText('TRANS.CLEANING')}
+                value={this.state[getText('TRANS.CLEANING')]} 
               />
             </Col>
           </FormGroup>
@@ -170,9 +171,9 @@ export default class Guest extends React.Component {
               <EditableField
                 disabled={locked} 
                 updateFieldValue={(name, val) => this.handleIncomeChange(name, val, guestNumber)} 
-                name="Airbnb Einkommen"
-                placeholder="Airbnb-Einkommen"
-                value={this.state["Airbnb Einkommen"]}
+                name={getText('TRANS.INCOME')}
+                placeholder={getText('TRANS.INCOME')}
+                value={this.state[getText('TRANS.INCOME')]}
                 required
               />
             </Col>
@@ -180,20 +181,20 @@ export default class Guest extends React.Component {
               <EditableField
                 disabled 
                 updateFieldValue={(name, val) => this.handleValueChange(name, val, guestNumber)} 
-                name="Gesamtumsatz Airgreets"
-                placeholder="Gesamtumsatz Airgreets"
-                value={this.state["Gesamtumsatz Airgreets"]}
+                name={getText('TOTAL.AIRGREETS')}
+                placeholder={getText('TOTAL.AIRGREETS')}
+                value={this.state[getText('TOTAL.AIRGREETS')]}
                 required
               />
             </Col>
             <Col>
-             { Belegart === "Auszahlung" &&
+             { Belegart === getText('PAYOUT')&&
                 <EditableField
                   disabled 
                   updateFieldValue={(name, val) => this.handleValueChange(name, val, guestNumber)} 
-                  name="Auszahlung an Kunde"
-                  placeholder="Auszahlung an Kunde"
-                  value={this.state["Auszahlung an Kunde"]}
+                  name={getText('TRANS.GUEST.A.KUNDE')}
+                  placeholder={getText('TRANS.GUEST.A.KUNDE')}
+                  value={this.state[getText('TRANS.GUEST.A.KUNDE')]}
                   required
                 />
               }

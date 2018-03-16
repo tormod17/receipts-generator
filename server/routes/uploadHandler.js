@@ -13,7 +13,7 @@ const DATETIMESTAMP = Date.now();
 exports.uploadHandler = (req, res, next) => {
   const { file, query } = req;
   const { userId } = query;
-  if (!file) return res.json({ message: 'err_desc: No file passed' });
+  if (!file) return res.json({ message: getText('FILE.EMPTY') });
   
   const { originalname } = file;
   const ext = originalname
@@ -21,7 +21,7 @@ exports.uploadHandler = (req, res, next) => {
 
   const acceptedExtension = ['xlsx', 'csv', 'xlsm']
 
-  if (!acceptedExtension.includes(ext)) return res.json({message: 'incorrect file type'});
+  if (!acceptedExtension.includes(ext)) return res.json({message: getText('FILE.INCORRECT')});
     
   const workbook = xlsx.read(file.buffer);
   const sheet_name_list = workbook.SheetNames;
@@ -125,7 +125,7 @@ exports.uploadHandler = (req, res, next) => {
           }, {})
           res.json({ 
             invoices: { ...newInvoices }, 
-            message: 'entfernt' 
+            message: getText('SUCCESS')
           })
         })
         .catch(err =>{

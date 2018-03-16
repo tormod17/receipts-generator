@@ -59,6 +59,7 @@
   "ARR.DATE": "Anreisedatum",
   "DPRT.DATE": "Abreisedatum (Leistungsdatum)",
 
+
   "TRANS.TYPE": "Belegart",
   "TRANS.CUSTOMER": "Kunde",
   "TRANS.EMAIL": "Emailadresse",
@@ -68,19 +69,29 @@
   "TRANS.CUSTOMER.NO": "Kundennummer",
 
   "TRANS.GUEST.NAME": "Name des Gastes",
-  "TRANS.ARR.DATE": "Abreisedatum",
-  "TRANS.DPRT.DATE": "Anreisedatum",
-  "TRANS.CLEANING": "Reinigungs-gebühr",
+  "TRANS.GUEST.SRV.FEE":"Airgreets Service Fee (€)",
+  
+
+  "TRANS.GUEST.ARR.DATE": "Anreisedatum",
+  "TRANS.GUEST.DPRT.DATE": "Abreisedatum (Leistungsdatum)",
+
+  "TRANS.ARR.DATE": "Anreisedatum",
+  "TRANS.DPRT.DATE": "Abreisedatum",
+  
+  "TRANS.CLEANING": "Reinigungsgebühr",
   "TRANS.LETTER.CLEANING": " davon: Reinigungs-gebühr",
 
   "TRANS.SRV.FEE":"davon: Airgreets Service Fee (€) (25%)",
-  "TRANS.GUEST.SRV.FEE":"Airgreets Service Fee (€)",
   "TRANS.INCOME": "Airbnb Einkommen",
   "TRANS.CORR.REASON":"Sonstige Leistungsbeschreibung",
   "TRANS.CORR.INV":"Rechnungskorrektur in €",
   "TRANS.CORR.PAYOUT":"Auszahlungskorrektur in €",
+
   "TOTAL.INV":"Gesamtrechnungsbetrag",
   "TOTAL.PAYOUT":"Gesamtauszahlungsbetrag",
-  "TOTAL.TAX": "Darin enthaltene Ust. (19%)"
+  "TOTAL.TAX": "Darin enthaltene Ust. (19%)",
+  "TOTAL.AIRGREETS": "Gesamtumsatz Airgreets",
+
+  "TRANS.GUEST.A.KUNDE": "Auszahlung an Kunde"
 
 }

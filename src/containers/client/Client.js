@@ -31,21 +31,21 @@ const requiredFields = [
 ];
 
 const requiredFieldsGuest = [
-  'Name des Gastes',
-  'Abreisedatum (Leistungsdatum)',
-  'Anreisedatum',
-  'Reinigungs-gebühr',
-  'Airgreets Service Fee (€)'
+  getText("TRANS.GUEST.NAME"),
+  getText("TRANS.ARR.DATE"),
+  getText("TRANS.GUEST.DPRT.DATE"),
+  getText("TRANS.CLEANING"),
+  getText("TRANS.GUEST.SRV.FEE")
 ];
 
 const requiredFieldsRechnungsCorrection = [
-   getText("TRANS.CORR.INV"),
-  'Sonstige Leistungsbeschreibung'
+  getText("TRANS.CORR.INV"),
+  getText('TRANS.CORR.REASON')
 ];
 
 const requiredFieldsAuszhalungsCorrection = [
-  'Auszahlungskorrektur in €',
-  'Sonstige Leistungsbeschreibung'
+  getText('TRANS.CORR.PAYOUT'),
+  getText('TRANS.CORR.REASON')
 ];
 
 class Client extends Component {
