@@ -55,9 +55,9 @@ export default class Guest extends React.Component {
   handleIncomeChange(name, value, id) {
     const newTotal = Number(value || 0) - Number(this.state[getText("TOTAL.AIRGREETS")] || 0) +'';
     this.setState({
-      [getText("GUEST.A.KUNDE")]: newTotal,
+      [getText("TRANS.GUEST.A.KUNDE")]: newTotal,
       [name]: value
-    }, this.props.updateFieldValue(getText("GUEST.A.KUNDE"), newTotal, 'guests', id))
+    }, this.props.updateFieldValue(getText("TRANS.GUEST.A.KUNDE"), newTotal, 'guests', id))
     this.props.updateFieldValue(name, value, 'guests', id)
   }
 
@@ -67,19 +67,19 @@ export default class Guest extends React.Component {
     const newTotal = Number(value || 0)  + Number(this.state[oppKey] || 0) + '';
     const newCustomerTotal = (Number(this.state[getText("TRANS.INCOME")] || 0) - Number(newTotal || 0) )+ '';
     this.setState({
-      [getText('TRANS.AIRGREETS')]: newTotal,
-      [getText('GUEST.A.KUNDE')]: newCustomerTotal,
+      [getText('TOTAL.AIRGREETS')]: newTotal,
+      [getText('TRANS.GUEST.A.KUNDE')]: newCustomerTotal,
       [name]: value
     },() => {
       this.props.updateFieldValue(getText('TRANS.AIRGREETS'), newTotal, 'guests', id)
-      this.props.updateFieldValue(getText('GUEST.A.KUNDE'), newCustomerTotal, 'guests', id)
+      this.props.updateFieldValue(getText('TRANS.GUEST.A.KUNDE'), newCustomerTotal, 'guests', id)
     })
     this.props.updateFieldValue(name, value, 'guests', id)
   }
 
   render() {
     const { updateFieldValue, Belegart, locked, guestNumber } = this.props;
-
+console.log(this.state[getText('TOTAL.AIRGREETS')], this.state);
     return (
         <div
           key={this.state._id}

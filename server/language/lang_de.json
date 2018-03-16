@@ -1,8 +1,10 @@
 {
   "CONFIRM.MESSAGE":"Bist du sicher?",
 
+
   "CUSTOMER.EXISTS": "Diese Kundennummer existiert bereits",
   "SUCCESS": "entfernt",
+  "DEL": "löschen",
 
   "PAYOUT": "Auszahlung",
   "INV":"Rechnung",
@@ -94,7 +96,7 @@
 
   "TRANS.GUEST.A.KUNDE": "Auszahlung an Kunde",
   "EMAIL.SENT": "E-Mail gesendet",
-  "FILE.EXIST": "Die Datei wurde bereits hochgeladen",
+  "FILE.EXIST": "Dateiname existiert. Um diese Datei erneut hochzuladen, müssen Sie einen anderen Dateinamen verwenden.",
   "FILE.INCORRECT": "falscher Dateityp",
   "FILE.EMPTY": "err_desc: Keine Datei wurde übergeben"
 

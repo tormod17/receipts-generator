@@ -45,6 +45,7 @@ const sumUpTotals = (transactions, fieldName) =>
   }, 0);
 
 export function calculateTotals(type, guests, corrections) {
+  debugger;
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
   const sumGuests = sumUpTotals(guests, key1);
@@ -53,6 +54,7 @@ export function calculateTotals(type, guests, corrections) {
 }
 
 export function calculateTaxTotals(type, guests, corrections) {
+
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, 'Ust-Korrektur');

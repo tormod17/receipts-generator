@@ -169,7 +169,6 @@ exports.updateInvoiceHandler = (req, res) => {
 exports.delClientHandler = (req, res) => {
   if (!req.body) return console.error('no body to request');
   const ids = [...req.body];
-
   InvoiceDB.remove({_id: { $in: ids}}, (err, response) => {
     if (err) return res.json({ message: '' + err});
     res.json({
