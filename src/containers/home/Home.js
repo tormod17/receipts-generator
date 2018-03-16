@@ -29,8 +29,6 @@ import './home.css';
 
 const TIMESTAMP = new Date();
 
-console.log(getText);
-
 const MONTH = [
   getText('MONTH.1'),
   getText('MONTH.2'),
@@ -124,8 +122,10 @@ class Home extends Component {
   }
 
   handleDelete() {
-    this.props.dispatch(deleteClients(this.getSelectedIds())
-    );
+    const ids = this.getSelectedIds();
+    if (!this.state.locked && !this.state.clients[ids[0]].locked) {
+      this.props.dispatch(deleteClients(ids));
+    }
   }
 
   getSelectedIds(){
@@ -285,7 +285,7 @@ class Home extends Component {
         <Row>
           <Col sm={4}>
             <InputGroup>
-              <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i>
+            {!locked && <i onClick={this.handleDelete} className="fa fa-trash fa-2x" aria-hidden="true"></i> }
             </InputGroup>
           </Col>
             <Col sm={4}>

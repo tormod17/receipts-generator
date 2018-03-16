@@ -49,8 +49,6 @@ export function calculateTotals(type, guests, corrections) {
   const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, key2);
-  console.log(sumGuests);
-
   return (sumGuests + sumCorr).toFixed(2) ;
 }
 

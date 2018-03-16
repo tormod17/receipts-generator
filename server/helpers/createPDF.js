@@ -164,16 +164,16 @@ exports.createPDF = (client) => {
         text: '-' //row[0]
       },
       {
-        rowSpan: 3,
-        text: row[2]
+        rowSpan: 3, 
+        text: row[2] // arrival date
       },
       { 
         rowSpan: 3,
-        text: row[3]                
+        text: row[3] // depart date                
       },
       { 
         rowSpan: 3,
-        text: row[4]                
+        text: row[4] || '-'// desc                
       },
       {
         text: getText('CORRECTION')
