@@ -71,7 +71,7 @@ export default class Guest extends React.Component {
       [getText('TRANS.GUEST.A.KUNDE')]: newCustomerTotal,
       [name]: value
     },() => {
-      this.props.updateFieldValue(getText('TRANS.AIRGREETS'), newTotal, 'guests', id)
+      this.props.updateFieldValue(getText('TOTAL.AIRGREETS'), newTotal, 'guests', id)
       this.props.updateFieldValue(getText('TRANS.GUEST.A.KUNDE'), newCustomerTotal, 'guests', id)
     })
     this.props.updateFieldValue(name, value, 'guests', id)
@@ -79,7 +79,6 @@ export default class Guest extends React.Component {
 
   render() {
     const { updateFieldValue, Belegart, locked, guestNumber } = this.props;
-console.log(this.state[getText('TOTAL.AIRGREETS')], this.state);
     return (
         <div
           key={this.state._id}

@@ -45,11 +45,12 @@ const sumUpTotals = (transactions, fieldName) =>
   }, 0);
 
 export function calculateTotals(type, guests, corrections) {
-  debugger;
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, key2);
+  console.log(sumGuests);
+
   return (sumGuests + sumCorr).toFixed(2) ;
 }
 
