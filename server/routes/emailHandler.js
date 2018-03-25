@@ -98,9 +98,10 @@ exports.emailHandler = (req, res) => {
       const subject = subjectTemplate({ name: client['Kunde']});
 
       const pdf = createPDF(client).getBuffer((buffer) => {
+        console.log(client.Emailadresse);
         const mailOptions = {
           from: emailAddress,
-          to: emailAddress, //client['Emailadresse'], // emailAddress
+          to: client['Emailadresse'], // emailAddress
           attachments: [{
               filename: `inv${client[getText("INV.NUMBER")]}.pdf`,
               content: new Buffer(buffer)
