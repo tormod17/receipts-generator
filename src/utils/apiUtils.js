@@ -39,7 +39,7 @@ export function calculateTax(total) {
 const sumUpTotals = (transactions, fieldName) =>
   Object.values(transactions || {}).reduce((a, b) => {
     transactions = 
-      (b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, '')) || 0);
+      ((b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, ''))) || 0);
     a +=   transactions;
     return a;
   }, 0);

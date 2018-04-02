@@ -47,7 +47,7 @@ export default class Example extends React.Component {
   }
 
   render() {
-    const { items, className } = this.props;
+    const { items } = this.props;
     const { selected } =this.state
 
     return (

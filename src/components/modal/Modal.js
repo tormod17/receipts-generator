@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import PropTypes from "prop-types";
-import { getClients, updateClient, addClient, saveMonth } from "../../actions/clients";
+import { updateClient, addClient, saveMonth } from "../../actions/clients";
 
 import {withRouter} from "react-router-dom";
 
@@ -30,7 +30,6 @@ class ModalComp extends React.Component {
 
   }
   componentDidMount(){
-    const { auth, dispatch } = this.props;
     document.addEventListener('lockMonth', this.handleModalValues);
     document.addEventListener('updateClient', this.handleModalValues);
     document.addEventListener('addClient', this.handleModalValues);
@@ -73,7 +72,9 @@ class ModalComp extends React.Component {
       case modalType === 'addClient':
         dispatch(addClient(id, payload));
         break;
-    }
+      default:
+        break;
+    };
     this.handleClose()
     this.props.history.push('/');
   }

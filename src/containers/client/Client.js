@@ -1,9 +1,7 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { Grid, Col, Row, Label, Control, Form, FormGroup, InputGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import { Col, Row, Form, FormGroup, Button } from 'reactstrap';
 import Dropdown from '../../components/dropdown/Dropdown';
 import EditableField from '../../components/editableField/EditableField'; 
 import Corrections from '../../components/corrections/Corrections';
@@ -13,8 +11,6 @@ import { getText } from '../../language/';
 
 import { calculateTotals, calculateTaxTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
-
-import { addClient, getClient, getClients, updateClient } from "../../actions/clients";
 
 import 'react-day-picker/lib/style.css';
 import "./client.css";
@@ -123,7 +119,7 @@ class Client extends Component {
   }
 
   handleSubmission(){
-    const { dispatch, auth, match } = this.props;
+    const { match } = this.props;
     const invoiceId = match.params.id;
     const data  = {
       ...this.state
@@ -180,11 +176,13 @@ class Client extends Component {
 
   updateFieldValue(field, value, type, id){
     if (!this.state.client['Rechnungsdatum']) {
-      this.state.client['Rechnungsdatum'] = new Date().getTime();
-    }
+      this.setState({
+        'Rechnungsdatum': new Date().getTime(),
+      });
+    };
     if ((/datum/).test(field)) {
       value = new Date(value).getTime();
-    }
+    };
     if (id && type) {
       this.setState( prevSate => ({ 
         ...prevSate,
@@ -206,7 +204,7 @@ class Client extends Component {
         }));
     } else  {
       this.setState( ()  => ({ [field]: value }));
-    }
+    };
   }
 
   render() {

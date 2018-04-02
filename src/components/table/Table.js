@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Table, Input, Label } from 'reactstrap';
 import PropTypes from "prop-types";
 import { formatDate } from 'react-day-picker/moment';
-import { getText } from '../../language/';
+//import { getText } from '../../language/';
 
 const CheckBox = (props) => {
   return (
@@ -50,9 +50,11 @@ class Tableclients extends Component {
     handleSelectAll(){
       let newClients = {};
       Object.keys(this.state.clients).forEach(key => {
-        this.state.clients[key].checked = !this.state.selectAllChecked;
         newClients = {
-          [key]: { ...this.state.clients[key] }
+          [key]: { 
+            ...this.state.clients[key],
+            checked: !this.state.selectAllChecked
+          }
         };
       });
       this.setState({
@@ -82,7 +84,6 @@ class Tableclients extends Component {
     }
 
     render() {
-      const { currentDate } = this.props;
       const { clients, selectAllChecked } = this.state;
       const hoptions ={
         checked: selectAllChecked,
@@ -101,7 +102,7 @@ class Tableclients extends Component {
                 <th>Belegart</th>
                 <th>Rechnungsnummer</th>     
                 <th>Rechnungsdatum</th> 
-                <th>Rechnungsbetrag</th>
+                <th>Gesamtrechnungsbetrag</th>
                 <th>
                   <CheckBox {...hoptions} />
                 </th>               

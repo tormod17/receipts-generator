@@ -1,7 +1,6 @@
 import React from 'react';
-import { Col, Label, FormGroup, InputGroupAddon, Input, Table, Button } from 'reactstrap';
+import { Col, Label, FormGroup, InputGroupAddon } from 'reactstrap';
 import PropTypes from "prop-types";
-import Dropdown from './../dropdown/Dropdown';
 import EditableField from './../editableField/EditableField';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import MomentLocaleUtils, {
@@ -9,9 +8,7 @@ import MomentLocaleUtils, {
   parseDate
 } from 'react-day-picker/moment';
 import 'moment/locale/de';
-import uuidv4 from 'uuid/v4';
 import { getText } from '../../language/';
-
 
 const TIMESTAMP = new Date().getTime();
 
@@ -39,7 +36,6 @@ export default class Guest extends React.Component {
   }
 
   componentWillReceiveProps(nextProps){
-    const { guests } = nextProps;
     if(this.props !== nextProps){
       this.setState({
         ...nextProps.guest,
@@ -78,7 +74,7 @@ export default class Guest extends React.Component {
   }
 
   render() {
-    const { updateFieldValue, Belegart, locked, guestNumber } = this.props;
+    const { Belegart, locked, guestNumber } = this.props;
     return (
         <div
           key={this.state._id}

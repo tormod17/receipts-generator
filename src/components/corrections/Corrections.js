@@ -1,8 +1,6 @@
 import React from 'react';
-import { Col, FormGroup, InputGroup, InputGroupAddon, Input } from 'reactstrap';
+import { Col, FormGroup } from 'reactstrap';
 import PropTypes from "prop-types";
-import Dropdown from './../dropdown/Dropdown';
-import EditableField from './../editableField/EditableField';
 import Correction from './Correction';
 
 export default class Corrections extends React.Component {

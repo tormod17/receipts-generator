@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import { withRouter } from "react-router";
 import { Nav, NavItem, NavLink } from 'reactstrap'
 
@@ -19,7 +18,7 @@ class Header extends Component {
     const isAuthenticated = this.props.auth.id && true
 
     const isLoginPage = pathname.indexOf("login") > -1;
-    const isUsersPage = pathname.indexOf("users") > -1;
+    //const isUsersPage = pathname.indexOf("users") > -1;
     const isSignupPage = pathname.indexOf("signup") > -1;
 
     return (

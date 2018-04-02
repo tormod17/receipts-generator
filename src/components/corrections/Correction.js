@@ -50,7 +50,7 @@ export default class Correction extends React.Component {
   }
 
   addTax(id, e){
-    const { total, correctionsBelegart, tax  } = this.state;
+    const { total } = this.state;
     const { updateFieldValue } = this.props;
     this.setState({
       tax: e.target.checked

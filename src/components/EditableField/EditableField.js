@@ -11,7 +11,6 @@ class EditableField extends Component {
     placeholder: PropTypes.string,
     name: PropTypes.string,
     type: PropTypes.string,
-    value: PropTypes.string, 
     label: PropTypes.string, 
     value: PropTypes.string, 
   }
@@ -48,7 +47,7 @@ class EditableField extends Component {
   }
 
   render() {
-    const { placeholder, updateFieldValue, type, name, label, nolabel, required, disabled } =this.props;
+    const { placeholder, type, name, label, nolabel, disabled } =this.props;
     const { value } = this.state
 
     return (
@@ -65,15 +64,10 @@ class EditableField extends Component {
           onChange={(e) => this.handleOnChange(e, name)}
           disabled={disabled}
           value={value}
-          required
         />
       </div> 
     );
   }
 }
-
-EditableField.propTypes = {
-
-};
 
 export default EditableField;

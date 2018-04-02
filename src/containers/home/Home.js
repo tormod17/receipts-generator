@@ -1,8 +1,7 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import {withRouter} from "react-router-dom";
-import {  Row, Col, Control,  FormGroup, Container, InputGroup, InputGroupAddon, Button } from 'reactstrap';
+import {  Row, Col,  FormGroup, Container, InputGroup, InputGroupAddon, Button } from 'reactstrap';
 
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import MomentLocaleUtils, {
@@ -178,7 +177,7 @@ class Home extends Component {
   lockMonthEditing(){
     const { id } = this.props.auth;
     let event = new Event('lockMonth');
-    event.message = getText('CONFIRM.MESSAGE'),
+    event.message = getText('CONFIRM.MESSAGE');
     event.value = MONTH.indexOf(this.state.selectedMonth) + '-' +this.state.selectedYear;
     event.payload = { ...this.state.clients };
     event.id = id;
@@ -319,7 +318,7 @@ const mapStateToProps = state => {
   const { clients } = state;
   const { message, invoices } = clients;
   let total = 0;
-  invoices && Object.keys(invoices || {}).map((key) => {
+  invoices && Object.keys(invoices || {}).forEach(function(key){
     invoices[key].Rechnungsbetrag = invoices && calcTotalListings(invoices[key].transactions); 
     total += invoices[key].Rechnungsbetrag;
   });
@@ -328,7 +327,7 @@ const mapStateToProps = state => {
   if (invoices) {
     locked =  Object.values(invoices)[0] && Object.values(invoices)[0].locked;
     currentDate = Object.values(invoices)[0] && Number(Object.values(invoices)[0]['Rechnungsdatum']);
-  }
+  };
   return {
     message,
     clients: {...invoices },
