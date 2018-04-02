@@ -10,8 +10,8 @@ class ModalComp extends React.Component {
 
   static propTypes = {
     open: PropTypes.bool.isRequired,
-    submit: PropTypes.func.isRequired,
-    cancel: PropTypes.func.isRequired,
+    submit: PropTypes.func,
+    cancel: PropTypes.func,
     message: PropTypes.string.isRequired,
   }
 

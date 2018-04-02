@@ -1,22 +1,9 @@
 import React, { Component } from "react";
-import { Table, Input, Label } from 'reactstrap';
+import { Table } from 'reactstrap';
 import PropTypes from "prop-types";
 import { formatDate } from 'react-day-picker/moment';
+import CheckBox from './Checkbox';
 //import { getText } from '../../language/';
-
-const CheckBox = (props) => {
-  return (
-    <Label check>
-      <Input 
-        className={props.cssClass}
-        type="checkbox"
-        id={props.id}
-        onChange={() => props.func(props.id)}
-        checked={props.checked}
-      />   
-    </Label>
-  );
-};
 
 class Tableclients extends Component { 
 
@@ -48,15 +35,13 @@ class Tableclients extends Component {
     }
 
     handleSelectAll(){
-      let newClients = {};
-      Object.keys(this.state.clients).forEach(key => {
-        newClients = {
-          [key]: { 
-            ...this.state.clients[key],
-            checked: !this.state.selectAllChecked
-          }
+      let newClients = Object.keys(this.state.clients).reduce((p,c) => {
+        p[c] = {
+          ...this.state.clients[c],
+          checked: !this.state.selectAllChecked
         };
-      });
+        return p;
+      },{});
       this.setState({
         clients: {
           ...this.state.clients,
@@ -75,7 +60,7 @@ class Tableclients extends Component {
             checked: !this.state.clients[id].checked
           }
         },
-        selectAllChecked: undefined
+        selectAllChecked: false,
       });
     }
 
@@ -112,7 +97,7 @@ class Tableclients extends Component {
               { clients &&  Object.values(clients).map( client => {
                 const options = {
                   id: client._id,
-                  checked: selectAllChecked || client.checked,
+                  checked: client.checked,
                   func: this.handleSelect,
                   cssClass: 'clientChecked'
                 };

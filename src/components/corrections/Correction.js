@@ -149,7 +149,7 @@ export default class Correction extends React.Component {
             <br/>
             {!locked &&
               <i 
-                class="fa fa-trash fa-2x"
+                className="fa fa-trash fa-2x"
                 aria-hidden="true"
                 onClick={() => this.props.handleDel(correctionNumber, 'corrections')}
               >

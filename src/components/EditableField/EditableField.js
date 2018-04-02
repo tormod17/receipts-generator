@@ -12,7 +12,7 @@ class EditableField extends Component {
     name: PropTypes.string,
     type: PropTypes.string,
     label: PropTypes.string, 
-    value: PropTypes.string, 
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), 
   }
 
   static defaultProps ={
@@ -20,7 +20,7 @@ class EditableField extends Component {
     type: 'text',
     label: undefined,
     updateFieldValue: () =>{},
-    value: null,
+    value: '',
   }
 
   constructor(props) {

@@ -45,7 +45,7 @@ export default class Corrections extends React.Component {
           <Col>
           {!locked &&
             <i 
-              class="fa fa-plus fa-2x"
+              className="fa fa-plus fa-2x"
               aria-hidden="true"
               onClick={() => this.props.handleAddCorrection('corrections', corrections)}
             ></i>

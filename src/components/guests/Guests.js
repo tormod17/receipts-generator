@@ -37,6 +37,7 @@ export default class Guests extends React.Component {
       { guests && Object.keys(guests).map(key => {
         return(
           <Guest
+            key={key}
             guestNumber={key}
             Belegart={Belegart}
             locked={locked}
@@ -55,7 +56,7 @@ export default class Guests extends React.Component {
         <Col>
           {!locked &&
             <i 
-            class="fa fa-plus fa-2x"
+            className="fa fa-plus fa-2x"
             aria-hidden="true"
             onClick={() => this.props.handleAddGuest('guests', guests)}
             >
