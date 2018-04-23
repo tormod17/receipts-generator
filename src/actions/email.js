@@ -14,7 +14,6 @@ function emailRequest(ids) {
 }
 
 function emailSuccess(payload) {
-  console.log(payload);
   return {
     type: EMAIL_SUCCESS,
     message: payload.message

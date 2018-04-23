@@ -30,6 +30,7 @@ export default class Corrections extends React.Component {
         </FormGroup>
         { corrections && Object.keys(corrections).map(key =>
           <Correction 
+            key={corrections[key]._id}
             correction={corrections[key]}
             updateFieldValue={this.props.updateFieldValue}
             handleDel={this.props.handleDelCorrection}

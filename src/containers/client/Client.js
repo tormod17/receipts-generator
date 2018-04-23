@@ -57,7 +57,7 @@ class Client extends Component {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: client[getText('TYPE')] || getText('TYPE'),
+      Belegart: client[getText('TYPE')],
       client: { ...client },
       guests: { ...guests},
       corrections: {...corrections},
@@ -70,8 +70,9 @@ class Client extends Component {
 
   componentWillReceiveProps(nextProps){
     if(this.props !== nextProps){
+      console.log(nextProps.client.Belegart, '>>>>>>>');
       this.setState({
-        Belegart: nextProps[getText('TYPE')],
+        Belegart: nextProps.client.Belegart,
         client: { ...nextProps.client },
         guests: { ...nextProps.guests},
         corrections: {...nextProps.corrections},
@@ -92,7 +93,6 @@ class Client extends Component {
     if (Belegart === getText('TYPE')) {
       return [getText('TYPE')];
     }
-    console.log(requiredFields);
     if( Belegart !== getText('TYPE') && !isGuests && !isCorrections) {
       fields = [ ...requiredFields ];
     }
@@ -203,12 +203,14 @@ class Client extends Component {
           }
         }));
     } else  {
+      console.log('do nothing');
       this.setState( ()  => ({ [field]: value }));
-    };
+    }
   }
 
   render() {
     const { client, guests, corrections, Belegart } = this.state;
+    console.log(client.Belegart,  'Belegart', this.state);
     const { locked } = this.props;
     return (
     <Form className="bill container">

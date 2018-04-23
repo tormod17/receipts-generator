@@ -159,7 +159,7 @@ export default class Correction extends React.Component {
         </FormGroup>
         <FormGroup row>
           <Col sm={{ size: 4, order: 1 }}>
-            { (correctionsBelegart === 'Rechnungskorrektur' || Belegart === 'Rechnung' ) && !locked &&
+            { correctionsBelegart !== 'Auszahlungskorrektur' &&
             <InputGroup>
               <InputGroupAddon>
                 <Input 
@@ -169,9 +169,9 @@ export default class Correction extends React.Component {
                   aria-label="Umsatzsteuer" 
                   onChange={(e) => this.addTax(correctionNumber, e)}
                   checked={tax}
+                  disabled={locked}
                 />
               </InputGroupAddon>
-            
               <Input                   
                 placeholder="Steuer hinzufügen" 
                 value="Steuer hinzufügen"

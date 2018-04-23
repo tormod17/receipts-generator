@@ -103,7 +103,8 @@
     "build": "react-scripts build",
     "start": "react-scripts start",
     "eject": "react-scripts eject",
-    "webpack": "webpack --watch",
+    "webpack": "webpack-dev-server -d --open",
+    "build-webpack": "webpack",
     "lint": "eslint src"
   }
 }
