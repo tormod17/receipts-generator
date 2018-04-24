@@ -68,10 +68,10 @@ export default class Correction extends React.Component {
 
   handleCorrectionTypeChange(name, value, id){
     this.setState({
-      correctionsBelegart: value
+      correctionsBelegart: value,
     }, () => {
       const newTotal = (value === 'Rechnungskorrektur') ? calculateTax(this.state.total) : 0;
-      this.props.updateFieldValue('Ust-Korrektur', newTotal, 'corrections', id)
+      this.props.updateFieldValue('Ust-Korrektur', newTotal, 'corrections', id);
     }) 
   }
 

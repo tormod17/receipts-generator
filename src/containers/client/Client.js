@@ -9,7 +9,7 @@ import Customer from '../../components/customer/Customer';
 import Guests from '../../components/guests/Guests';
 import { getText } from '../../language/';
 
-import { calculateTotals, calculateTaxTotals } from '../../utils/apiUtils';
+import { calculateATotals, calculateRTotals, calculateTaxTotals } from '../../utils/apiUtils';
 import uuidv4 from 'uuid/v4';
 
 import 'react-day-picker/lib/style.css';
@@ -203,14 +203,12 @@ class Client extends Component {
           }
         }));
     } else  {
-      console.log('do nothing');
       this.setState( ()  => ({ [field]: value }));
     }
   }
 
   render() {
     const { client, guests, corrections, Belegart } = this.state;
-    console.log(client.Belegart,  'Belegart', this.state);
     const { locked } = this.props;
     return (
     <Form className="bill container">
@@ -270,7 +268,7 @@ class Client extends Component {
               <EditableField 
                 name="Gesamtumsatz Airgreets" 
                 placeholder="Gesamtauszahlungsbetrag"
-                value={calculateTotals('Auszahlung', guests, corrections)}
+                value={calculateATotals(guests, corrections, client['Belegart'])}
                 disabled
               />
             }
@@ -279,7 +277,7 @@ class Client extends Component {
             <EditableField 
               name="Gesamt Rechnungs Betrag"
               placeholder="Gesamtrechnungsbetrag"
-              value={calculateTotals('Rechnungs', guests, corrections)}
+              value={calculateRTotals(guests, corrections, client['Belegart'])}
               disabled
             />
           </Col>

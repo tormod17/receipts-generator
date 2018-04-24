@@ -36,28 +36,51 @@ export function calculateTax(total) {
    return((total / 119 ) * 19).toFixed(2);
 }
 
-const sumUpTotals = (transactions, fieldName) =>
-  Object.values(transactions || {}).reduce((a, b) => {
+const sumUpTotals = (transactions, fieldName) => {
+  return Object.values(transactions || {}).reduce((a, b) => {
     transactions = 
       ((b && b[fieldName] && parseFloat(b[fieldName].replace( /,/g, ''))) || 0);
     a +=   transactions;
+
     return a;
   }, 0);
+}
 
-export function calculateTotals(type, guests, corrections) {
-  const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
-  const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';
-  const sumGuests = sumUpTotals(guests, key1);
-  const sumCorr = sumUpTotals(corrections, key2);
-  return (sumGuests + sumCorr).toFixed(2) ;
+
+export function calculateATotals(guests, corrections, type) {  
+  console.log(corrections);
+  const sumGuests = sumUpTotals(guests, 'Auszahlung an Kunde');
+  const sumCorrA = sumUpTotals(corrections, 'Auszahlungskorrektur in €');
+  const sumCorrR =sumUpTotals(corrections, 'Rechnungskorrektur in €');
+  
+  console.log(sumCorrA, sumCorrR, type);
+  const sumCorr = sumCorrA - sumCorrR;
+  const total = sumGuests + sumCorr;
+  return total.toFixed(2) ;
+}
+
+export function calculateRTotals(guests, corrections, type) {
+  console.log(corrections);
+  const sumGuests = sumUpTotals(guests, 'Gesamtumsatz Airgreets');
+  const sumCorrR = sumUpTotals(corrections,  'Rechnungskorrektur in €');
+  const sumCorrA = type === 'Auszahlungskorrektur in €' ? sumUpTotals(corrections,  'Auszahlungskorrektur in €') : 0;
+  return (sumGuests + sumCorrR + sumCorrA).toFixed(2) ;
 }
 
 export function calculateTaxTotals(type, guests, corrections) {
-
   const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
   const sumGuests = sumUpTotals(guests, key1);
   const sumCorr = sumUpTotals(corrections, 'Ust-Korrektur');
   return ((((sumGuests) / 119 ) * 19) + sumCorr).toFixed(2);
+}
+
+export function calculateTotals(type, guests, corrections) {
+  const key1 = type === 'Auszahlung' ? 'Auszahlung an Kunde' : 'Gesamtumsatz Airgreets';
+  const key2 = type === 'Auszahlung' ? 'Auszahlungskorrektur in €' : 'Rechnungskorrektur in €';  
+  const sumGuests = sumUpTotals(guests, key1);
+  const sumCorr = sumUpTotals(corrections, key2);
+  
+  return (sumGuests + sumCorr).toFixed(2) ;
 }
 
 /**
