@@ -29,7 +29,10 @@ function createRows(rowData, fields, numberOfRows = 0) {
 
 exports.createPDF = (client) => {
   const guests = client.transactions.filter(listing => listing[getText('TRANS.GUEST.NAME')]);
-  const corrections = client.transactions.filter(listing => !listing[getText('TRANS.GUEST.NAME')]);
+  const corrections = client.transactions.filter(listing => !listing[getText('TRANS.GUEST.NAME')]).map(t => { 
+    t[t.type + ' in €'] = t.total;
+    return t;
+  });;
   const isInvoice = client[getText('TYPE')] === getText('INV');
   
   const { vfs } = vfsFonts.pdfMake;

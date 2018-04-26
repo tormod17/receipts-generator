@@ -7,9 +7,9 @@ export default class Example extends React.Component {
   static propTyps = {
     name: PropTypes.string.isRequired,
     items: PropTypes.shape([]).isRequired,
-    data: PropTypes.shape({}).isRequired,
-    selected: PropTypes.string.isRequired
-    //updateFieldValue: PropTypes.func.isRequired,
+    //data: PropTypes.shape({}).isRequired,
+    selected: PropTypes.string.isRequired,
+    updateFieldValue: PropTypes.func.isRequired,
   }
 
   constructor(props) {

@@ -35,12 +35,12 @@ const requiredFieldsGuest = [
 ];
 
 const requiredFieldsRechnungsCorrection = [
-  getText("TRANS.CORR.INV"),
+  'type',
   getText('TRANS.CORR.REASON')
 ];
 
 const requiredFieldsAuszhalungsCorrection = [
-  getText('TRANS.CORR.PAYOUT'),
+  'type',
   getText('TRANS.CORR.REASON')
 ];
 
@@ -50,19 +50,21 @@ class Client extends Component {
     client: {},
     guests: {},
     correction: {},
-    Belegart: getText('TYPE')
+    Belegart: getText('TYPE'),
+    locked: false,
   }
 
   constructor(props) {
     super(props);
     const  { guests, corrections, client } = props;
     this.state ={
-      Belegart: client[getText('TYPE')],
+      Belegart: client[getText('TYPE')] || getText('TYPE') ,
       client: { ...client },
       guests: { ...guests},
       corrections: {...corrections},
     };
-    this.updateFieldValue = this.updateFieldValue.bind(this);    
+    this.updateFieldValue = this.updateFieldValue.bind(this); 
+    this.resetCorrection = this.resetCorrection.bind(this);   
     this.handleAdd = this.handleAdd.bind(this);
     this.handleDel = this.handleDel.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
@@ -70,7 +72,6 @@ class Client extends Component {
 
   componentWillReceiveProps(nextProps){
     if(this.props !== nextProps){
-      console.log(nextProps.client.Belegart, '>>>>>>>');
       this.setState({
         Belegart: nextProps.client.Belegart,
         client: { ...nextProps.client },
@@ -82,7 +83,7 @@ class Client extends Component {
 
   checkRequiredFields(data){
     const { client, guests, corrections, Belegart } = data;
-    let fields= [];
+    let validationFields= [];
     const isGuests = Object.keys(guests || {}).length > 0;
     const isCorrections = Object.keys(corrections || {}).length > 0;
     const clientKeys = Object.keys(client);
@@ -94,27 +95,27 @@ class Client extends Component {
       return [getText('TYPE')];
     }
     if( Belegart !== getText('TYPE') && !isGuests && !isCorrections) {
-      fields = [ ...requiredFields ];
+      validationFields = [ ...requiredFields ];
     }
     if( Belegart === 'Auszahlung' && isGuests && !isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsGuest];
+      validationFields = [ ...requiredFields, ...requiredFieldsGuest];
     }
     if( Belegart === 'Rechnung' && isGuests && !isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsGuest];
+      validationFields = [ ...requiredFields, ...requiredFieldsGuest];
     }
     if( Belegart === 'Auszahlung' && isGuests && isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection, ...requiredFieldsGuest];
+      validationFields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection, ...requiredFieldsGuest];
     }
     if (Belegart === 'Rechnung' && isGuests && isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection, ...requiredFieldsGuest];
+      validationFields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection, ...requiredFieldsGuest];
     }
     if( Belegart === 'Auszahlung' && isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection];
+      validationFields = [ ...requiredFields, ...requiredFieldsAuszhalungsCorrection];
     }
     if (Belegart === 'Rechnung' && isCorrections) {
-      fields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection ];
+      validationFields = [ ...requiredFields, ...requiredFieldsRechnungsCorrection ];
     }
-    let missingFields =fields.filter(key => !currentFields.includes(key));
+    let missingFields = validationFields.filter(key => !currentFields.includes(key));
     return missingFields;
   }
 
@@ -172,6 +173,22 @@ class Client extends Component {
         ...newEntries
       }
     });
+  }
+
+  resetCorrection(type, id) {
+    console.log(type, id);
+    this.setState(prevSate => ({
+      ...prevSate,
+      corrections: {
+        ...prevSate.corrections,
+        [id]:{
+          type,
+          total: 0,
+          reason: '',
+          _id: uuidv4(),
+        }
+      }
+    }))
   }
 
   updateFieldValue(field, value, type, id){
@@ -256,6 +273,7 @@ class Client extends Component {
         />
         <Corrections 
           updateFieldValue={this.updateFieldValue} 
+          resetCorrection={this.resetCorrection} 
           corrections={corrections}
           handleDelCorrection ={this.handleDel}
           handleAddCorrection ={this.handleAdd}

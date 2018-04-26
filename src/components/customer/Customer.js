@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 import EditableField from './../editableField/EditableField';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 
-//import { formatDate } from "../../utils/apiUtils";
 import MomentLocaleUtils, {
   formatDate,
   parseDate
@@ -24,13 +23,15 @@ export default class Customer extends React.Component {
 
   constructor(props) {
     super(props);
-
+    const { client } = props;
     this.state = {
       client: {
-        ...props.client
+        ...client
       }
     };
     this.handleValueChange = this.handleValueChange.bind(this);
+    const date = `${formatDate(new Date(Number(client['Rechnungsdatum']) || TIMESTAMP), 'LL', 'de')}`;
+    props.updateFieldValue('Rechnungsdatum', date, 'client');
   }
 
   componentWillReceiveProps(nextProps) {
@@ -71,10 +72,10 @@ export default class Customer extends React.Component {
             <EditableField
               disabled={locked} 
               updateFieldValue={this.handleValueChange}
-               name="Emailadresse" 
-               placeholder="Emailadresse" 
-               value={client.Emailadresse}
-               required
+              name="Emailadresse" 
+              placeholder="Emailadresse" 
+              value={client.Emailadresse}
+              required
             />
           </Col>
           <Col>

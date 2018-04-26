@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, FormGroup } from 'reactstrap';
 import PropTypes from "prop-types";
 import Correction from './Correction';
+import { getText } from '../../language/';
 
 export default class Corrections extends React.Component {
   
@@ -31,12 +32,19 @@ export default class Corrections extends React.Component {
         { corrections && Object.keys(corrections).map(key =>
           <Correction 
             key={corrections[key]._id}
-            correction={corrections[key]}
-            updateFieldValue={this.props.updateFieldValue}
-            handleDel={this.props.handleDelCorrection}
+            id={corrections[key]._id}
+            invoiceType={Belegart}
+            type={corrections[key].type}
+            reason={corrections[key][getText('TRANS.CORR.REASON')]}
+            tax={corrections[key].tax || corrections[key]['Ust-Korrektur']}
+            total={corrections[key].total}
             correctionNumber={key}
             Belegart={Belegart}
             locked={locked}
+            updateFieldValue={this.props.updateFieldValue}
+            resetCorrection={this.props.resetCorrection}
+            handleDel={this.props.handleDelCorrection}
+     
           />
         )}
         { Object.keys(corrections).length === 0 &&

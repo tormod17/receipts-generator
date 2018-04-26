@@ -26,7 +26,7 @@ exports.addClientHandler = (req, res) => {
   const transactions = [ 
     ...Object.values(guests || {}),
     ...Object.values(corrections || {}) 
-    ];
+  ];
 
   const listings = createTransactionList(transactions, 'manual entry');
 
@@ -45,7 +45,7 @@ exports.addClientHandler = (req, res) => {
             ...client,
             _id: uuidv1(),
             clientId: client['Kundennummer'],
-            transactions: transactions,
+            transactions: listings,
             Rechnungsnummer: (count + 1),
             Belegart
           };

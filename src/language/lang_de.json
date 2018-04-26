@@ -84,6 +84,9 @@
   "TRANS.CORR.REASON":"Sonstige Leistungsbeschreibung",
   "TRANS.CORR.INV":"Rechnungskorrektur in €",
   "TRANS.CORR.PAYOUT":"Auszahlungskorrektur in €",
+  
+  "TRANS.CORR.INV.TITLE":"Rechnungskorrektur",  
+  "TRANS.CORR.PAYOUT.TITLE":"Auszahlungskorrektur",
 
   "TOTAL.INV":"Gesamtrechnungsbetrag",
   "TOTAL.PAYOUT":"Gesamtauszahlungsbetrag",

@@ -1,5 +1,6 @@
 const uuidv4= require('uuid/v4');
 const DATETIMESTAMP = Date.now();
+const { getText } = require ('../language/');
 
 
 const sumUpTotals = (transactions, fieldName) =>
@@ -88,8 +89,23 @@ exports.createTransactionList = (list, filename) => {
     Object.keys(record).forEach(key => {
       if (key.includes('datum')){
         record[key] = formatDate(record[key]) || DATETIMESTAMP;
+      }    
+      // if its a correction create a type.
+      if( !record[getText('TRANS.GUEST.NAME')]) {
+        console.log(record);
+        let type, total;
+        if(record["Rechnungskorrektur"]) {
+          type = 'Rechnungskorrektur';
+          total = record["Rechnungskorrektur in €"];
+        } else {
+          type = 'Auszahlungskorrektur';
+          total = record['Auszahlungskorrektur in €'];
+        }
+        record.type = type;
+        record.total = total;
       }
     })
+
     return {
         ...sortObject(record),
         filename,
