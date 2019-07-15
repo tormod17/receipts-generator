@@ -84,7 +84,7 @@ class Login extends Component {
 
                 <button
                   className="btn btn-primary btn-block"
-                  onClick={this.handleLogin}
+                  onClick={(e) => this.handleLogin(e)}
                 >
                   <i className="fa fa-sign-in" />{" "}Log in
                 </button>

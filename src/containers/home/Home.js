@@ -81,10 +81,10 @@ class Home extends Component {
   }
 
   componentWillMount() {
-    const { id } = this.props.auth;
-    if (!id) {
-      this.props.history.replace('/login');
-    } 
+    // const { id } = this.props.auth;
+    // if (!id) {
+    //   this.props.history.replace('/login');
+    // } 
   }
 
   componentWillReceiveProps(nextProps) {

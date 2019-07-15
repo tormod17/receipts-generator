@@ -65,7 +65,7 @@ app.use(function (err, req, res) {
   res.status(err.status || 500);
   res.send(err.message);
 });
-// Test server is working (GET http://localhost:3001/api)
+// Test server is working (GET http://localhost:4000/api)
 app.get('/api/', function(req, res) {
   res.json({ message: 'Hi, welcome to the server api!' });
 });

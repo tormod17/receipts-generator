@@ -28,15 +28,16 @@ import "./app.css";
 const TIMESTAMP = new Date();
 
 class App extends Component {
-
   constructor(props) {
     super(props);
-    this.state ={};
+    this.state = {};
   }
 
-  componentDidMount(){
+  componentDidMount() {
     const { auth, dispatch } = this.props;
-    dispatch(getClients(auth.id, TIMESTAMP.getMonth(), TIMESTAMP.getFullYear()));
+    dispatch(
+      getClients(auth.id, TIMESTAMP.getMonth(), TIMESTAMP.getFullYear())
+    );
   }
 
   handleLogout() {
@@ -45,23 +46,29 @@ class App extends Component {
   }
 
   render() {
-    const { auth } = this.props;    
+    const { auth } = this.props;
     return (
       <Router>
         <div>
-          <Header auth={auth}  handleLogout={() => this.handleLogout()} />
-            <div className="appContent">
-              <Switch>
-                <Route exact path="/" render={() => <Home {...this.props}/>} />
-                <Route path="/about" component={About} />
-                <Route path="/login" component={Login} />
-                <Route path="/signup" component={Signup} />
-                <Route path="/client/:id" component={() => <Client  {...this.props}/>} />
-                <Route path="/client" component={() => <Client  {...this.props}/>} />
-                <Route component={NotFound} />
-              </Switch>
-            </div>       
-          <ModalComp {...this.props}/>
+          <Header auth={auth} handleLogout={() => this.handleLogout()} />
+          <div className="appContent">
+            <Switch>
+              <Route exact path="/" render={() => <Home {...this.props} />} />
+              <Route path="/about" component={About} />
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
+              <Route
+                path="/client/:id"
+                component={() => <Client {...this.props} />}
+              />
+              <Route
+                path="/client"
+                component={() => <Client {...this.props} />}
+              />
+              <Route component={NotFound} />
+            </Switch>
+          </div>
+          <ModalComp {...this.props} />
           <Footer />
         </div>
       </Router>

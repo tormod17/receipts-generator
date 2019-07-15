@@ -11,9 +11,8 @@ class Signup extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     if (nextProps.auth) {
-      nextProps.history.push('/');
+      // nextProps.history.push('/');
     }
   }
 
