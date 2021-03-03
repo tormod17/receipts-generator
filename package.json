@@ -78,7 +78,7 @@
     "pdfmake": "^0.1.34",
     "popper.js": "^1.13.0",
     "prop-types": "^15.6.0",
-    "pug": "^2.0.0-rc.4",
+    "pug": "^3.0.1",
     "react": "^16.0.0",
     "react-bootstrap": "^0.31.5",
     "react-day-picker": "^7.0.5",
